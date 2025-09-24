@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}All Posts - Reddit Clone{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="posts-section">
+    <h1 class="page-title">Community Posts</h1>
+    
+    <div class="posts-container">
+        {% for post in posts %}
+        <article class="post-card">
+            <div class="post-header">
+                <h2 class="post-title">
+                    <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                </h2>
+                <span class="post-author">by {{ post.author.username }}</span>
+            </div>
+            
+            <div class="post-content">
+                <p>{{ post.content|truncatewords:30 }}</p>
+            </div>
+            
+            <div class="post-footer">
+                <span class="post-date">{{ post.created_at|date:"M d, Y" }}</span>
+                <span class="post-comments">{{ post.comments.count }} comments</span>
+            </div>
+        </article>
+        {% empty %}
+        <div class="no-posts">
+            <p>No posts yet. Be the first to <a href="{% url 'create_post' %}">create a post</a>!</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/posts.js' %}"></script>
+{% endblock %}
