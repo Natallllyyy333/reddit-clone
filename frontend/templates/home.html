@@ -7,7 +7,7 @@
     <h1>Welcome to Reddit Clone</h1>
     <p>A community-driven platform for sharing content</p>
     <div class="cta-buttons">
-        <a href="{% url 'post_list' %}" class="btn btn-primary">Browse Posts</a>
+        <a href="/posts/" class="btn btn-primary">Browse Posts</a>
         {% if not user.is_authenticated %}
             <a href="{% url 'register' %}" class="btn btn-secondary">Join Now</a>
         {% endif %}
