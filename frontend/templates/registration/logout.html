@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Logout - Reddit Clone{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 50px;">
+    <h1>Logout</h1>
+    <p>Are you sure you want to logout?</p>
+    
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; margin: 5px;">
+            Yes, Logout
+        </button>
+        <a href="{% url 'home' %}" style="padding: 10px 20px; background: #95a5a6; color: white; text-decoration: none; border-radius: 5px; margin: 5px;">
+            Cancel
+        </a>
+    </form>
+</div>
+{% endblock %}
