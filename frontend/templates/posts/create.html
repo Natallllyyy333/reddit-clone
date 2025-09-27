@@ -3,25 +3,29 @@
 {% block title %}Create Post - Reddit Clone{% endblock %}
 
 {% block content %}
-<h1>Create New Post</h1>
+<div style="max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<h1 style="color: #1c1c1c; margin-bottom: 1.5rem;">Create New Post</h1>
 
 <form method="post">
     {% csrf_token %}
     
-    <div style="margin-bottom: 15px;">
-        <label for="id_title">Title:</label>
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_title" style="display: block; margin-bottom: 0.5rem; color: #1c1c1c; font-weight: 500;">Title:</label>
         {{ form.title }}
     </div>
     
-    <div style="margin-bottom: 15px;">
-        <label for="id_content">Content:</label>
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_content" style="display: block; margin-bottom: 0.5rem; color: #1c1c1c; font-weight: 500;">Content:</label>
         {{ form.content }}
     </div>
     
-    <button type="submit" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px;">
+    <button type="submit" style="padding: 0.75rem 2rem; background: #ff4500; color: white; border: none; border-radius: 20px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s;">
         Create Post
     </button>
 </form>
 
-<a href="{% url 'post_list' %}">← Back to Posts</a>
+<div style="margin-top: 1.5rem;">
+<a href="{% url 'post_list' %}" style="color: #0079d3; text-decoration: none; font-weight: 500;">← Back to Posts</a>
+</div>
+</div>
 {% endblock %}

@@ -3,33 +3,36 @@
 {% block title %}Posts - Reddit Clone{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center;">
-<h1>Community Posts</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<h1 style="color: #1c1c1c; margin: 0;">Community Posts</h1>
  {% if user.is_authenticated %}
-        <a href="{% url 'create_post' %}" style="padding: 10px 20px; background: #27ae60; color: white; text-decoration: none; border-radius: 5px;">
+        <a href="{% url 'create_post' %}" style="padding: 0.75rem 1.5rem; background: #ff4500; color: white; text-decoration: none; border-radius: 20px; font-weight: 600; transition: background 0.3s;">
             + Create Post
         </a>
     {% endif %}
 </div>
 {% if posts %}
     {% for post in posts %}
-    <div class="post" style="border: 1px solid #ccc; padding: 15px; margin: 10px; border-radius: 5px;">
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.content }}</p>
-        <div style="display: flex; justify-content: space-between; color: #666; font-size: 0.9em;">
+    <div class="post" style="border: 1px solid #ccc; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #1c1c1c; margin-bottom: 0.5rem;"><a href="#" style="color: #1c1c1c; text-decoration: none;">{{ post.title }}</a></h3>
+        <p style="color: #7c7c7c; line-height: 1.5; margin-bottom: 1rem;">{{ post.content }}</p>
+        <div style="display: flex; justify-content: space-between; color: #7c7c7c; font-size: 0.9em; border-top: 1px solid #f0f0f0; padding-top: 0.75rem;">
             <span>By {{ post.author.username }}</span>
             <span>{{ post.created_at|date:"M d, Y H:i" }}</span>
     </div>
     </div>
     {% endfor %}
 {% else %}
-    <p>No posts yet.  {% if user.is_authenticated %}
-            <a href="{% url 'create_post' %}">Create the first post!</a>
+<div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"> 
+    <p style="color: #7c7c7c; margin-bottom: 1rem;">No posts yet.</p>
+    {% if user.is_authenticated %}
+            <a href="{% url 'create_post' %}" style="color: #0079d3; text-decoration: none; font-weight: 500;">Create the first post!</a>
         {% else %}
-            <a href="/admin/login/">Login to create posts</a>
+            <a href="/admin/login/" style="color: #0079d3; text-decoration: none; font-weight: 500;">Login to create posts</a>
         {% endif %}
-    </p>
+    </div>
 {% endif %}
-
-<a href="/">← Back to Home</a>
+<div style="text-align: center; margin-top: 2rem;">
+<a href="/" style="color: #0079d3; text-decoration: none; font-weight: 500;">← Back to Home</a>
+</div>
 {% endblock %}
