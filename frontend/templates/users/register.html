@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+
 {% block title %}Register - Reddit Clone{% endblock %}
 
 {% block content %}
 <div style="max-width: 400px; margin: 0 auto;">
     <h1>Join Reddit Clone</h1>
-
-     <form method="post">
+    
+    <form method="post">
         {% csrf_token %}
         
         {% for field in form %}
