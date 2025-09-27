@@ -40,12 +40,12 @@
                 
                 {% if user.is_authenticated %}
                     <div class="user-info">
-                        <span>Welcome, <strong>{{ user.username }}</strong>!</span>
-                        <form class="logout-form" action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="logout-btn">Logout</button>
-                        </form>
-                    </div>
+    <span>👋 Welcome, <strong>{{ user.username }}</strong></span>
+    <form class="logout-form" action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">🚪 Logout</button>
+    </form>
+</div>
                 {% else %}
                     <a href="{% url 'login' %}">Login</a>
                     <a href="{% url 'register' %}">Register</a>

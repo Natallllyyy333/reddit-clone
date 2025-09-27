@@ -17,7 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from django.views.generic import RedirectView
 from django.contrib.auth import views as auth_views
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+
+def instant_logout(request):
+    logout(request)
+    return redirect('home')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +34,5 @@ urlpatterns = [
     path('posts/', include('posts.urls')),
     path('users/', include('users.urls')), 
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
+    path('logout/', instant_logout, name='logout'),
 ]
