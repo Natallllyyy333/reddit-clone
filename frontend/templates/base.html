@@ -7,21 +7,29 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
         .header { background: #2c3e50; color: white; padding: 1rem; }
-        .nav { display: flex; justify-content: space-between; max-width: 1200px; margin: 0 auto; }
-        .nav a { color: white; text-decoration: none; margin: 0 10px; }
+        .nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .nav-brand a { color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 1rem; padding: 0.5rem 1rem; border-radius: 4px; }
+        .nav-links a:hover { background: #34495e; }
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .btn { display: inline-block; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; }
     </style>
 </head>
 <body>
     <header class="header">
         <nav class="nav">
-            <div>
-                <a href="/">Reddit Clone</a>
+            <div class="nav-brand">
+                <a href="{% url 'home' %}">Reddit Clone</a>
             </div>
-            <div>
-                <a href="/">Home</a>
-                <a href="/admin/">Admin</a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'post_list' %}">Posts</a>
+                {% if user.is_authenticated %}
+                    <span>Hello, {{ user.username }}!</span>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'register' %}">Register</a>
+                {% endif %}
             </div>
         </nav>
     </header>
