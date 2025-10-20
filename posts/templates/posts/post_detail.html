@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ post.title }}</h2>
+                    
+                    <div class="text-muted mb-3">
+                        Автор: {{ post.author.username }} | 
+                        Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
+                        {% if post.community %}
+                            Сообщество: <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a> |
+                        {% endif %}
+                        Голосов: {{ post.score }}
+                    </div>
+                    
+                    <div class="card-text">
+                        {{ post.content|linebreaks }}
+                    </div>
+                    
+                    <div class="mt-4">
+                        {% if user.is_authenticated %}
+                        <div class="btn-group" role="group">
+                            <form method="post" action="{% url 'vote_post' post.id 'upvote' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-success">
+                                    👍 Upvote ({{ post.upvotes.count }})
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'vote_post' post.id 'downvote' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">
+                                    👎 Downvote ({{ post.downvotes.count }})
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'vote_post' post.id 'remove' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    ❌ Remove vote
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Блок комментариев можно добавить позже -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5>Комментарии</h5>
+                    <p class="text-muted">Система комментариев будет добавлена позже</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">О посте</h5>
+                    <p><strong>Автор:</strong> {{ post.author.username }}</p>
+                    <p><strong>Создан:</strong> {{ post.created_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Обновлен:</strong> {{ post.updated_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Голосов:</strong> {{ post.score }}</p>
+                    {% if post.community %}
+                    <p><strong>Сообщество:</strong> 
+                        <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

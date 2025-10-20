@@ -2,24 +2,56 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Все посты</h1>
-    <a href="{% url 'create_post' %}" class="btn btn-primary mb-3">Создать пост</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Все посты</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_post' %}" class="btn btn-primary">Создать пост</a>
+        {% endif %}
+    </div>
     
     {% for post in posts %}
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">{{ post.title }}</h5>
+            <h5 class="card-title">
+                <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none">
+                    {{ post.title }}
+                </a>
+            </h5>
             <p class="card-text">{{ post.content|truncatewords:30 }}</p>
             <div class="text-muted small">
                 Автор: {{ post.author.username }} | 
                 Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
-                Сообщество: {% if post.community %}r/{{ post.community.name }}{% else %}Без сообщества{% endif %}
+                Сообщество: {% if post.community %}
+                    <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a>
+                {% else %}
+                    Без сообщества
+                {% endif %} |
+                Голосов: {{ post.score }}
             </div>
-            <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary mt-2">Читать</a>
+            <div class="mt-2">
+                <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Читать</a>
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'vote_post' post.id 'upvote' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">👍 {{ post.upvotes.count }}</button>
+                </form>
+                <form method="post" action="{% url 'vote_post' post.id 'downvote' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">👎 {{ post.downvotes.count }}</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
     </div>
     {% empty %}
-    <p>Пока нет постов. <a href="{% url 'create_post' %}">Создайте первый!</a></p>
+    <div class="text-center">
+        <p>Пока нет постов.</p>
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_post' %}" class="btn btn-primary">Создать первый пост</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary">Войдите чтобы создать пост</a>
+        {% endif %}
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
