@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('posts/', include('posts.urls')),
+    path('comments/', include('comments.urls')),
     path('users/', include('users.urls')), 
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', instant_logout, name='logout'),

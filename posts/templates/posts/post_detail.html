@@ -1,88 +1,36 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card" data-post-id="{{ post.id }}">
-                <div class="card-body">
-                    <h2 class="card-title">{{ post.title }}</h2>
-                    
-                    <div class="text-muted mb-3">
-                        Автор: {{ post.author.username }} | 
-                        Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
-                        {% if post.community %}
-                            Сообщество: <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a> |
-                        {% endif %}
-                        Голосов: <span id="post-score" class="post-score">{{ post.score }}</span>
-                    </div>
-                    
-                    <div class="card-text">
-                        {{ post.content|linebreaks }}
-                    </div>
-                    
-                    <div class="mt-4">
-                        {% if user.is_authenticated %}
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-success vote-btn" data-vote-type="upvote">
-                                👍 <span id="upvotes-count" class="post-upvotes">{{ post.upvotes.count }}</span>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger vote-btn" data-vote-type="downvote">
-                                👎 <span id="downvotes-count" class="post-downvotes">{{ post.downvotes.count }}</span>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary vote-btn" data-vote-type="remove">
-                                ❌ Remove vote
-                            </button>
-                        </div>
-                        {% else %}
-                        <p class="text-muted">Войдите, чтобы голосовать</p>
-                        {% endif %}
-                    </div>
-                </div>
+<!-- Блок комментариев -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5>Комментарии ({{ post.comments.count }})</h5>
+        
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'comments:add_comment' post.id %}" class="mb-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea name="content" class="form-control" placeholder="Добавить комментарий..." rows="3" required></textarea>
             </div>
-            
-            <!-- Блок комментариев -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h5>Комментарии ({{ post.comments.count }})</h5>
-                    
-                    {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'add_comment' post.id %}" class="mb-4">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <textarea name="content" class="form-control" placeholder="Добавить комментарий..." rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Комментировать</button>
-                    </form>
-                    {% endif %}
-                    
-                    {% for comment in post.comments.all %}
-                    <div class="card mb-2">
-                        <div class="card-body py-2">
-                            <div class="d-flex justify-content-between">
-                                <strong>{{ comment.author.username }}</strong>
-                                <small class="text-muted">{{ comment.created_at|timesince }} назад</small>
-                            </div>
-                            <p class="mb-1">{{ comment.content }}</p>
-                            {% if user == comment.author %}
-                            <form method="post" action="{% url 'delete_comment' comment.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p class="text-muted">Пока нет комментариев</p>
-                    {% endfor %}
+            <button type="submit" class="btn btn-primary">Комментировать</button>
+        </form>
+        {% endif %}
+        
+        {% for comment in post.comments.all %}
+        <div class="card mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ comment.author.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at|timesince }} назад</small>
                 </div>
+                <p class="mb-1">{{ comment.content }}</p>
+                {% if user == comment.author %}
+                <form method="post" action="{% url 'comments:delete_comment' comment.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                </form>
+                {% endif %}
             </div>
         </div>
+        {% empty %}
+        <p class="text-muted">Пока нет комментариев</p>
+        {% endfor %}
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'posts/js/voting.js' %}"></script>
-{% endblock %}
