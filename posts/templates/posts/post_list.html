@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Все посты</h1>
+    <a href="{% url 'create_post' %}" class="btn btn-primary mb-3">Создать пост</a>
+    
+    {% for post in posts %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+            <div class="text-muted small">
+                Автор: {{ post.author.username }} | 
+                Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
+                Сообщество: {% if post.community %}r/{{ post.community.name }}{% else %}Без сообщества{% endif %}
+            </div>
+            <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary mt-2">Читать</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>Пока нет постов. <a href="{% url 'create_post' %}">Создайте первый!</a></p>
+    {% endfor %}
+</div>
+{% endblock %}
