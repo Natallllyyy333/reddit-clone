@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'posts',
     'comments',
     'home',
+    'communities', 
 ]
 
 MIDDLEWARE = [
