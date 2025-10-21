@@ -1,30 +1,135 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'posts/css/create_post.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Создать новый пост</h2>
+        <div class="col-md-10 col-lg-8">
+            <div class="card create-post-card">
+                <div class="card-header create-post-header text-center">
+                    <h4 class="mb-0">📝 Создать новый пост</h4>
+                    <p class="mb-0 mt-2 opacity-75">Поделитесь своими мыслями с сообществом</p>
                 </div>
-                <div class="card-body">
-                    <form method="post">
+                
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="postForm">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="id_title" class="form-label">Заголовок</label>
-                            {{ form.title }}
+                        
+                        <!-- Заголовок -->
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                                📌 Заголовок поста
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.title.name }}" 
+                                   id="{{ form.title.id_for_label }}" 
+                                   class="form-control" 
+                                   placeholder="Введите заголовок вашего поста..."
+                                   maxlength="200"
+                                   value="{{ form.title.value|default:'' }}">
+                            <div class="character-count mt-1" id="titleCount">
+                                <span id="titleCurrent">0</span>/<span id="titleMax">200</span> символов
+                            </div>
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mb-3">
-                            <label for="id_content" class="form-label">Содержание</label>
-                            {{ form.content }}
+                        
+                        <!-- Содержание -->
+                        <div class="mb-4">
+                            <label for="{{ form.content.id_for_label }}" class="form-label fw-semibold">
+                                📝 Содержание поста
+                            </label>
+                            <textarea name="{{ form.content.name }}" 
+                                      id="{{ form.content.id_for_label }}" 
+                                      class="form-control" 
+                                      placeholder="Расскажите что-нибудь интересное..."
+                                      rows="6"
+                                      maxlength="10000"
+                                      style="min-height: 150px; resize: vertical;">{{ form.content.value|default:'' }}</textarea>
+                            <div class="character-count mt-1" id="contentCount">
+                                <span id="contentCurrent">0</span>/<span id="contentMax">10000</span> символов
+                            </div>
+                            {% if form.content.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.content.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <button type="submit" class="btn btn-primary">Создать пост</button>
-                        <a href="{% url 'post_list' %}" class="btn btn-secondary">Отмена</a>
+                        
+                        <!-- Сообщество -->
+                        <div class="mb-4">
+                            <label for="{{ form.community.id_for_label }}" class="form-label fw-semibold">
+                                👥 Сообщество
+                            </label>
+                            <select name="{{ form.community.name }}" 
+                                    id="{{ form.community.id_for_label }}" 
+                                    class="form-select">
+                                <option value="">Выберите сообщество...</option>
+                                {% for value, label in form.community.field.choices %}
+                                    <option value="{{ value }}" {% if form.community.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Выберите сообщество для вашего поста (необязательно)</div>
+                            {% if form.community.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.community.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Остальной код остается без изменений -->
+                        <!-- Загрузка медиа -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                🖼️ Медиафайлы
+                            </label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <div class="mb-3">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h5>Перетащите файлы сюда</h5>
+                                    <p class="text-muted">или нажмите для выбора</p>
+                                </div>
+                                <input type="file" id="mediaFiles" name="media_files" multiple 
+                                       accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('mediaFiles').click()">
+                                    Выбрать файлы
+                                </button>
+                            </div>
+                            
+                            <!-- Preview area -->
+                            <div class="file-preview" id="filePreview"></div>
+                            
+                            <div class="form-text">
+                                Поддерживаются изображения (JPG, PNG, GIF) и видео (MP4, MOV). Максимальный размер: 10MB
+                            </div>
+                        </div>
+                        
+                        <!-- Кнопки действий -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{% url 'post_list' %}" class="btn btn-outline-secondary px-4">
+                                ❌ Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+                                🚀 Опубликовать
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'posts/js/create_post.js' %}"></script>
 {% endblock %}
