@@ -1,10 +1,11 @@
 from django import forms
 from .models import Post
+from communities.models import Community
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'media_file']
+        fields = ['title', 'content', 'community', 'media_file']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -15,16 +16,16 @@ class PostForm(forms.ModelForm):
                 'placeholder': 'Расскажите что-нибудь интересное...',
                 'rows': 6
             }),
+            'community': forms.Select(attrs={
+                'class': 'form-select'
+            }),
             'media_file': forms.FileInput(attrs={
-                'class': 'form-control',
-                'accept': 'image/*,video/*'
+                'class': 'form-control'
             })
         }
     
-    def clean_media_file(self):
-        media_file = self.cleaned_data.get('media_file')
-        if media_file:
-            # Проверка размера файла (10MB)
-            if media_file.size > 10 * 1024 * 1024:
-                raise forms.ValidationError("Файл слишком большой. Максимальный размер: 10MB.")
-        return media_file
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['community'].queryset = Community.objects.all()
+        self.fields['community'].required = False
+        self.fields['community'].empty_label = "Выберите сообщество (необязательно)"

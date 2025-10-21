@@ -9,9 +9,8 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    upvotes = models.ManyToManyField(User, related_name='upvoted_posts', blank=True)
-    downvotes = models.ManyToManyField(User, related_name='downvoted_posts', blank=True)
     
+    # Связь с сообществом - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
     community = models.ForeignKey(
         'communities.Community', 
         on_delete=models.SET_NULL, 
@@ -19,7 +18,11 @@ class Post(models.Model):
         blank=True,
         related_name='posts'
     )
-    # Поле для медиафайлов
+    
+    upvotes = models.ManyToManyField(User, related_name='upvoted_posts', blank=True)
+    downvotes = models.ManyToManyField(User, related_name='downvoted_posts', blank=True)
+    
+    # Поле для медиафайлов - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
     media_file = models.FileField(
         upload_to='post_media/%Y/%m/%d/',
         blank=True,
@@ -29,7 +32,7 @@ class Post(models.Model):
         )]
     )
     
-    # Поле для определения типа медиа
+    # Поле для определения типа медиа - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
     MEDIA_TYPE_CHOICES = [
         ('image', 'Image'),
         ('video', 'Video'),
@@ -58,11 +61,12 @@ class Post(models.Model):
         return 0
     
     def save(self, *args, **kwargs):
-        # Определяем тип медиа при сохранении
+        # Автоматически определяем тип медиа
         if self.media_file:
-            if self.media_file.name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+            file_extension = self.media_file.name.lower().split('.')[-1]
+            if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
                 self.media_type = 'image'
-            elif self.media_file.name.lower().endswith(('.mp4', '.mov', '.avi')):
+            elif file_extension in ['mp4', 'mov', 'avi']:
                 self.media_type = 'video'
         else:
             self.media_type = 'none'
