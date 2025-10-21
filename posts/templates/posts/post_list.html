@@ -47,7 +47,7 @@
                                 {{ post.title }}
                             </a>
                             {% if post.community %}
-                                <span class="community-badge">r/{{ post.community.name }}</span>
+                                <span class="community-badge">{{ post.community.name }}</span>
                             {% endif %}
                         </h5>
                     </div>
@@ -56,6 +56,13 @@
                     <p class="card-text post-content">{{ post.content|truncatewords:50 }}</p>
                     
                     <!-- Медиафайл -->
+                     {% if post.media_file %}
+                        <div class="debug-info" style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Медиа: {{ post.media_file.url }} | Тип: {{ post.media_type }}
+                        </div>
+                    {% endif %}
+
+
                     {% if post.media_file and post.media_type == 'image' %}
                         <div class="post-media-container mb-2">
                             <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid">
@@ -68,14 +75,19 @@
                             </video>
                         </div>
                     {% endif %}
-                    
+                    <!-- Отладочная информация -->
+                    {% if post.media_file %}
+                        <div class="debug-info" style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Медиа: {{ post.media_file.url }} | Тип: {{ post.media_type }}
+                        </div>
+                    {% endif %}
                     <!-- Информация о посте -->
                     <div class="post-footer">
                         <small class="text-muted">
                             Опубликовано <strong>{{ post.author.username }}</strong> 
                             {{ post.created_at|timesince }} назад
                             {% if post.community %}
-                                в <strong>r/{{ post.community.name }}</strong>
+                                в <strong>{{ post.community.name }}</strong>
                             {% endif %}
                         </small>
                         

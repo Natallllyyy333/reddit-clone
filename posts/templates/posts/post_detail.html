@@ -23,7 +23,7 @@
                                 {% if post.community %}
                                     <span class="separator">•</span>
                                     <span class="community">в 
-                                        <a href="#" class="community-link">r/{{ post.community.name }}</a>
+                                        <a href="#" class="community-link">{{ post.community.name }}</a>
                                     </span>
                                 {% endif %}
                             </div>
@@ -147,7 +147,7 @@
                         </div>
                         {% if post.community %}
                         <div class="info-item">
-                            <strong>Сообщество:</strong> r/{{ post.community.name }}
+                            <strong>Сообщество:</strong> {{ post.community.name }}
                         </div>
                         {% endif %}
                         <div class="info-item">
