@@ -1,0 +1,141 @@
+.post-detail-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.post-title {
+    color: #1c1c1c;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.post-meta {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.separator {
+    margin: 0 8px;
+}
+
+.community-link {
+    color: #0079d3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.community-link:hover {
+    text-decoration: underline;
+}
+
+.vote-section .vote-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+}
+
+.vote-section .vote-count {
+    font-size: 1.2rem;
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #1c1c1c;
+}
+
+.post-media {
+    max-width: 100%;
+    max-height: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-video {
+    max-width: 100%;
+    max-height: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-stats {
+    padding: 1rem 0;
+    border-top: 1px solid #e9ecef;
+}
+
+.stat-item {
+    font-size: 0.9rem;
+}
+
+/* Комментарии */
+.comments-section .card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.comment-form textarea {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    resize: vertical;
+}
+
+.comment-form textarea:focus {
+    border-color: #0079d3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 121, 211, 0.25);
+}
+
+.comment-item {
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.comment-author {
+    color: #0079d3;
+}
+
+/* Сайдбар */
+.sidebar-card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar-info .info-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-info .info-item:last-child {
+    border-bottom: none;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .post-title {
+        font-size: 1.5rem;
+    }
+    
+    .vote-section {
+        margin-top: 1rem;
+    }
+    
+    .post-media, .post-video {
+        max-height: 400px;
+    }
+}

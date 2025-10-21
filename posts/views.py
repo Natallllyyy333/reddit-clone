@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from .models import Post
-from .forms import PostForm
+from comments.models import Comment  # Импортируем Comment из comments
 
 class PostListView(ListView):
     model = Post
@@ -18,11 +18,29 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'posts/post_detail.html'
     context_object_name = 'post'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # ИСПРАВЛЕНО: используем post_comments вместо comments
+        context['comments'] = self.object.post_comments.all().order_by('-created_at')
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        post = self.get_object()
+        if request.user.is_authenticated:
+            content = request.POST.get('content')
+            if content:
+                Comment.objects.create(
+                    post=post,
+                    author=request.user,
+                    content=content
+                )
+        return self.get(request, *args, **kwargs)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    form_class = PostForm  # Используем нашу кастомную форму
     template_name = 'posts/create_post.html'
+    fields = ['title', 'content', 'community', 'media_file']
     success_url = reverse_lazy('post_list')
     
     def form_valid(self, form):

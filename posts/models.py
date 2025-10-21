@@ -72,3 +72,4 @@ class Post(models.Model):
             self.media_type = 'none'
         
         super().save(*args, **kwargs)
+

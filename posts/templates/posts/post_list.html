@@ -1,127 +1,101 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Posts</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .vote-buttons {
-            min-width: 60px;
-        }
-        .vote-btn {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        .vote-count {
-            font-size: 14px;
-            min-height: 20px;
-        }
-        .vote-btn.active {
-            border-width: 2px;
-        }
-        .post-media {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        .post-video {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        .community-badge {
-            background-color: #0079d3;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-4">
-        <h1>All Posts</h1>
-        {% for post in posts %}
-        <div class="card mb-3">
-            <div class="row g-0">
-                <div class="col-md-1">
-                    <div class="vote-buttons text-center p-2">
-                        <!-- Кнопка апвоута -->
-                        <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-success vote-btn" 
-                                    data-post-id="{{ post.pk }}" data-vote-type="upvote">
-                                ▲
-                            </button>
-                        </form>
-                        
-                        <!-- Общее количество голосов -->
-                        <div class="vote-count my-1">
-                            <strong>{{ post.total_votes }}</strong>
-                        </div>
-                        
-                        <!-- Кнопка даунвоута -->
-                        <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger vote-btn" 
-                                    data-post-id="{{ post.pk }}" data-vote-type="downvote">
-                                ▼
-                            </button>
-                        </form>
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'posts/css/post_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Все посты</h1>
+    
+    {% for post in posts %}
+    <div class="post-card card mb-3">
+        <div class="row g-0">
+            <!-- Блок голосования -->
+            <div class="col-md-1">
+                <div class="vote-buttons text-center p-2">
+                    <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-success vote-btn" 
+                                data-post-id="{{ post.pk }}" data-vote-type="upvote">
+                            ▲
+                        </button>
+                    </form>
+                    
+                    <div class="vote-count my-1">
+                        <strong>{{ post.total_votes }}</strong>
                     </div>
+                    
+                    <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger vote-btn" 
+                                data-post-id="{{ post.pk }}" data-vote-type="downvote">
+                            ▼
+                        </button>
+                    </form>
                 </div>
-                <div class="col-md-11">
-                    <div class="card-body">
+            </div>
+            
+            <!-- Основной контент поста -->
+            <div class="col-md-11">
+                <div class="card-body">
+                    <!-- Заголовок и сообщество -->
+                    <div class="post-header mb-2">
                         <h5 class="card-title">
-                            <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none">{{ post.title }}</a>
+                            <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none post-title">
+                                {{ post.title }}
+                            </a>
                             {% if post.community %}
                                 <span class="community-badge">r/{{ post.community.name }}</span>
                             {% endif %}
                         </h5>
-                        <p class="card-text">{{ post.content|truncatewords:30 }}</p>
-                        
-                        <!-- Отображение медиа -->
-                        {% if post.media_file %}
-                            {% if post.media_type == 'image' %}
-                                <div class="post-media-container">
-                                    <img src="{{ post.media_file.url }}" alt="Post media" class="post-media">
-                                </div>
-                            {% elif post.media_type == 'video' %}
-                                <div class="post-media-container">
-                                    <video controls class="post-video">
-                                        <source src="{{ post.media_file.url }}" type="video/mp4">
-                                        Ваш браузер не поддерживает видео.
-                                    </video>
-                                </div>
+                    </div>
+                    
+                    <!-- Содержание поста -->
+                    <p class="card-text post-content">{{ post.content|truncatewords:50 }}</p>
+                    
+                    <!-- Медиафайл -->
+                    {% if post.media_file and post.media_type == 'image' %}
+                        <div class="post-media-container mb-2">
+                            <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid">
+                        </div>
+                    {% elif post.media_file and post.media_type == 'video' %}
+                        <div class="post-media-container mb-2">
+                            <video controls class="post-video img-fluid">
+                                <source src="{{ post.media_file.url }}" type="video/mp4">
+                                Ваш браузер не поддерживает видео.
+                            </video>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Информация о посте -->
+                    <div class="post-footer">
+                        <small class="text-muted">
+                            Опубликовано <strong>{{ post.author.username }}</strong> 
+                            {{ post.created_at|timesince }} назад
+                            {% if post.community %}
+                                в <strong>r/{{ post.community.name }}</strong>
                             {% endif %}
-                        {% endif %}
+                        </small>
                         
-                        <p class="card-text">
-                            <small class="text-muted">
-                                Опубликовано {{ post.author.username }} {{ post.created_at|timesince }} назад
-                                {% if post.community %}
-                                    в <strong>r/{{ post.community.name }}</strong>
-                                {% endif %}
-                            </small>
-                        </p>
+                        <!-- Количество комментариев -->
+                        <small class="text-muted ms-3">
+                            💬 {{ post.post_comments.count }} комментариев
+                        </small>
                     </div>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <p>Пока нет постов.</p>
-        {% endfor %}
     </div>
+    {% empty %}
+    <div class="alert alert-info">
+        Пока нет постов. <a href="{% url 'create_post' %}">Создайте первый пост!</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block extra_js %}
+    <script src="{% static 'posts/js/post_list.js' %}"></script>
+{% endblock %}
