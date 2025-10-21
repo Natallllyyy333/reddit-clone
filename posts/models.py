@@ -28,24 +28,29 @@ class Post(models.Model):
         return self.title
     
     def upvote(self, user):
-        
+        """Добавить upvote"""
         if self.pk:
+            print(f"Upvoting post {self.id} by user {user.id}")  # Для отладки
             if user in self.downvotes.all():
                 self.downvotes.remove(user)
-            self.upvotes.add(user)
+            if user not in self.upvotes.all():
+                self.upvotes.add(user)
             self.update_score()
 
     def downvote(self, user):
         """Добавить downvote"""
         if self.pk:
+            print(f"Downvoting post {self.id} by user {user.id}")  # Для отладки
             if user in self.upvotes.all():
                 self.upvotes.remove(user)
-            self.downvotes.add(user)
+            if user not in self.downvotes.all():
+                self.downvotes.add(user)
             self.update_score()
 
     def remove_vote(self, user):
         """Удалить голос пользователя"""
         if self.pk:
+            print(f"Removing vote from post {self.id} by user {user.id}")  # Для отладки
             self.upvotes.remove(user)
             self.downvotes.remove(user)
             self.update_score()
@@ -53,6 +58,7 @@ class Post(models.Model):
     def update_score(self):
         """Обновить счет"""
         if self.pk:
-            self.score = self.upvotes.count() - self.downvotes.count()
+            new_score = self.upvotes.count() - self.downvotes.count()
+            print(f"Updating score for post {self.id}: {self.score} -> {new_score}")  # Для отладки
+            self.score = new_score
             self.save(update_fields=['score'])
-        

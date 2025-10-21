@@ -11,34 +11,42 @@
     </div>
     
     {% for post in posts %}
-    <div class="card mb-3" data-post-id="{{ post.id }}">
-        <div class="card-body">
-            <h5 class="card-title">
-                <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none">
-                    {{ post.title }}
-                </a>
-            </h5>
-            <p class="card-text">{{ post.content|truncatewords:30 }}</p>
-            <div class="text-muted small">
-                Автор: {{ post.author.username }} | 
-                Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
-                Сообщество: {% if post.community %}
-                    <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a>
-                {% else %}
-                    Без сообщества
-                {% endif %} |
-                Голосов: <span class="post-score">{{ post.score }}</span>
-            </div>
-            <div class="mt-2">
-                <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Читать</a>
+    <div class="post" data-post-id="{{ post.id }}">
+        <div class="post-content">
+            <div class="vote-section">
                 {% if user.is_authenticated %}
-                <button type="button" class="btn btn-sm btn-outline-success vote-btn" data-vote-type="upvote">
-                    👍 <span class="post-upvotes">{{ post.upvotes.count }}</span>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-danger vote-btn" data-vote-type="downvote">
-                    👎 <span class="post-downvotes">{{ post.downvotes.count }}</span>
+                <button class="vote-btn upvote-btn" data-vote-type="upvote" aria-label="Проголосовать за">
+                    ▲
                 </button>
                 {% endif %}
+                <div class="vote-count" id="post-score-{{ post.id }}">{{ post.score }}</div>
+                {% if user.is_authenticated %}
+                <button class="vote-btn downvote-btn" data-vote-type="downvote" aria-label="Проголосовать против">
+                    ▼
+                </button>
+                {% endif %}
+            </div>
+            <div class="post-body">
+                <div class="post-header">
+                    Опубликовано пользователем {{ post.author.username }} • {{ post.created_at|timesince }} назад
+                    {% if post.community %}
+                    в <a href="{% url 'communities:community_detail' post.community.name %}">r/{{ post.community.name }}</a>
+                    {% endif %}
+                </div>
+                <h2 class="post-title">
+                    <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                </h2>
+                <div class="post-text">
+                    {{ post.content|truncatewords:30 }}
+                </div>
+                <div class="post-actions">
+                    <a href="{% url 'post_detail' post.pk %}" class="action-btn">
+                        <i>💬</i> {{ post.comments.count }} комментариев
+                    </a>
+                    <button class="action-btn share-btn">
+                        <i>↗️</i> Поделиться
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -56,5 +64,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'posts/js/voting.js' %}"></script>
+<script src="{% static 'js/voting.js' %}"></script>
 {% endblock %}

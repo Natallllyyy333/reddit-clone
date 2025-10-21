@@ -3,20 +3,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
     
+    console.log('Voting script loaded');
+    console.log('Found vote buttons:', voteButtons.length);
+    console.log('CSRF token:', csrfToken ? 'Present' : 'Missing');
+    
     if (!voteButtons.length || !csrfToken) {
-        console.log('No vote buttons or CSRF token found');
+        console.error('No vote buttons or CSRF token found');
         return;
     }
     
     voteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const voteType = this.dataset.voteType;
-            const postId = this.closest('[data-post-id]')?.dataset.postId;
+            const postElement = this.closest('[data-post-id]');
+            const postId = postElement ? postElement.dataset.postId : null;
             
-            console.log('Vote clicked:', { voteType, postId }); // Для отладки
+            console.log('Vote clicked:', { 
+                voteType: voteType, 
+                postId: postId,
+                element: this 
+            });
             
             if (!postId) {
-                console.error('Post ID not found');
+                console.error('Post ID not found. Check data-post-id attribute');
                 showNotification('Ошибка: ID поста не найден', 'error');
                 return;
             }
@@ -26,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '...';
             this.disabled = true;
             
-            // ✅ ИСПРАВЛЕННЫЙ ПУТЬ - убрали лишний posts/
+            // Отправляем запрос
             fetch(`/posts/${postId}/vote/${voteType}/`, {
                 method: 'POST',
                 headers: {
@@ -35,15 +44,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
             })
             .then(response => {
+                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Vote response:', data); // Для отладки
+                console.log('Vote response data:', data);
                 if (data.success) {
-                    updateVoteCounters(data);
+                    updateVoteCounters(data, postId);
                     updateButtonStyles(this, voteType);
                     showNotification('Голос учтен!', 'success');
                 } else {
@@ -51,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showNotification('Произошла ошибка при голосовании', 'error');
+                console.error('Fetch error:', error);
+                showNotification('Произошла ошибка при голосовании: ' + error.message, 'error');
             })
             .finally(() => {
                 this.innerHTML = originalText;
@@ -61,12 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    function updateVoteCounters(data) {
+    function updateVoteCounters(data, postId) {
+        console.log('Updating counters for post:', postId, 'with data:', data);
+        
+        // Обновляем счетчики на детальной странице
         const scoreElement = document.getElementById('post-score');
         const upvotesElement = document.getElementById('upvotes-count');
         const downvotesElement = document.getElementById('downvotes-count');
-        
-        console.log('Updating counters:', data); // Для отладки
         
         if (scoreElement) {
             scoreElement.textContent = data.score;
@@ -79,6 +90,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (upvotesElement) upvotesElement.textContent = data.upvotes;
         if (downvotesElement) downvotesElement.textContent = data.downvotes;
+        
+        // Обновляем счетчики в списке постов
+        const listScoreElement = document.getElementById(`post-score-${postId}`);
+        if (listScoreElement) {
+            listScoreElement.textContent = data.score;
+            listScoreElement.classList.remove('positive', 'negative');
+            if (data.score > 0) {
+                listScoreElement.classList.add('positive');
+            } else if (data.score < 0) {
+                listScoreElement.classList.add('negative');
+            }
+        }
     }
     
     function updateButtonStyles(clickedButton, voteType) {
@@ -96,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showNotification(message, type = 'info') {
-        // Упрощенное уведомление
-        alert(message); // Временное решение
+        // Временное решение - используем alert для отладки
+        alert(`${type.toUpperCase()}: ${message}`);
     }
 });
