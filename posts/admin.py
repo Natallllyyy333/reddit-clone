@@ -5,7 +5,7 @@ from .models import Post
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'author', 'created_at', 'score',]
-    list_filter = ['created_at',]
+    list_filter = ['created_at', 'author']
     
     search_fields = [
         'title',
@@ -13,7 +13,7 @@ class PostAdmin(admin.ModelAdmin):
         'author__username',
         
     ]
-    
+    date_hierarchy = 'created_at'
     readonly_fields = ['created_at', 'updated_at']
 
     def upvotes_count(self, obj):

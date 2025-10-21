@@ -1,46 +1,58 @@
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.http import JsonResponse
 from .models import Post
 
+class PostListView(ListView):
+    model = Post
+    template_name = 'posts/post_list.html'
+    context_object_name = 'posts'
+    ordering = ['-created_at']
+    paginate_by = 10
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'posts/post_detail.html'
+    context_object_name = 'post'
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    template_name = 'posts/post_form.html'
+    fields = ['title', 'content']
+    success_url = reverse_lazy('post_list')
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
 @login_required
-@require_http_methods(["POST"])
-def vote_post(request, post_id, vote_type):
-    """Обработка голосования за пост"""
-    try:
-        post = Post.objects.get(id=post_id)
-        print(f"Vote received: post_id={post_id}, vote_type={vote_type}, user={request.user}")  # Для отладки
-        
-        if vote_type == 'upvote':
-            post.upvote(request.user)
-        elif vote_type == 'downvote':
-            post.downvote(request.user)
-        elif vote_type == 'remove':
-            post.remove_vote(request.user)
+def vote_post(request, pk, vote_type):
+    post = get_object_or_404(Post, pk=pk)
+    
+    if vote_type == 'upvote':
+        if post.downvotes.filter(id=request.user.id).exists():
+            post.downvotes.remove(request.user)
+        if post.upvotes.filter(id=request.user.id).exists():
+            post.upvotes.remove(request.user)
         else:
-            return JsonResponse({
-                'success': False,
-                'error': 'Неверный тип голоса'
-            }, status=400)
-        
-        # Обновляем данные поста
-        post.refresh_from_db()
-        
+            post.upvotes.add(request.user)
+    
+    elif vote_type == 'downvote':
+        if post.upvotes.filter(id=request.user.id).exists():
+            post.upvotes.remove(request.user)
+        if post.downvotes.filter(id=request.user.id).exists():
+            post.downvotes.remove(request.user)
+        else:
+            post.downvotes.add(request.user)
+    
+    # Для AJAX запросов возвращаем JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
-            'success': True,
-            'score': post.score,
-            'upvotes': post.upvotes.count(),
-            'downvotes': post.downvotes.count()
+            'total_votes': post.total_votes(),
+            'user_vote': post.user_vote(request.user)
         })
-        
-    except Post.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'error': 'Пост не найден'
-        }, status=404)
-    except Exception as e:
-        print(f"Vote error: {e}")  # Для отладки
-        return JsonResponse({
-            'success': False,
-            'error': 'Внутренняя ошибка сервера'
-        }, status=500)
+    
+    return redirect('post_list')

@@ -1,129 +1,50 @@
-// posts/static/posts/js/voting.js
-
 document.addEventListener('DOMContentLoaded', function() {
-    const voteButtons = document.querySelectorAll('.vote-btn');
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    const voteForms = document.querySelectorAll('form[action*="vote"]');
     
-    if (!voteButtons.length || !csrfToken) {
-        return; // Если нет кнопок голосования или CSRF токена, выходим
-    }
-    
-    voteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const voteType = this.dataset.voteType;
-            const postId = this.closest('[data-post-id]')?.dataset.postId || 
-                          document.querySelector('[data-post-id]')?.dataset.postId;
+    voteForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            if (!postId) {
-                console.error('Post ID not found');
-                return;
-            }
+            const formData = new FormData(this);
+            const url = this.action;
+            const postId = this.querySelector('.vote-btn').dataset.postId;
             
-            // Блокируем кнопку на время запроса
-            const originalText = this.innerHTML;
-            this.innerHTML = '...';
-            this.disabled = true;
-            
-            fetch(`/posts/${postId}/vote/${voteType}/`, {
+            fetch(url, {
                 method: 'POST',
+                body: formData,
                 headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    'X-Requested-With': 'XMLHttpRequest',
                 }
-                return response.json();
             })
+            .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Обновляем счетчики на странице
-                    updateVoteCounters(data);
-                    
-                    // Визуальная обратная связь
-                    updateButtonStyles(this, voteType);
-                    
-                    // Показываем уведомление
-                    showNotification('Голос учтен!', 'success');
-                } else {
-                    showNotification('Ошибка: ' + data.error, 'error');
-                }
+                // Обновляем счетчик голосов
+                const voteCount = document.querySelector(`[data-post-id="${postId}"]`).closest('.vote-buttons').querySelector('.vote-count strong');
+                voteCount.textContent = data.total_votes;
+                
+                // Обновляем стили кнопок
+                updateButtonStyles(postId, data.user_vote);
             })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Произошла ошибка при голосовании', 'error');
-            })
-            .finally(() => {
-                // Восстанавливаем кнопку
-                this.innerHTML = originalText;
-                this.disabled = false;
-            });
+            .catch(error => console.error('Error:', error));
         });
     });
     
-    function updateVoteCounters(data) {
-        const scoreElement = document.getElementById('post-score');
-        const upvotesElement = document.getElementById('upvotes-count');
-        const downvotesElement = document.getElementById('downvotes-count');
+    function updateButtonStyles(postId, userVote) {
+        const voteButtons = document.querySelectorAll(`[data-post-id="${postId}"]`);
         
-        if (scoreElement) scoreElement.textContent = data.score;
-        if (upvotesElement) upvotesElement.textContent = data.upvotes;
-        if (downvotesElement) downvotesElement.textContent = data.downvotes;
-        
-        // Также обновляем счетчики в списке постов если они есть
-        const listScoreElements = document.querySelectorAll('.post-score');
-        const listUpvotesElements = document.querySelectorAll('.post-upvotes');
-        const listDownvotesElements = document.querySelectorAll('.post-downvotes');
-        
-        listScoreElements.forEach(el => el.textContent = data.score);
-        listUpvotesElements.forEach(el => el.textContent = data.upvotes);
-        listDownvotesElements.forEach(el => el.textContent = data.downvotes);
-    }
-    
-    function updateButtonStyles(clickedButton, voteType) {
-        const allButtons = document.querySelectorAll('.vote-btn');
-        
-        // Сбрасываем стили всех кнопок
-        allButtons.forEach(btn => {
-            btn.classList.remove('btn-success', 'btn-danger', 'btn-primary');
-            btn.classList.add('btn-outline-success', 'btn-outline-danger', 'btn-outline-secondary');
+        voteButtons.forEach(button => {
+            button.classList.remove('active', 'btn-success', 'btn-danger');
+            button.classList.add('btn-outline-success', 'btn-outline-danger');
         });
         
-        // Применяем стиль к активной кнопке
-        if (voteType === 'upvote') {
-            clickedButton.classList.remove('btn-outline-success');
-            clickedButton.classList.add('btn-success');
-        } else if (voteType === 'downvote') {
-            clickedButton.classList.remove('btn-outline-danger');
-            clickedButton.classList.add('btn-danger');
-        } else if (voteType === 'remove') {
-            clickedButton.classList.remove('btn-outline-secondary');
-            clickedButton.classList.add('btn-primary');
+        if (userVote === 1) {
+            const upvoteBtn = document.querySelector(`[data-post-id="${postId}"][data-vote-type="upvote"]`);
+            upvoteBtn.classList.remove('btn-outline-success');
+            upvoteBtn.classList.add('btn-success', 'active');
+        } else if (userVote === -1) {
+            const downvoteBtn = document.querySelector(`[data-post-id="${postId}"][data-vote-type="downvote"]`);
+            downvoteBtn.classList.remove('btn-outline-danger');
+            downvoteBtn.classList.add('btn-danger', 'active');
         }
-    }
-    
-    function showNotification(message, type = 'info') {
-        // Создаем уведомление Bootstrap
-        const alertClass = type === 'error' ? 'alert-danger' : 
-                          type === 'success' ? 'alert-success' : 'alert-info';
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        document.body.appendChild(alertDiv);
-        
-        // Автоматически удаляем через 3 секунды
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 3000);
     }
 });
