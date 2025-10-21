@@ -27,20 +27,14 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
-    def update_score(self):
-        """Отдельный метод для обновления score"""
-        if self.pk:
-            self.score = self.upvotes.count() - self.downvotes.count()
-            self.save(update_fields=['score'])
-    
     def upvote(self, user):
-        """Добавить upvote"""
+        
         if self.pk:
             if user in self.downvotes.all():
                 self.downvotes.remove(user)
             self.upvotes.add(user)
             self.update_score()
-    
+
     def downvote(self, user):
         """Добавить downvote"""
         if self.pk:
@@ -48,10 +42,17 @@ class Post(models.Model):
                 self.upvotes.remove(user)
             self.downvotes.add(user)
             self.update_score()
-    
+
     def remove_vote(self, user):
         """Удалить голос пользователя"""
         if self.pk:
             self.upvotes.remove(user)
             self.downvotes.remove(user)
             self.update_score()
+
+    def update_score(self):
+        """Обновить счет"""
+        if self.pk:
+            self.score = self.upvotes.count() - self.downvotes.count()
+            self.save(update_fields=['score'])
+        

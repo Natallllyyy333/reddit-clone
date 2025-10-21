@@ -1,10 +1,10 @@
 // frontend/static/js/voting.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
     
     if (!voteButtons.length || !csrfToken) {
+        console.log('No vote buttons or CSRF token found');
         return;
     }
     
@@ -13,8 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const voteType = this.dataset.voteType;
             const postId = this.closest('[data-post-id]')?.dataset.postId;
             
+            console.log('Vote clicked:', { voteType, postId }); // Для отладки
+            
             if (!postId) {
                 console.error('Post ID not found');
+                showNotification('Ошибка: ID поста не найден', 'error');
                 return;
             }
             
@@ -23,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '...';
             this.disabled = true;
             
+            // ✅ ИСПРАВЛЕННЫЙ ПУТЬ - убрали лишний posts/
             fetch(`/posts/${postId}/vote/${voteType}/`, {
                 method: 'POST',
                 headers: {
@@ -32,11 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Vote response:', data); // Для отладки
                 if (data.success) {
                     updateVoteCounters(data);
                     updateButtonStyles(this, voteType);
@@ -60,6 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const scoreElement = document.getElementById('post-score');
         const upvotesElement = document.getElementById('upvotes-count');
         const downvotesElement = document.getElementById('downvotes-count');
+        
+        console.log('Updating counters:', data); // Для отладки
         
         if (scoreElement) {
             scoreElement.textContent = data.score;
@@ -89,23 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showNotification(message, type = 'info') {
-        const alertClass = type === 'error' ? 'alert-danger' : 
-                          type === 'success' ? 'alert-success' : 'alert-info';
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        document.body.appendChild(alertDiv);
-        
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 3000);
+        // Упрощенное уведомление
+        alert(message); // Временное решение
     }
 });
