@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from .models import Post, Comment
 from comments.models import Comment  # Импортируем Comment из comments
+from .forms import PostForm 
 
 class PostListView(ListView):
     model = Post
@@ -39,8 +40,9 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
+    form_class = PostForm 
     template_name = 'posts/create_post.html'
-    fields = ['title', 'content', 'community', 'media_file']
+    # fields = ['title', 'content', 'community', 'media_file']
     success_url = reverse_lazy('post_list')
     
     def form_valid(self, form):

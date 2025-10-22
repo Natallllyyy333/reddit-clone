@@ -47,7 +47,7 @@
                                 {{ post.title }}
                             </a>
                             {% if post.community %}
-                                <span class="community-badge">r/{{ post.community.name }}</span>
+                                <span class="community-badge">{{ post.community.name }}</span>
                             {% endif %}
                         </h5>
                     </div>
@@ -75,7 +75,7 @@
                             Опубликовано <strong>{{ post.author.username }}</strong> 
                             {{ post.created_at|timesince }} назад
                             {% if post.community %}
-                                в <strong>r/{{ post.community.name }}</strong>
+                                в <strong>{{ post.community.name }}</strong>
                             {% endif %}
                         </small>
                         

@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-# Create your views here.
+def home(request):
+    # Перенаправляем на список постов как главную страницу
+    return redirect('post_list')
