@@ -29,3 +29,4 @@ class PostForm(forms.ModelForm):
         self.fields['community'].queryset = Community.objects.all()
         self.fields['community'].required = False
         self.fields['community'].empty_label = "Выберите сообщество (необязательно)"
+        self.fields['community'].label_from_instance = lambda obj: obj.name

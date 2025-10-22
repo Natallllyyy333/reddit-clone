@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <h5 class="card-title">
                         <a href="{% url 'communities:community_detail' community.name %}">
-                            r/{{ community.name }}
+                            {{ community.name }}
                         </a>
                     </h5>
                     <p class="card-text">{{ community.description|truncatewords:20 }}</p>

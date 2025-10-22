@@ -47,8 +47,18 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
 
+        # Обрабатываем загрузку файла
+        print("=== DEBUG CREATE POST ===")
+        print(f"FILES в запросе: {self.request.FILES}")
+        if self.request.FILES.get('media_file'):
+            file = self.request.FILES['media_file']
+            print(f"Файл получен: {file.name}, размер: {file.size}, тип: {file.content_type}")
+        else:
+            print("Файл НЕ получен в запросе!")
+        print("========================")
+        
+        return super().form_valid(form)
 @login_required
 def vote_post(request, pk, vote_type):
     post = get_object_or_404(Post, pk=pk)
