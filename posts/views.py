@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .models import Post
+from .models import Post, Comment
 from comments.models import Comment  # Импортируем Comment из comments
 
 class PostListView(ListView):
@@ -22,7 +22,7 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # ИСПРАВЛЕНО: используем post_comments вместо comments
-        context['comments'] = self.object.post_comments.all().order_by('-created_at')
+        context['comments'] = self.object.comments.all().order_by('-created_at')
         return context
     
     def post(self, request, *args, **kwargs):

@@ -23,7 +23,7 @@
                                 {% if post.community %}
                                     <span class="separator">•</span>
                                     <span class="community">в 
-                                        <a href="#" class="community-link">{{ post.community.name }}</a>
+                                        <a href="#" class="community-link">r/{{ post.community.name }}</a>
                                     </span>
                                 {% endif %}
                             </div>
@@ -81,7 +81,7 @@
                             <strong>{{ post.total_votes }}</strong> голосов
                         </div>
                         <div class="stat-item">
-                            <strong>{{ post.post_comments.count }}</strong> комментариев
+                            <strong>{{ post.comments.count }}</strong> комментариев
                         </div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
             <div class="comments-section mt-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">💬 Комментарии ({{ post.post_comments.count }})</h5>
+                        <h5 class="mb-0">💬 Комментарии ({{ post.comments.count }})</h5>
                     </div>
                     <div class="card-body">
                         {% if user.is_authenticated %}
@@ -147,11 +147,11 @@
                         </div>
                         {% if post.community %}
                         <div class="info-item">
-                            <strong>Сообщество:</strong> {{ post.community.name }}
+                            <strong>Сообщество:</strong> r/{{ post.community.name }}
                         </div>
                         {% endif %}
                         <div class="info-item">
-                            <strong>Комментарии:</strong> {{ post.post_comments.count }}
+                            <strong>Комментарии:</strong> {{ post.comments.count }}
                         </div>
                     </div>
                     

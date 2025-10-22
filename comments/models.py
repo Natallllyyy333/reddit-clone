@@ -13,4 +13,5 @@ class Comment(models.Model):
         return f"Comment by {self.author} on {self.post.title}"
     
     class Meta:
+        app_label = 'comments'
         ordering = ['created_at']

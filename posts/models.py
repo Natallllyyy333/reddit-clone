@@ -10,7 +10,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Связь с сообществом - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
+    # Связь с сообществом
     community = models.ForeignKey(
         'communities.Community', 
         on_delete=models.SET_NULL, 
@@ -22,7 +22,7 @@ class Post(models.Model):
     upvotes = models.ManyToManyField(User, related_name='upvoted_posts', blank=True)
     downvotes = models.ManyToManyField(User, related_name='downvoted_posts', blank=True)
     
-    # Поле для медиафайлов - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
+    # Поле для медиафайлов
     media_file = models.FileField(
         upload_to='post_media/%Y/%m/%d/',
         blank=True,
@@ -32,7 +32,7 @@ class Post(models.Model):
         )]
     )
     
-    # Поле для определения типа медиа - УБЕДИТЕСЬ ЧТО ЭТО ЕСТЬ
+    # Поле для определения типа медиа
     MEDIA_TYPE_CHOICES = [
         ('image', 'Image'),
         ('video', 'Video'),
@@ -72,4 +72,17 @@ class Post(models.Model):
             self.media_type = 'none'
         
         super().save(*args, **kwargs)
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Comment by {self.author} on {self.post.title}"
+    
+    class Meta:
+        ordering = ['created_at']
 
