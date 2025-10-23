@@ -30,3 +30,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     lazyImages.forEach(img => imageObserver.observe(img));
 });
+
+
+// AJAX шаринг
+document.addEventListener('DOMContentLoaded', function() {
+    const shareForms = document.querySelectorAll('#shareForm');
+    
+    shareForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const postId = this.getAttribute('data-post-id');
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновить счетчик шаров
+                    const shareBadge = document.querySelector(`[data-post-id="${postId}"] .badge`);
+                    if (shareBadge) {
+                        shareBadge.textContent = data.shares_count;
+                    }
+                    // Закрыть модальное окно
+                    bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
+                }
+            });
+        });
+    });
+});

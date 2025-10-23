@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .models import Post, Comment
+from .models import Post, Comment, Share
 from comments.models import Comment  # Импортируем Comment из comments
 from .forms import PostForm 
 
@@ -87,3 +87,33 @@ def vote_post(request, pk, vote_type):
         })
     
     return redirect('post_list')
+
+@login_required
+def share_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    if request.method == 'POST':
+        platform = request.POST.get('platform', '')
+        
+        # Create share record
+        share, created = Share.objects.get_or_create(
+            post=post,
+            user=request.user,
+            defaults={'shared_to': platform}
+        )
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'shares_count': post.shares.count(),
+                'message': 'Post shared successfully!'
+            })
+        
+        return redirect('posts:post_detail', post_id=post.id)
+    
+    # For GET requests, show share options
+    context = {
+        'post': post,
+        'share_url': request.build_absolute_uri(post.get_absolute_url())
+    }
+    return render(request, 'posts/share_modal.html', context)

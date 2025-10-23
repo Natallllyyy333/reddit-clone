@@ -35,6 +35,14 @@
                         </button>
                     </form>
                 </div>
+                 <!-- Кнопка Share -->
+            <button class="btn btn-outline-secondary btn-sm share-btn" 
+                    data-post-id="{{ post.id }}"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#shareModal{{ post.id }}">
+                <i class="fas fa-share"></i> Share
+                <span class="badge bg-secondary">{{ post.shares.count }}</span>
+            </button>
             </div>
             
             <!-- Основной контент поста -->
@@ -96,7 +104,12 @@
                         <small class="text-muted ms-3">
                             💬 {{ post.comments.count }} комментариев
                         </small>
+
+                        <div class="modal fade" id="shareModal{{ post.id }}" tabindex="-1">
+    <!-- Аналогично share_modal.html, но с data-post-id="{{ post.id }}" -->
+</div>
                     </div>
+
                 </div>
             </div>
         </div>

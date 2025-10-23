@@ -1,0 +1,69 @@
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Share URL:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="shareUrl" value="{{ share_url }}" readonly>
+                        <button class="btn btn-outline-secondary" onclick="copyShareUrl()">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="share-platforms">
+                    <p class="mb-2">Share to:</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-outline-primary btn-sm" onclick="shareToPlatform('twitter')">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="shareToPlatform('facebook')">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="shareToPlatform('linkedin')">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="shareToPlatform('telegram')">
+                            <i class="fab fa-telegram"></i> Telegram
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{% url 'posts:share_post' post.id %}" id="shareForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="platform" id="sharePlatform">
+                    <button type="submit" class="btn btn-primary">Share</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyShareUrl() {
+    const shareUrl = document.getElementById('shareUrl');
+    shareUrl.select();
+    document.execCommand('copy');
+    // Можно добавить уведомление о копировании
+}
+
+function shareToPlatform(platform) {
+    document.getElementById('sharePlatform').value = platform;
+    const shareUrl = document.getElementById('shareUrl').value;
+    
+    const shareUrls = {
+        'twitter': `https://twitter.com/intent/tweet?text=Check%20this%20post&url=${encodeURIComponent(shareUrl)}`,
+        'facebook': `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+        'linkedin': `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+        'telegram': `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`
+    };
+    
+    if (shareUrls[platform]) {
+        window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+    }
+}
+</script>

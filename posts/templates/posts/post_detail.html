@@ -83,7 +83,18 @@
                         <div class="stat-item">
                             <strong>{{ post.comments.count }}</strong> комментариев
                         </div>
-                    </div>
+
+                         <button class="btn btn-outline-secondary btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#shareModal">
+                            <i class="fas fa-share"></i> Share
+                            <span class="badge bg-secondary">{{ post.shares.count }}</span>
+                        </button>
+
+
+                        <!-- <div class="stat-item">
+                            <strong>{{ post.shares.count }}</strong> репостов
+                    </div> -->
                 </div>
             </div>
             
@@ -171,3 +182,4 @@
 {% block extra_js %}
     <script src="{% static 'posts/js/post_detail.js' %}"></script>
 {% endblock %}
+{% include 'posts/share_modal.html' %}
