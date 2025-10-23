@@ -1,1 +1,7 @@
 .post { border: 1px solid #ccc; padding: 15px; margin: 10px; }
+.main-cont {
+    min-height: calc(100vh - 130px);
+}
+
+
+

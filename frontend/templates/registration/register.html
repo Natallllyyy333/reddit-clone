@@ -1,13 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Register - Reddit Clone{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 400px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-<h1 style="text-align: center; color: #1c1c1c; margin-bottom: 1rem;">Join Reddit Clone</h1>
-<p style="text-align: center; color: #7c7c7c; margin-bottom: 1.5rem;">Registration will be available soon.</p>
-<div style="text-align: center;">
-<a href="/" style="color: #0079d3; text-decoration: none; font-weight: 500;">← Back to Home</a>
-</div>
+<div class="auth-container">
+    <div class="auth-form">
+        <h2>Create Account</h2>
+        
+        {% if form.errors %}
+        <div class="alert alert-error">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="field-error">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+        
+        <p class="auth-link">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </p>
+    </div>
 </div>
 {% endblock %}
