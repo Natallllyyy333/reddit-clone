@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block title %}Posts - Reddit Clone{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'posts/css/post_list.css' %}">
 {% endblock %}
@@ -120,9 +120,11 @@
     </div>
     {% endfor %}
 </div>
+{% include 'posts/includes/share_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
     <script src="{% static 'posts/js/post_list.js' %}"></script>
+    <script src="{% static 'js/share.js' %}"></script>
 {% endblock %}
 
