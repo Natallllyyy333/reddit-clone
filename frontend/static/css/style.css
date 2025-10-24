@@ -3,5 +3,112 @@
     min-height: calc(100vh - 130px);
 }
 
+/* Стили для блока голосования и действий */
+.vote-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
 
+.vote-count {
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 30px;
+    text-align: center;
+    color: #1c1c1c;
+}
+
+.btn-vote {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.btn-vote:hover {
+    background: #f8f9fa;
+}
+
+.btn-vote:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-upvote:hover {
+    color: #ff4500;
+}
+
+.btn-downvote:hover {
+    color: #7193ff;
+}
+
+.text-success {
+    color: #ff4500 !important;
+}
+
+.text-danger {
+    color: #7193ff !important;
+}
+
+/* Стили для блока действий */
+.post-actions {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 12px;
+}
+
+/* Модальное окно */
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 1050;
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+}
+
+/* Кнопки социальных сетей */
+.share-platforms .btn {
+    flex: 1;
+    min-width: 120px;
+    margin: 2px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .post-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .vote-container {
+        order: 1;
+    }
+    
+    .share-btn {
+        order: 2;
+    }
+}
 

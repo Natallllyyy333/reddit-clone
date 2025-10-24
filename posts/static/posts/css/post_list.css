@@ -35,6 +35,50 @@
     font-weight: bold;
 }
 
+
+
+
+/* Стили для счетчика лайков */
+.vote-count {
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 30px;
+    text-align: center;
+    margin: 0 5px;
+    line-height: 1;
+}
+
+/* Контейнер для голосования */
+.vote-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Кнопки голосования */
+.btn-vote {
+    border: none;
+    background: transparent;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-vote:hover {
+    background: #f8f9fa;
+}
+
+.btn-upvote:hover {
+    color: #ff4500;
+}
+
+.btn-downvote:hover {
+    color: #7193ff;
+}
+
+
+
 .community-badge {
     background-color: #0079d3;
     color: white;

@@ -17,18 +17,18 @@
                         <div>
                             <h1 class="post-title">{{ post.title }}</h1>
                             <div class="post-meta">
-                                <span class="author">Опубликовано {{ post.author.username }}</span>
+                                <span class="author">{{ post.author.username }}</span>
                                 <span class="separator">•</span>
-                                <span class="date">{{ post.created_at|timesince }} назад</span>
+                                <span class="date">{{ post.created_at|timesince }} ago</span>
                                 {% if post.community %}
                                     <span class="separator">•</span>
-                                    <span class="community">в 
+                                    <span class="community">in 
                                         <a href="#" class="community-link">{{ post.community.name }}</a>
                                     </span>
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="vote-section">
+                        <!-- <div class="vote-section">
                             <div class="vote-buttons text-center">
                                 <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline">
                                     {% csrf_token %}
@@ -50,7 +50,7 @@
                                     </button>
                                 </form>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 
@@ -63,7 +63,7 @@
                     {% if post.media_file %}
                         {% if post.media_type == 'image' %}
                             <div class="post-media-container text-center mb-4">
-                                <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid rounded">
+                                <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid rounded text-center">
                             </div>
                         {% elif post.media_type == 'video' %}
                             <div class="post-media-container text-center mb-4">
@@ -84,11 +84,9 @@
                             <strong>{{ post.comments.count }}</strong> комментариев
                         </div>
 
-                         <button class="btn btn-outline-secondary btn-sm" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#shareModal">
+                        <button class="btn btn-outline-secondary btn-sm share-btn" 
+                                data-post-id="{{ post.id }}">
                             <i class="fas fa-share"></i> Share
-                            <span class="badge bg-secondary">{{ post.shares.count }}</span>
                         </button>
 
 
@@ -102,7 +100,7 @@
             <div class="comments-section mt-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">💬 Комментарии ({{ post.comments.count }})</h5>
+                        <h5 class="mb-0">💬 Comments ({{ post.comments.count }})</h5>
                     </div>
                     <div class="card-body">
                         {% if user.is_authenticated %}
@@ -111,13 +109,13 @@
                                 {% csrf_token %}
                                 <div class="mb-3">
                                     <textarea name="content" class="form-control" rows="3" 
-                                              placeholder="Напишите ваш комментарий..." required></textarea>
+                                              placeholder="Write a comment..." required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Опубликовать комментарий</button>
+                                <button type="submit" class="btn btn-primary">Leave your comment</button>
                             </form>
                         {% else %}
                             <div class="alert alert-info">
-                                <a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.
+                                <a href="{% url 'login' %}">Log in</a> to leave a comment.
                             </div>
                         {% endif %}
                         
@@ -135,7 +133,7 @@
                                 </div>
                             {% empty %}
                                 <div class="text-center text-muted py-4">
-                                    <p>Пока нет комментариев. Будьте первым!</p>
+                                    <p>No comments yet. Be the first!</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -177,9 +175,10 @@
         </div>
     </div>
 </div>
+{% include 'posts/includes/share_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
     <script src="{% static 'posts/js/post_detail.js' %}"></script>
+    <script src="{% static 'js/share.js' %}"></script>
 {% endblock %}
-{% include 'posts/share_modal.html' %}
