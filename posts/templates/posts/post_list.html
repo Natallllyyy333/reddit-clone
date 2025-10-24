@@ -69,58 +69,41 @@
                <div class="text-muted small mb-4">
                      <p class="card-text">{{ post.content|truncatewords:50 }}</p>
                 </div>
-                <!-- Media_carousel -->
-                {% if post.media_files.exists or post.media_file %}
+
+
+
+
+
+                                <!-- Media_carousel -->
+                {% if post.media_files.exists %}
                 <div class="post-media-container mb-3">
                     <div class="media-carousel">
                         <div class="media-scroll-wrapper">
                             <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
-                                <!-- ========== ОБРАБОТКА МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
                                 {% for media in post.media_files.all %}
                                 <div class="media-item">
                                     {% if media.media_type == 'image' %}
                                     <img src="{{ media.media_file.url }}" 
                                          alt="Post media {{ forloop.counter }}" 
-                                         class="img-fluid rounded"
-                                         style="max-height: 500px; object-fit: contain;">
+                                         class="img-fluid rounded media-image">
                                     {% elif media.media_type == 'video' %}
                                     <div class="video-item">
-                                        <video class="img-fluid rounded" style="max-height: 500px;">
+                                        <video class="img-fluid rounded media-video" {% if not post.media_files.count > 1 %}controls{% endif %}>
                                             <source src="{{ media.media_file.url }}" type="video/mp4">
                                         </video>
+                                        {% if not post.media_files.count > 1 %}
                                         <div class="video-overlay" onclick="playVideo(this)">
                                             <i class="fas fa-play fa-2x"></i>
                                         </div>
+                                        {% endif %}
                                     </div>
                                     {% endif %}
                                 </div>
                                 {% endfor %}
-                                
-                                <!-- ========== ОБРАТНАЯ СОВМЕСТИМОСТЬ СО СТАРЫМИ ПОСТАМИ ========== -->
-                                {% if not post.media_files.exists and post.media_file %}
-                                <div class="media-item">
-                                    {% if post.media_type == 'image' %}
-                                    <img src="{{ post.media_file.url }}" 
-                                         alt="Post media" 
-                                         class="img-fluid rounded"
-                                         style="max-height: 500px; object-fit: contain;">
-                                    {% elif post.media_type == 'video' %}
-                                    <div class="video-item">
-                                        <video class="img-fluid rounded" style="max-height: 500px;">
-                                            <source src="{{ post.media_file.url }}" type="video/mp4">
-                                        </video>
-                                        <div class="video-overlay" onclick="playVideo(this)">
-                                            <i class="fas fa-play fa-2x"></i>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                         
-                        <!-- ========== КНОПКИ НАВИГАЦИИ ДЛЯ МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
-                        {% if post.media_files.count > 1 or post.has_multiple_media %}
+                        {% if post.media_files.count > 1 %}
                         <div class="carousel-controls">
                             <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
                                 <i class="fas fa-chevron-left"></i>
@@ -132,21 +115,13 @@
                         {% endif %}
                     </div>
                     
-                    <!-- ========== СЧЕТЧИК МЕДИАФАЙЛОВ ========== -->
-                    {% if post.media_files.count > 1 or post.has_multiple_media %}
+                    {% if post.media_files.count > 1 %}
                     <div class="media-counter">
-                        <span class="current">1</span>/<span class="total">
-                            {% if post.media_files.exists %}
-                                {{ post.media_files.count }}
-                            {% else %}
-                                1
-                            {% endif %}
-                        </span>
+                        <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
                     </div>
                     {% endif %}
                 </div>
                 {% endif %}
-            </div>
 
 
 
