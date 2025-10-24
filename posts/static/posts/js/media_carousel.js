@@ -1,5 +1,7 @@
 function scrollMedia(postId, direction) {
     const scrollContainer = document.getElementById(`mediaScroll-${postId}`);
+    if (!scrollContainer) return;
+    
     const mediaItems = scrollContainer.querySelectorAll('.media-item');
     const scrollWidth = scrollContainer.offsetWidth;
     const currentScroll = scrollContainer.scrollLeft || 0;
@@ -20,7 +22,7 @@ function scrollMedia(postId, direction) {
 }
 
 function updateMediaCounter(postId, currentIndex) {
-    const counter = document.querySelector(`#mediaScroll-${postId}`).closest('.post-media-container').querySelector('.media-counter .current');
+    const counter = document.querySelector(`#mediaScroll-${postId}`)?.closest('.post-media-container')?.querySelector('.media-counter .current');
     if (counter) {
         counter.textContent = currentIndex;
     }
@@ -28,9 +30,11 @@ function updateMediaCounter(postId, currentIndex) {
 
 function playVideo(element) {
     const video = element.parentElement.querySelector('video');
-    video.controls = true;
-    video.play();
-    element.style.display = 'none';
+    if (video) {
+        video.controls = true;
+        video.play();
+        element.style.display = 'none';
+    }
 }
 
 // Инициализация при загрузке страницы
@@ -74,6 +78,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const x = e.touches[0].pageX - container.offsetLeft;
             const walk = (x - startX) * 2;
             container.scrollLeft = scrollLeft - walk;
+            
+            // Обновляем счетчик при свайпе
+            const currentIndex = Math.round(container.scrollLeft / container.offsetWidth) + 1;
+            const postId = container.id.replace('mediaScroll-', '');
+            updateMediaCounter(postId, currentIndex);
+        });
+    });
+    
+    // Автоматически скрываем overlay при клике на видео
+    document.querySelectorAll('.video-item video').forEach(video => {
+        video.addEventListener('play', function() {
+            const overlay = this.parentElement.querySelector('.video-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
         });
     });
 });

@@ -58,16 +58,23 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         #     print("Файл НЕ получен в запросе!")
         # print("========================")
         
-        response = super().form_valid(form)
+         # ========== СОХРАНИТЬ POST БЕЗ MEDIA_FILE ==========
+        # Не сохраняем media_file через форму, только через PostMedia
+        post = form.save(commit=False)
+        post.media_file = None  # Убедимся что старое поле пустое
+        post.media_type = 'none'
+        post.save()
+        
+        # ========== ОБРАБОТКА МНОЖЕСТВЕННЫХ ФАЙЛОВ ==========
         media_files = self.request.FILES.getlist('media_files')
         for media_file in media_files:
             if media_file:
                 PostMedia.objects.create(
-                    post=form.instance,
+                    post=post,
                     media_file=media_file
                 )
         
-        return response
+        return redirect(self.success_url)
 @login_required
 def vote_post(request, pk, vote_type):
     post = get_object_or_404(Post, pk=pk)

@@ -91,12 +91,12 @@ class Post(models.Model):
         
         super().save(*args, **kwargs)
 
-        if self.media_file and not self.media_files.exists():
-            PostMedia.objects.create(
-                post=self,
-                media_file=self.media_file,
-                media_type=self.media_type
-            )
+        # if self.media_file and not self.media_files.exists():
+        #     PostMedia.objects.create(
+        #         post=self,
+        #         media_file=self.media_file,
+        #         media_type=self.media_type
+        #     )
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
