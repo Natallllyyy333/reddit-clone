@@ -4,7 +4,8 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'posts/css/post_list.css' %}">
     <link rel="stylesheet" href="{% static 'posts/css/style.css' %}">
-      <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -68,18 +69,86 @@
                <div class="text-muted small mb-4">
                      <p class="card-text">{{ post.content|truncatewords:50 }}</p>
                 </div>
-                {% if post.media_file %}
-                <div class="post-media-container text-center mb-1">
-                    {% if post.media_file.url|lower|slice:'-4:' == '.jpg' or post.media_file.url|lower|slice:'-5:' == '.jpeg' or post.media_file.url|lower|slice:'-4:' == '.png' or post.media_file.url|lower|slice:'-4:' == '.gif' %}
-                    <img src="{{ post.media_file.url }}" alt="Post media" class="img-fluid rounded" style="max-height: 500px; ">
-                    {% elif post.media_file.url|lower|slice:'-4:' == '.mp4' or post.media_file.url|lower|slice:'-5:' == '.webm' %}
-                    <video controls class="img-fluid rounded" style="max-height: 500px;">
-                        <source src="{{ post.media_file.url }}" type="video/mp4">
-                    </video>
+                <!-- Media_carousel -->
+                {% if post.media_files.exists or post.media_file %}
+                <div class="post-media-container mb-3">
+                    <div class="media-carousel">
+                        <div class="media-scroll-wrapper">
+                            <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                                <!-- ========== ОБРАБОТКА МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
+                                {% for media in post.media_files.all %}
+                                <div class="media-item">
+                                    {% if media.media_type == 'image' %}
+                                    <img src="{{ media.media_file.url }}" 
+                                         alt="Post media {{ forloop.counter }}" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 500px; object-fit: contain;">
+                                    {% elif media.media_type == 'video' %}
+                                    <div class="video-item">
+                                        <video class="img-fluid rounded" style="max-height: 500px;">
+                                            <source src="{{ media.media_file.url }}" type="video/mp4">
+                                        </video>
+                                        <div class="video-overlay" onclick="playVideo(this)">
+                                            <i class="fas fa-play fa-2x"></i>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                <!-- ========== ОБРАТНАЯ СОВМЕСТИМОСТЬ СО СТАРЫМИ ПОСТАМИ ========== -->
+                                {% if not post.media_files.exists and post.media_file %}
+                                <div class="media-item">
+                                    {% if post.media_type == 'image' %}
+                                    <img src="{{ post.media_file.url }}" 
+                                         alt="Post media" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 500px; object-fit: contain;">
+                                    {% elif post.media_type == 'video' %}
+                                    <div class="video-item">
+                                        <video class="img-fluid rounded" style="max-height: 500px;">
+                                            <source src="{{ post.media_file.url }}" type="video/mp4">
+                                        </video>
+                                        <div class="video-overlay" onclick="playVideo(this)">
+                                            <i class="fas fa-play fa-2x"></i>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- ========== КНОПКИ НАВИГАЦИИ ДЛЯ МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
+                        {% if post.media_files.count > 1 or post.has_multiple_media %}
+                        <div class="carousel-controls">
+                            <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- ========== СЧЕТЧИК МЕДИАФАЙЛОВ ========== -->
+                    {% if post.media_files.count > 1 or post.has_multiple_media %}
+                    <div class="media-counter">
+                        <span class="current">1</span>/<span class="total">
+                            {% if post.media_files.exists %}
+                                {{ post.media_files.count }}
+                            {% else %}
+                                1
+                            {% endif %}
+                        </span>
+                    </div>
                     {% endif %}
                 </div>
                 {% endif %}
             </div>
+
+
 
 
  <!-- Действия с постом - ТОЧНО КАК В POST_DETAIL -->
@@ -153,5 +222,6 @@
 {% block extra_js %}
     <script src="{% static 'posts/js/post_list.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
+     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 {% endblock %}
 

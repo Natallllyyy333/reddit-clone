@@ -3,6 +3,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -60,20 +61,79 @@
                         <p>{{ post.content|linebreaksbr }}</p>
                     </div>
                     
-                    {% if post.media_file %}
-                        {% if post.media_type == 'image' %}
-                            <div class="post-media-container text-center mb-4 ">
-                                <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid rounded text-center">
+
+
+{% if post.media_files.exists or post.media_file %}
+                    <div class="post-media-container mb-4">
+                        <div class="media-carousel detail-view">
+                            <div class="media-scroll-wrapper">
+                                <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                                    <!-- ========== ОБРАБОТКА МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
+                                    {% for media in post.media_files.all %}
+                                    <div class="media-item">
+                                        {% if media.media_type == 'image' %}
+                                        <img src="{{ media.media_file.url }}" 
+                                             alt="Post media {{ forloop.counter }}" 
+                                             class="img-fluid rounded post-media">
+                                        {% elif media.media_type == 'video' %}
+                                        <div class="video-item">
+                                            <video controls class="post-video img-fluid rounded">
+                                                <source src="{{ media.media_file.url }}" type="video/mp4">
+                                                Ваш браузер не поддерживает видео.
+                                            </video>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                    
+                                    <!-- ========== ОБРАТНАЯ СОВМЕСТИМОСТЬ СО СТАРЫМИ ПОСТАМИ ========== -->
+                                    {% if not post.media_files.exists and post.media_file %}
+                                    <div class="media-item">
+                                        {% if post.media_type == 'image' %}
+                                        <img src="{{ post.media_file.url }}" 
+                                             alt="Post media" 
+                                             class="img-fluid rounded post-media">
+                                        {% elif post.media_type == 'video' %}
+                                        <div class="video-item">
+                                            <video controls class="post-video img-fluid rounded">
+                                                <source src="{{ post.media_file.url }}" type="video/mp4">
+                                                Ваш браузер не поддерживает видео.
+                                            </video>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                        {% elif post.media_type == 'video' %}
-                            <div class="post-media-container text-center mb-4">
-                                <video controls class="post-video img-fluid rounded">
-                                    <source src="{{ post.media_file.url }}" type="video/mp4">
-                                    Ваш браузер не поддерживает видео.
-                                </video>
+                            
+                            <!-- ========== КНОПКИ НАВИГАЦИИ ДЛЯ МНОЖЕСТВЕННЫХ ФАЙЛОВ ========== -->
+                            {% if post.media_files.count > 1 or post.has_multiple_media %}
+                            <div class="carousel-controls">
+                                <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- ========== СЧЕТЧИК МЕДИАФАЙЛОВ ========== -->
+                        {% if post.media_files.count > 1 or post.has_multiple_media %}
+                        <div class="media-counter">
+                            <span class="current">1</span>/<span class="total">
+                                {% if post.media_files.exists %}
+                                    {{ post.media_files.count }}
+                                {% else %}
+                                    1
+                                {% endif %}
+                            </span>
+                        </div>
                         {% endif %}
+                    </div>
                     {% endif %}
+                    
                     
                     <!-- Статистика поста -->
                    <div class="card-footer d-flex justify-content-start align-items-center">
@@ -203,4 +263,5 @@
 {% block extra_js %}
     <script src="{% static 'posts/js/post_detail.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
+    <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 {% endblock %}

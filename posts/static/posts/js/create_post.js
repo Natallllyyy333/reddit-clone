@@ -69,23 +69,27 @@ class CreatePostForm {
             e.preventDefault();
             fileUploadArea.classList.remove('dragover');
             this.handleFiles(e.dataTransfer.files);
+            this.updateFileInput();
         });
 
         fileInput.addEventListener('change', (e) => {
             this.handleFiles(e.target.files);
+            this.updateFileInput();
         });
     }
 
     handleFiles(files) {
         for (let file of files) {
             if (this.isValidFile(file)) {
-                this.uploadedFiles.push(file);
-                this.createPreview(file);
+                if (!this.isDuplicateFile(file)) {
+                    this.uploadedFiles.push(file);
+                    this.createPreview(file);
+                }
             } else {
                 this.showError(`Файл "${file.name}" не поддерживается. Разрешены только изображения и видео до 10MB.`);
             }
         }
-        this.updateFileInput();
+       
     }
 
     isValidFile(file) {
@@ -93,6 +97,14 @@ class CreatePostForm {
         const maxSize = 10 * 1024 * 1024; // 10MB
         
         return validTypes.includes(file.type) && file.size <= maxSize;
+    }
+
+    isDuplicateFile(newFile) {
+        return this.uploadedFiles.some(existingFile => 
+            existingFile.name === newFile.name && 
+            existingFile.size === newFile.size &&
+            existingFile.type === newFile.type
+        );
     }
 
     createPreview(file) {
@@ -126,6 +138,9 @@ class CreatePostForm {
 
         previewItem.appendChild(removeBtn);
         filePreview.appendChild(previewItem);
+
+        // ========== СКРЫТЬ ОБЛАСТЬ ЗАГРУЗКИ ПРИ НАЛИЧИИ ФАЙЛОВ ==========
+        document.getElementById('fileUploadArea').style.display = 'none';
     }
 
     updateFileInput() {
