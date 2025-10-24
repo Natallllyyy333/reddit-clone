@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post
 from communities.models import Community
+from comments.models import Comment
 
 
 
@@ -32,6 +33,19 @@ class PostForm(forms.ModelForm):
         self.fields['community'].required = False
         self.fields['community'].empty_label = "Pick a community (not required)"
         self.fields['community'].label_from_instance = lambda obj: obj.name
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Write a comment...',
+                'rows': 3,
+                'id': 'write_comment'
+            })
+        }
         
     
 

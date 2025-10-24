@@ -1,12 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import JsonResponse
+from django.contrib import messages
 from .models import Post, Comment, Share, PostMedia
-from comments.models import Comment  # Импортируем Comment из comments
-from .forms import PostForm 
+from .forms import PostForm, CommentForm
+from django.views.decorators.http import require_POST
 
 class PostListView(ListView):
     model = Post
@@ -22,50 +23,49 @@ class PostDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # ИСПРАВЛЕНО: используем post_comments вместо comments
         context['comments'] = self.object.comments.all().order_by('-created_at')
+        context['comment_form'] = CommentForm()
         return context
     
     def post(self, request, *args, **kwargs):
-        post = self.get_object()
-        if request.user.is_authenticated:
-            content = request.POST.get('content')
-            if content:
-                Comment.objects.create(
-                    post=post,
-                    author=request.user,
-                    content=content
-                )
+        self.object = self.get_object()
+        
+        # Обработка комментариев
+        if 'content' in request.POST:
+            if not request.user.is_authenticated:
+                messages.error(request, 'You need to log in to comment.')
+                return redirect('login')
+            
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = self.object
+                comment.author = request.user
+                comment.save()
+                messages.success(request, 'Comment added successfully.')
+                return redirect('post_detail', pk=self.object.pk)
+            else:
+                # Если форма невалидна, показываем ошибки
+                messages.error(request, 'Error adding comment. Please check your input.')
+        
         return self.get(request, *args, **kwargs)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm 
     template_name = 'posts/create_post.html'
-    # fields = ['title', 'content', 'community', 'media_file']
     success_url = reverse_lazy('post_list')
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-
-        # # Обрабатываем загрузку файла
-        # print("=== DEBUG CREATE POST ===")
-        # print(f"FILES в запросе: {self.request.FILES}")
-        # if self.request.FILES.get('media_file'):
-        #     file = self.request.FILES['media_file']
-        #     print(f"Файл получен: {file.name}, размер: {file.size}, тип: {file.content_type}")
-        # else:
-        #     print("Файл НЕ получен в запросе!")
-        # print("========================")
         
-         # ========== СОХРАНИТЬ POST БЕЗ MEDIA_FILE ==========
-        # Не сохраняем media_file через форму, только через PostMedia
+        # Сохраняем пост БЕЗ медиафайла в старое поле
         post = form.save(commit=False)
         post.media_file = None  # Убедимся что старое поле пустое
         post.media_type = 'none'
         post.save()
         
-        # ========== ОБРАБОТКА МНОЖЕСТВЕННЫХ ФАЙЛОВ ==========
+        # Обрабатываем множественные файлы через PostMedia
         media_files = self.request.FILES.getlist('media_files')
         for media_file in media_files:
             if media_file:
@@ -74,35 +74,75 @@ class PostCreateView(LoginRequiredMixin, CreateView):
                     media_file=media_file
                 )
         
+        messages.success(self.request, 'Post created successfully!')
         return redirect(self.success_url)
+
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'posts/post_edit.html'
+    
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+    
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Post updated successfully!')
+        return super().form_valid(form)
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = 'posts/post_delete.html'
+    success_url = reverse_lazy('post_list')
+    
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Post deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+# ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЛАЙКОВ (ОДНА ВЕРСИЯ) ==========
+@require_POST
 @login_required
 def vote_post(request, pk, vote_type):
     post = get_object_or_404(Post, pk=pk)
     
     if vote_type == 'upvote':
-        if post.downvotes.filter(id=request.user.id).exists():
-            post.downvotes.remove(request.user)
         if post.upvotes.filter(id=request.user.id).exists():
             post.upvotes.remove(request.user)
+            action = 'removed_upvote'
         else:
             post.upvotes.add(request.user)
-    
+            post.downvotes.remove(request.user)
+            action = 'added_upvote'
     elif vote_type == 'downvote':
-        if post.upvotes.filter(id=request.user.id).exists():
-            post.upvotes.remove(request.user)
         if post.downvotes.filter(id=request.user.id).exists():
             post.downvotes.remove(request.user)
+            action = 'removed_downvote'
         else:
             post.downvotes.add(request.user)
+            post.upvotes.remove(request.user)
+            action = 'added_downvote'
+    else:
+        return JsonResponse({'error': 'Invalid vote type'}, status=400)
     
     # Для AJAX запросов возвращаем JSON
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({
             'total_votes': post.total_votes(),
-            'user_vote': post.user_vote(request.user)
+            'user_vote': post.user_vote(request.user),
+            'action': action
         })
     
-    return redirect('post_list')
+    # Для обычных запросов редирект
+    referer = request.META.get('HTTP_REFERER', 'post_list')
+    if 'post_detail' in referer:
+        return redirect('post_detail', pk=post.pk)
+    else:
+        return redirect('post_list')
 
 @login_required
 def share_post(request, post_id):
@@ -125,7 +165,7 @@ def share_post(request, post_id):
                 'message': 'Post shared successfully!'
             })
         
-        return redirect('posts:post_detail', post_id=post.id)
+        return redirect('post_detail', pk=post.id)
     
     # For GET requests, show share options
     context = {
@@ -133,18 +173,3 @@ def share_post(request, post_id):
         'share_url': request.build_absolute_uri(post.get_absolute_url())
     }
     return render(request, 'posts/share_modal.html', context)
-
-def create_post(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            
-            # Файлы автоматически сохраняются через форму
-            return redirect('post_detail', pk=post.pk)
-    else:
-        form = PostForm()
-    
-    return render(request, 'posts/create_post.html', {'form': form})
