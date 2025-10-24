@@ -65,15 +65,15 @@
 
  <!-- Контент поста -->
             <div class="post-content  mb-3 px-3 pb-3">
-               <div class="text-muted small">
+               <div class="text-muted small mb-4">
                      <p class="card-text">{{ post.content|truncatewords:50 }}</p>
                 </div>
                 {% if post.media_file %}
-                <div class="post-media-container text-center mb-4">
+                <div class="post-media-container text-center mb-1">
                     {% if post.media_file.url|lower|slice:'-4:' == '.jpg' or post.media_file.url|lower|slice:'-5:' == '.jpeg' or post.media_file.url|lower|slice:'-4:' == '.png' or post.media_file.url|lower|slice:'-4:' == '.gif' %}
-                    <img src="{{ post.media_file.url }}" alt="Post media" class="img-fluid rounded" style="max-height: 300px;">
+                    <img src="{{ post.media_file.url }}" alt="Post media" class="img-fluid rounded" style="max-height: 500px; ">
                     {% elif post.media_file.url|lower|slice:'-4:' == '.mp4' or post.media_file.url|lower|slice:'-5:' == '.webm' %}
-                    <video controls class="img-fluid rounded" style="max-height: 300px;">
+                    <video controls class="img-fluid rounded" style="max-height: 500px;">
                         <source src="{{ post.media_file.url }}" type="video/mp4">
                     </video>
                     {% endif %}
@@ -99,11 +99,11 @@
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-lg btn-outline-danger vote-btn ms-1 me-3 px-3" 
                                             data-post-id="{{ post.pk }}" data-vote-type="downvote">
-                                      <i class="fa fa-thumbs-up fa-lg ms-1 me-1"></i> 
+                                      <i class="fa fa-thumbs-down fa-lg ms-1 me-1"></i> 
                                     </button>
                                 </form>
                             
-                <a href="{% url 'post_detail' post.pk %}" class="btn btn-outline-secondary btn-sm me-3">
+               <a href="{% url 'post_detail' post.pk %}#write_comment" class="btn btn-outline-secondary btn-sm me-3">
                     <i class="fas fa-comment"></i> {{ post.comments.count }}
                 </a>
 
@@ -147,7 +147,7 @@
     </div>
     {% endfor %}
 </div>
-{% include 'posts/includes/share_modal.html' %}
+<!-- {% include 'posts/includes/share_modal.html' %} -->
 {% endblock %}
 
 {% block extra_js %}

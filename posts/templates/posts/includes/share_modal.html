@@ -1,0 +1,43 @@
+<!-- Общее модальное окно для шаринга -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Share URL:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="shareUrl" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copyShareUrlBtn">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="share-platforms">
+                    <p class="mb-2">Share to social media:</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a class="btn btn-outline-primary btn-sm share-platform-btn" id="twitterShare" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm share-platform-btn" id="facebookShare" target="_blank">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm share-platform-btn" id="linkedinShare" target="_blank">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm share-platform-btn" id="telegramShare" target="_blank">
+                            <i class="fab fa-telegram"></i> Telegram
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

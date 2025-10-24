@@ -7,9 +7,9 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
+    <div class="row justify-content-center">
         <!-- Основной контент поста -->
-        <div class="col-lg-8">
+        <div class="col-lg-8 px-3">
             <div class="post-detail-card card">
                 <!-- Заголовок и информация -->
                 <div class="card-header post-header">
@@ -55,14 +55,14 @@
                 </div>
                 
                 <!-- Содержание и медиа -->
-                <div class="card-body">
+                <div class="card-body ">
                     <div class="post-content mb-4">
                         <p>{{ post.content|linebreaksbr }}</p>
                     </div>
                     
                     {% if post.media_file %}
                         {% if post.media_type == 'image' %}
-                            <div class="post-media-container text-center mb-4">
+                            <div class="post-media-container text-center mb-4 ">
                                 <img src="{{ post.media_file.url }}" alt="Post media" class="post-media img-fluid rounded text-center">
                             </div>
                         {% elif post.media_type == 'video' %}
@@ -76,31 +76,53 @@
                     {% endif %}
                     
                     <!-- Статистика поста -->
-                    <div class="post-stats d-flex gap-4 text-muted">
-                        <div class="stat-item">
-                            <strong>{{ post.total_votes }}</strong> голосов
-                        </div>
-                        <div class="stat-item">
-                            <strong>{{ post.comments.count }}</strong> комментариев
-                        </div>
+                   <div class="card-footer d-flex justify-content-start align-items-center">
+                
+   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline "  >
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn  btn-outline-success vote-btn  me-1 px-3" 
+                                            data-post-id="{{ post.pk }}" data-vote-type="upvote">
+                                        <i class="fa fa-thumbs-up fa-lg me-1 "></i> 
+                                    </button>
+                                </form>
+                <span><strong>{{ post.total_votes }}</strong></span>
+                                <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
+                                            data-post-id="{{ post.pk }}" data-vote-type="downvote">
+                                      <i class="fa fa-thumbs-down fa-lg ms-1 me-1"></i> 
+                                    </button>
+                                </form>
+                            
+               <a href="{% url 'post_detail' post.pk %}#write_comment" class="btn btn-outline-secondary btn me-3">
+                    <i class="fas fa-comment fa-2xl"></i> {{ post.comments.count }}
+                </a>
 
-                        <button class="btn btn-outline-secondary btn-sm share-btn" 
+     
+   
+           
+
+     
+               
+           
+                
+
+
+                 <!-- Кнопка Share -->
+            <button class="btn btn-outline-secondary  share-btn fa-2xl" 
                                 data-post-id="{{ post.id }}">
-                            <i class="fas fa-share"></i> Share
+                            <i class="fas fa-share fa-2xl"></i> Share
                         </button>
-
-
-                        <!-- <div class="stat-item">
-                            <strong>{{ post.shares.count }}</strong> репостов
-                    </div> -->
-                </div>
+             </div>
+            </div>
+            
             </div>
             
             <!-- Секция комментариев -->
             <div class="comments-section mt-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">💬 Comments ({{ post.comments.count }})</h5>
+                        <h5 class="mb-0" >💬 Comments ({{ post.comments.count }})</h5>
                     </div>
                     <div class="card-body">
                         {% if user.is_authenticated %}
@@ -108,7 +130,7 @@
                             <form method="post" class="comment-form mb-4">
                                 {% csrf_token %}
                                 <div class="mb-3">
-                                    <textarea name="content" class="form-control" rows="3" 
+                                    <textarea id="write_comment" name="content" class="form-control" rows="3" 
                                               placeholder="Write a comment..." required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Leave your comment</button>
