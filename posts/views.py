@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .models import Post, Comment, Share
+from .models import Post, Comment, Share, PostMedia
 from comments.models import Comment  # Импортируем Comment из comments
 from .forms import PostForm 
 
@@ -48,17 +48,26 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
 
-        # Обрабатываем загрузку файла
-        print("=== DEBUG CREATE POST ===")
-        print(f"FILES в запросе: {self.request.FILES}")
-        if self.request.FILES.get('media_file'):
-            file = self.request.FILES['media_file']
-            print(f"Файл получен: {file.name}, размер: {file.size}, тип: {file.content_type}")
-        else:
-            print("Файл НЕ получен в запросе!")
-        print("========================")
+        # # Обрабатываем загрузку файла
+        # print("=== DEBUG CREATE POST ===")
+        # print(f"FILES в запросе: {self.request.FILES}")
+        # if self.request.FILES.get('media_file'):
+        #     file = self.request.FILES['media_file']
+        #     print(f"Файл получен: {file.name}, размер: {file.size}, тип: {file.content_type}")
+        # else:
+        #     print("Файл НЕ получен в запросе!")
+        # print("========================")
         
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        media_files = self.request.FILES.getlist('media_files')
+        for media_file in media_files:
+            if media_file:
+                PostMedia.objects.create(
+                    post=form.instance,
+                    media_file=media_file
+                )
+        
+        return response
 @login_required
 def vote_post(request, pk, vote_type):
     post = get_object_or_404(Post, pk=pk)
