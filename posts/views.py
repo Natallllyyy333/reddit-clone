@@ -117,3 +117,18 @@ def share_post(request, post_id):
         'share_url': request.build_absolute_uri(post.get_absolute_url())
     }
     return render(request, 'posts/share_modal.html', context)
+
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            
+            # Файлы автоматически сохраняются через форму
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    
+    return render(request, 'posts/create_post.html', {'form': form})
