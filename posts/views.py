@@ -110,10 +110,10 @@ def vote_post(request, pk, vote_type):
             post.upvotes.remove(request.user)
     
     # Простой возврат JSON
-    return JsonResponse({
-        'total_votes': post.total_votes(),
-        'user_vote': post.user_vote(request.user)
-    })
+    # return JsonResponse({
+    #     'total_votes': post.total_votes(),
+    #     'user_vote': post.user_vote(request.user)
+    # })
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({

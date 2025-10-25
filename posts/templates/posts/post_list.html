@@ -131,17 +131,17 @@
  <!-- Комментарии -->
             <div class="card-footer d-flex justify-content-start align-items-center">
                 
-   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline "  >
+   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline vote-form"  >
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-lg btn-outline-success vote-btn  me-1 px-3" 
+                                    <button type="submit" class="btn  btn-outline-success vote-btn  me-1 px-3" 
                                             data-post-id="{{ post.pk }}" data-vote-type="upvote">
                                         <i class="fa fa-thumbs-up fa-lg me-1 "></i> 
                                     </button>
                                 </form>
                 <span class="vote-count" id="vote-count-{{ post.pk }}"><strong>{{ post.total_votes }}</strong></span>
-                                <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
+    <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline vote-form">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-lg btn-outline-danger vote-btn ms-1 me-3 px-3" 
+                                    <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
                                             data-post-id="{{ post.pk }}" data-vote-type="downvote">
                                       <i class="fa fa-thumbs-down fa-lg ms-1 me-1"></i> 
                                     </button>
@@ -198,7 +198,14 @@
     <script src="{% static 'posts/js/post_list.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
      <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-     <script src="{% static 'posts/js/votes.js' %}"></script>
+     <!-- <script src="{% static 'posts/js/post_list_votes.js' %}"></script> -->
+     <!-- <script src="{% static 'posts/js/votes.js' %}"></script> -->
+     <script src="{% static 'posts/js/posts.js' %}"></script>
      <script src="{% static 'posts/js/ajax_handler.js' %}"></script>
+
+
+
+
+     
 {% endblock %}
 
