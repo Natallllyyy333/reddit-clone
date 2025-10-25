@@ -25,7 +25,7 @@
    
 </head>
 <body>
-    
+     {% csrf_token %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <!-- Ссылка на главную страницу с постами -->
@@ -104,7 +104,15 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+     <script>
+        function getCSRFToken() {
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            return csrfInput ? csrfInput.value : '';
+        }
+    </script>
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
+    <script src="{% static 'posts/js/post_list.js' %}"></script>
+    <script src="{% static 'posts/js/ajax_handler.js' %}"></script>
     {% block extra_js %}
 
     {% endblock %}

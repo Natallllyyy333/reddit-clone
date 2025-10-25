@@ -117,15 +117,15 @@
                     <!-- Статистика поста -->
                    <div class="card-footer d-flex justify-content-start align-items-center">
                 
-   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline "  >
+   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline vote-form"  >
                                     {% csrf_token %}
                                     <button type="submit" class="btn  btn-outline-success vote-btn  me-1 px-3" 
                                             data-post-id="{{ post.pk }}" data-vote-type="upvote">
                                         <i class="fa fa-thumbs-up fa-lg me-1 "></i> 
                                     </button>
                                 </form>
-                <span><strong>{{ post.total_votes }}</strong></span>
-                                <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
+                <span class="vote-count" id="vote-count-{{ post.pk }}"><strong>{{ post.total_votes }}</strong></span>
+    <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline vote-form">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
                                             data-post-id="{{ post.pk }}" data-vote-type="downvote">
@@ -167,13 +167,12 @@
                         {% if user.is_authenticated %}
                             <!-- Форма добавления комментария -->
                             <form method="post" class="comment-form mb-4">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <textarea id="write_comment" name="content" class="form-control" rows="3" 
-                                              placeholder="Write a comment..." required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Leave your comment</button>
-                            </form>
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ comment_form.content }}
+    </div>
+    <button type="submit" class="btn btn-primary">Leave your comment</button>
+</form>
                         {% else %}
                             <div class="alert alert-info">
                                 <a href="{% url 'login' %}">Log in</a> to leave a comment.
@@ -226,11 +225,11 @@
                     </div>
                     
                     {% if user.is_authenticated and user == post.author %}
-                        <div class="post-actions mt-3">
-                            <a href="#" class="btn btn-outline-primary btn-sm">Редактировать</a>
-                            <a href="#" class="btn btn-outline-danger btn-sm">Удалить</a>
-                        </div>
-                    {% endif %}
+<div class="post-actions mt-3">
+    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Редактировать</a>
+    <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
+</div>
+{% endif %}
                 </div>
             </div>
         </div>
@@ -243,5 +242,6 @@
     <script src="{% static 'posts/js/post_detail.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-    <script src="{% static 'posts/js/votes.js' %}"></script>
+    <!-- <script src="{% static 'posts/js/votes.js' %}"></script> -->
+    <!-- <script src="{% static 'posts/js/ajax_handler.js' %}"></script> -->
 {% endblock %}
