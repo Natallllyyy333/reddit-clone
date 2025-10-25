@@ -10,6 +10,10 @@ class PostList {
 
     setupVoteButtons() {
         const voteForms = document.querySelectorAll('form[action*="vote"]');
+
+        // const voteForms = document.querySelectorAll('form.vote-form');
+        // const voteForms = document.querySelectorAll('form[data-vote-form]');
+        // const voteForms = document.querySelectorAll('form:not([data-skip-js])');
         
         voteForms.forEach(form => {
             form.addEventListener('submit', async (e) => {
