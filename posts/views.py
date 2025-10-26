@@ -41,7 +41,7 @@ class PostDetailView(DetailView):
                 comment.save()
                 messages.success(request, 'Comment added successfully.')
             else:
-                messages.error(request, 'Error adding comment.')
+                messages.error(request, 'Error adding comment.Please check your input.')
         
         return redirect('post_detail', pk=self.object.pk)
 
