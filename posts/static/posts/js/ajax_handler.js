@@ -8,6 +8,30 @@
     }
     window.voteHandlerInitialized = true;
 
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'info') {
+        // Создаем уведомление Bootstrap
+        const alertClass = type === 'error' ? 'alert-danger' : 
+                          type === 'success' ? 'alert-success' : 'alert-info';
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Автоматически скрываем через 3 секунды
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.parentNode.removeChild(alertDiv);
+            }
+        }, 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Vote handler initialized - CLEAN VERSION');
         
@@ -74,6 +98,7 @@
                     
                     if (data.error) {
                         console.error('Server error:', data.error);
+                        showNotification(data.message || 'Error processing vote', 'error');
                         return;
                     }
                     
@@ -82,6 +107,11 @@
                     
                     // Обновляем стили кнопок
                     updateVoteButtons(postId, data.user_vote);
+                    
+                    // Показываем уведомление об успехе
+                    if (data.status === 'success' && data.message) {
+                        showNotification(data.message, 'success');
+                    }
                     
                     // Восстанавливаем позицию прокрутки
                     window.scrollTo(0, scrollPosition);
@@ -92,6 +122,8 @@
                     console.error('Fetch error:', error);
                     button.innerHTML = originalHTML;
                     button.disabled = false;
+                    
+                    showNotification('Error processing vote', 'error');
                     
                     // Восстанавливаем позицию прокрутки даже при ошибке
                     window.scrollTo(0, scrollPosition);
