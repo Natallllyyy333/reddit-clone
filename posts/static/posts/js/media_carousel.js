@@ -1,98 +1,67 @@
+// Функция для остановки всех видео в контейнере
+// Функция для остановки всех видео в контейнере
+function stopAllVideosInContainer(container) {
+    const videos = container.querySelectorAll('.video-player:not(.d-none)');
+    videos.forEach(video => {
+        video.pause();
+        video.currentTime = 0; // Сбрасываем на начало
+        // Сбрасываем видео к превью
+        const videoContainer = video.closest('.video-container');
+        if (videoContainer) {
+            const preview = videoContainer.querySelector('.video-preview');
+            const playButton = videoContainer.querySelector('.video-play-button');
+            if (preview && playButton) {
+                video.classList.add('d-none');
+                preview.classList.remove('d-none');
+                playButton.classList.remove('d-none');
+            }
+        }
+    });
+}
+
+// Функция для прокрутки медиа
 function scrollMedia(postId, direction) {
-    const scrollContainer = document.getElementById(`mediaScroll-${postId}`);
-    if (!scrollContainer) return;
+    const mediaScroll = document.getElementById(`mediaScroll-${postId}`);
+    const mediaItems = mediaScroll.querySelectorAll('.media-item');
+    const scrollAmount = mediaItems[0].offsetWidth + 10; // 10px для gap
     
-    const mediaItems = scrollContainer.querySelectorAll('.media-item');
-    const scrollWidth = scrollContainer.offsetWidth;
-    const currentScroll = scrollContainer.scrollLeft || 0;
+    // Останавливаем видео перед прокруткой
+    stopAllVideosInContainer(mediaScroll);
     
-    let targetScroll = currentScroll + (direction * scrollWidth);
-    
-    // Ограничиваем прокрутку
-    const maxScroll = scrollWidth * (mediaItems.length - 1);
-    targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
-    
-    scrollContainer.scrollTo({
-        left: targetScroll,
+    mediaScroll.scrollBy({
+        left: direction * scrollAmount,
         behavior: 'smooth'
     });
     
-    // Обновляем счетчик
-    updateMediaCounter(postId, Math.round(targetScroll / scrollWidth) + 1);
+    // Обновляем счетчик (если есть)
+    updateMediaCounter(postId);
 }
 
-function updateMediaCounter(postId, currentIndex) {
-    const counter = document.querySelector(`#mediaScroll-${postId}`)?.closest('.post-media-container')?.querySelector('.media-counter .current');
-    if (counter) {
-        counter.textContent = currentIndex;
-    }
-}
-
-function playVideo(element) {
-    const video = element.parentElement.querySelector('video');
-    if (video) {
-        video.controls = true;
-        video.play();
-        element.style.display = 'none';
-    }
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем обработчики для свайпа на мобильных устройствах
-    document.querySelectorAll('.media-scroll').forEach(container => {
-        let startX;
-        let scrollLeft;
-        let isDown = false;
-        
-        container.addEventListener('mousedown', (e) => {
-            isDown = true;
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-        });
-        
-        container.addEventListener('mouseleave', () => {
-            isDown = false;
-        });
-        
-        container.addEventListener('mouseup', () => {
-            isDown = false;
-        });
-        
-        container.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 2;
-            container.scrollLeft = scrollLeft - walk;
-        });
-        
-        // Touch events для мобильных
-        container.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-        });
-        
-        container.addEventListener('touchmove', (e) => {
-            if (!e.touches || e.touches.length !== 1) return;
-            const x = e.touches[0].pageX - container.offsetLeft;
-            const walk = (x - startX) * 2;
-            container.scrollLeft = scrollLeft - walk;
-            
-            // Обновляем счетчик при свайпе
-            const currentIndex = Math.round(container.scrollLeft / container.offsetWidth) + 1;
-            const postId = container.id.replace('mediaScroll-', '');
-            updateMediaCounter(postId, currentIndex);
-        });
-    });
+// Функция для обновления счетчика медиа
+function updateMediaCounter(postId) {
+    const mediaScroll = document.getElementById(`mediaScroll-${postId}`);
+    const mediaItems = mediaScroll.querySelectorAll('.media-item');
+    const scrollLeft = mediaScroll.scrollLeft;
+    const itemWidth = mediaItems[0].offsetWidth + 10; // 10px для gap
     
-    // Автоматически скрываем overlay при клике на видео
-    document.querySelectorAll('.video-item video').forEach(video => {
-        video.addEventListener('play', function() {
-            const overlay = this.parentElement.querySelector('.video-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
+    const currentIndex = Math.round(scrollLeft / itemWidth) + 1;
+    const total = mediaItems.length;
+    
+    const counter = document.querySelector(`#mediaScroll-${postId}`).closest('.post-media-container').querySelector('.media-counter');
+    if (counter) {
+        counter.querySelector('.current').textContent = currentIndex;
+        counter.querySelector('.total').textContent = total;
+    }
+}
+
+// Инициализация карусели при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавляем обработчики для прокрутки колесом мыши
+    const mediaScrolls = document.querySelectorAll('.media-scroll');
+    mediaScrolls.forEach(scroll => {
+        scroll.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            this.scrollLeft += e.deltaY;
         });
     });
 });

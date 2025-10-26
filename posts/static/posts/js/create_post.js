@@ -1,6 +1,7 @@
 class CreatePostForm {
     constructor() {
         this.uploadedFiles = [];
+        this.maxFiles = 10;
         this.init();
     }
 
@@ -11,7 +12,6 @@ class CreatePostForm {
     }
 
     setupCharacterCounters() {
-        // Используем прямые селекторы вместо Django template tags
         const titleInput = document.querySelector('input[name="title"]');
         const contentInput = document.querySelector('textarea[name="content"]');
         const titleCount = document.getElementById('titleCount');
@@ -76,20 +76,36 @@ class CreatePostForm {
             this.handleFiles(e.target.files);
             this.updateFileInput();
         });
+
+        // Обновляем видимость области загрузки при инициализации
+        this.updateUploadAreaVisibility();
     }
 
     handleFiles(files) {
+        let filesAdded = 0;
+
         for (let file of files) {
+            // Проверяем лимит файлов
+            if (this.uploadedFiles.length >= this.maxFiles) {
+                this.showError(`Максимальное количество файлов: ${this.maxFiles}`);
+                break;
+            }
             if (this.isValidFile(file)) {
                 if (!this.isDuplicateFile(file)) {
                     this.uploadedFiles.push(file);
                     this.createPreview(file);
+                    filesAdded++;
                 }
             } else {
                 this.showError(`Файл "${file.name}" не поддерживается. Разрешены только изображения и видео до 10MB.`);
             }
         }
-       
+        
+        // Обновляем видимость области загрузки
+        this.updateUploadAreaVisibility();
+        
+        // Сбрасываем input чтобы можно было выбрать те же файлы снова
+        document.getElementById('mediaFiles').value = '';
     }
 
     isValidFile(file) {
@@ -119,6 +135,7 @@ class CreatePostForm {
             previewItem.remove();
             this.uploadedFiles = this.uploadedFiles.filter(f => f !== file);
             this.updateFileInput();
+            this.updateUploadAreaVisibility(); // Обновляем видимость при удалении
         };
 
         if (file.type.startsWith('image/')) {
@@ -136,11 +153,80 @@ class CreatePostForm {
             previewItem.appendChild(video);
         }
 
+        // Добавляем информацию о файле
+        const fileInfo = document.createElement('div');
+        fileInfo.className = 'file-info';
+        fileInfo.innerHTML = `
+            <small class="file-name">${file.name}</small>
+            <small class="file-size">${this.formatFileSize(file.size)}</small>
+        `;
+        previewItem.appendChild(fileInfo);
         previewItem.appendChild(removeBtn);
         filePreview.appendChild(previewItem);
+        
+        // ВАЖНО: НЕ скрываем область загрузки здесь!
+        // Область загрузки будет управляться только через updateUploadAreaVisibility()
+    }
 
-        // ========== СКРЫТЬ ОБЛАСТЬ ЗАГРУЗКИ ПРИ НАЛИЧИИ ФАЙЛОВ ==========
-        document.getElementById('fileUploadArea').style.display = 'none';
+    // Метод для обновления видимости области загрузки
+    updateUploadAreaVisibility() {
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        
+        if (!fileUploadArea) return;
+
+        // Создаем счетчик файлов если его нет
+        let fileCounter = document.getElementById('fileCounter');
+        if (!fileCounter) {
+            fileCounter = document.createElement('div');
+            fileCounter.id = 'fileCounter';
+            fileCounter.className = 'file-counter';
+            fileUploadArea.parentNode.insertBefore(fileCounter, fileUploadArea);
+        }
+
+        // Обновляем счетчик
+        fileCounter.textContent = `Файлов: ${this.uploadedFiles.length}/${this.maxFiles}`;
+        
+        // ВАЖНОЕ ИСПРАВЛЕНИЕ: Область загрузки скрывается ТОЛЬКО при достижении лимита
+        if (this.uploadedFiles.length >= this.maxFiles) {
+            fileUploadArea.style.display = 'none';
+        } else {
+            fileUploadArea.style.display = 'block'; // Всегда показываем, если не достигнут лимит
+        }
+
+        // Обновляем текст в области загрузки чтобы показать сколько файлов осталось
+        const uploadText = fileUploadArea.querySelector('h5');
+        if (uploadText) {
+            const remaining = this.maxFiles - this.uploadedFiles.length;
+            uploadText.textContent = `Перетащите файлы сюда (осталось: ${remaining})`;
+        }
+        
+        // Показываем сообщение при достижении лимита
+        let maxFilesMessage = document.getElementById('maxFilesMessage');
+        if (this.uploadedFiles.length >= this.maxFiles) {
+            if (!maxFilesMessage) {
+                maxFilesMessage = document.createElement('div');
+                maxFilesMessage.id = 'maxFilesMessage';
+                maxFilesMessage.className = 'alert alert-info mt-2';
+                maxFilesMessage.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    Достигнут лимит в ${this.maxFiles} файлов. 
+                    Удалите некоторые файлы чтобы добавить новые.
+                `;
+                fileUploadArea.parentNode.appendChild(maxFilesMessage);
+            }
+        } else {
+            if (maxFilesMessage) {
+                maxFilesMessage.remove();
+            }
+        }
+    }
+
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     updateFileInput() {

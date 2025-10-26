@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from .models import Post, Comment, PostMedia
 from .forms import PostForm, CommentForm
+from django.conf import settings
+
 
 class PostListView(ListView):
     model = Post
@@ -92,34 +94,51 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 @require_POST
-@login_required
+# @login_required
 def vote_post(request, pk, vote_type):
+    referer = request.META.get('HTTP_REFERER', '/posts/')
+    # Проверка аутентификации
+    if not request.user.is_authenticated:
+        referer = request.META.get('HTTP_REFERER', '/')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': 'Authentication required', 
+                'login_url': f'/users/login/?next={referer}'
+            }, status=401)
+        else:
+            return redirect(f'/users/login/?next={referer}')
+
     post = get_object_or_404(Post, pk=pk)
     
-    if vote_type == 'upvote':
-        if post.upvotes.filter(id=request.user.id).exists():
-            post.upvotes.remove(request.user)
-        else:
-            post.upvotes.add(request.user)
-            post.downvotes.remove(request.user)
-    elif vote_type == 'downvote':
-        if post.downvotes.filter(id=request.user.id).exists():
-            post.downvotes.remove(request.user)
-        else:
-            post.downvotes.add(request.user)
-            post.upvotes.remove(request.user)
-    
-    # Простой возврат JSON
-    # return JsonResponse({
-    #     'total_votes': post.total_votes(),
-    #     'user_vote': post.user_vote(request.user)
-    # })
-
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    try:
+        if vote_type == 'upvote':
+            if post.upvotes.filter(id=request.user.id).exists():
+                post.upvotes.remove(request.user)
+            else:
+                post.upvotes.add(request.user)
+                post.downvotes.remove(request.user)
+        elif vote_type == 'downvote':
+            if post.downvotes.filter(id=request.user.id).exists():
+                post.downvotes.remove(request.user)
+            else:
+                post.downvotes.add(request.user)
+                post.upvotes.remove(request.user)
+        
+        # Обновляем объект из базы данных
+        post.refresh_from_db()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'total_votes': post.total_votes(),
-                'user_vote': post.user_vote(request.user)
+                'user_vote': post.user_vote(request.user),
+                'status': 'success'
             })
-    else:
-            # Если не AJAX, редиректим обратно
-            return redirect(request.META.get('HTTP_REFERER', 'post_list'))
+        else:
+            return redirect(referer)
+            
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        else:
+            messages.error(request, 'Error voting')
+            return redirect(referer)
