@@ -1,32 +1,150 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'posts/css/edit_post.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/media_upload.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Редактировать пост</h4>
+        <div class="col-md-10 col-lg-8">
+            <div class="card edit-post-card">
+                <div class="card-header edit-post-header">
+                    <h4 class="mb-0">✏️ Редактировать пост</h4>
+                    <p class="mb-0 mt-2 opacity-75">Обновите свой пост</p>
                 </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="postForm">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Заголовок</label>
-                            {{ form.title }}
+                        
+                        <!-- Заголовок -->
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                📌 Заголовок поста
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.title.name }}" 
+                                   id="{{ form.title.id_for_label }}" 
+                                   class="form-control" 
+                                   placeholder="Введите заголовок вашего поста..."
+                                   maxlength="200"
+                                   value="{{ form.title.value|default:'' }}">
+                            <div class="character-count mt-1" id="titleCount">
+                                <span id="titleCurrent">{{ form.title.value|length|default:0 }}</span>/<span>200</span> символов
+                            </div>
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Содержание</label>
-                            {{ form.content }}
+                        
+                        <!-- Содержание -->
+                        <div class="mb-4">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">
+                                📝 Содержание поста
+                            </label>
+                            <textarea name="{{ form.content.name }}" 
+                                      id="{{ form.content.id_for_label }}" 
+                                      class="form-control" 
+                                      placeholder="Расскажите что-нибудь интересное..."
+                                      rows="6"
+                                      maxlength="10000"
+                                      style="min-height: 150px; resize: vertical;">{{ form.content.value|default:'' }}</textarea>
+                            <div class="character-count mt-1" id="contentCount">
+                                <span id="contentCurrent">{{ form.content.value|length|default:0 }}</span>/<span>10000</span> символов
+                            </div>
+                            {% if form.content.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.content.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Сообщество</label>
-                            {{ form.community }}
+                        
+                        <!-- Сообщество -->
+                        <div class="mb-4">
+                            <label for="{{ form.community.id_for_label }}" class="form-label">
+                                👥 Сообщество
+                            </label>
+                            <select name="{{ form.community.name }}" 
+                                    id="{{ form.community.id_for_label }}" 
+                                    class="form-select">
+                                <option value="">Выберите сообщество...</option>
+                                {% for value, label in form.community.field.choices %}
+                                    <option value="{{ value }}" {% if form.community.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Выберите сообщество для вашего поста (необязательно)</div>
+                            {% if form.community.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.community.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                            <a href="{% url 'post_detail' object.pk %}" class="btn btn-secondary">Отмена</a>
+                        
+                        <!-- Загрузка медиа -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                🖼️ Медиафайлы
+                            </label>
+                            
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <div class="mb-3">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h5>Перетащите файлы сюда</h5>
+                                    <p class="text-muted">Можно выбрать несколько файлов</p>
+                                </div>
+                                <input type="file" id="mediaFiles" name="media_files" multiple 
+                                       accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('mediaFiles').click()">
+                                    Выбрать файлы
+                                </button>
+                            </div>
+                            
+                            <!-- Preview area -->
+                            <div class="file-preview" id="filePreview">
+                                <!-- Существующие медиафайлы -->
+                                {% for media in existing_media %}
+                                <div class="existing-media-item" data-media-id="{{ media.id }}">
+                                    {% if media.media_type == 'image' %}
+                                        <img src="{{ media.media_file.url }}" alt="Existing media">
+                                    {% elif media.media_type == 'video' %}
+                                        <video controls style="max-width: 150px; max-height: 150px;">
+                                            <source src="{{ media.media_file.url }}" type="video/mp4">
+                                        </video>
+                                    {% endif %}
+                                    <button type="button" class="remove-existing-file">×</button>
+                                    <div class="file-info">
+                                        <small class="file-name">{{ media.media_file.name }}</small>
+                                        <small class="file-size">Существующий файл</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="form-text">
+                                Поддерживаемые форматы: изображения (JPG, PNG, GIF) и видео (MP4, MOV). Максимальный размер: 10MB
+                            </div>
+                            {% if form.media_files.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.media_files.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Кнопки -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{% url 'post_detail' object.pk %}" class="btn btn-outline-secondary px-4">
+                                ❌ Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+                                💾 Сохранить изменения
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -34,4 +152,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'posts/js/edit_post.js' %}"></script>
 {% endblock %}

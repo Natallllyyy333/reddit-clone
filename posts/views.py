@@ -77,9 +77,27 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавляем существующие медиафайлы в контекст
+        context['existing_media'] = self.object.media_files.all()
+        return context
+    
     def form_valid(self, form):
+        post = form.save()
+        # Обрабатываем удаление медиафайлов
+        delete_media_ids = self.request.POST.getlist('delete_media')
+        if delete_media_ids:
+            PostMedia.objects.filter(id__in=delete_media_ids, post=post).delete()
+        
+        # Добавляем новые медиафайлы
+        media_files = self.request.FILES.getlist('media_files')
+        for media_file in media_files:
+            if media_file:
+                PostMedia.objects.create(post=post, media_file=media_file)
+        
         messages.success(self.request, 'Post updated successfully!')
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
