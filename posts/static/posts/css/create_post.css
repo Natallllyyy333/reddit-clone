@@ -1,28 +1,30 @@
-/* edit_post.css - Стили как у login.html */
-.edit-post-card {
+/* create_post.css - Насыщенный оранжевый для создания поста */
+.create-post-card {
     border: none;
-    box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
     border-radius: 12px;
     overflow: hidden;
-    background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+    background: linear-gradient(135deg, #ff6d00 0%, #ff3d00 100%);
 }
 
-.edit-post-header {
-    background: transparent;
-    color: #7c2d12;
+.create-post-header {
+    background: rgba(255, 87, 34, 0.9);
+    color: #fff3e0;
     padding: 1.5rem;
-    border-bottom: 1px solid rgba(124, 45, 18, 0.2);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
     text-align: center;
 }
 
-.edit-post-header h4 {
+.create-post-header h4 {
     font-weight: 600;
     margin-bottom: 0.5rem;
+    color: white;
 }
 
-.edit-post-header p {
+.create-post-header p {
     opacity: 0.9;
     margin-bottom: 0;
+    color: #ffe0b2;
 }
 
 .form-control, .form-select {
@@ -32,25 +34,25 @@
     transition: all 0.2s ease;
     font-size: 14px;
     background: rgba(255, 255, 255, 0.95);
-    color: #7c2d12;
+    color: #bf360c;
     width: 100%;
     box-sizing: border-box;
 }
 
 .form-control:focus, .form-select:focus {
     outline: none;
-    border-color: #ff9800;
+    border-color: #ff6d00;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.3);
+    box-shadow: 0 0 0 3px rgba(255, 109, 0, 0.3);
 }
 
 .form-control:hover, .form-select:hover {
-    border-color: #ff9800;
+    border-color: #ff6d00;
     background: #ffffff;
 }
 
 .form-label {
-    color: #7c2d12;
+    color: #fff3e0;
     font-weight: 500;
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
@@ -58,23 +60,23 @@
 }
 
 .file-upload-area {
-    border: 2px dashed rgba(255, 255, 255, 0.8);
+    border: 2px dashed rgba(255, 255, 255, 0.7);
     border-radius: 8px;
     padding: 2rem;
     text-align: center;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.3);
     cursor: pointer;
 }
 
 .file-upload-area:hover {
-    border-color: #ff9800;
-    background: rgba(255, 255, 255, 0.7);
+    border-color: #ff6d00;
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .file-upload-area.dragover {
-    border-color: #ff9800;
-    background: rgba(255, 255, 255, 0.8);
+    border-color: #ff6d00;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .file-preview {
@@ -137,22 +139,22 @@
 }
 
 .btn-primary {
-    background: #e65100;
+    background: #d84315;
     color: #ffffff;
     border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     padding: 12px 30px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(230, 81, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(216, 67, 21, 0.4);
 }
 
 .btn-primary:hover {
-    background: #e65100;
+    background: #bf360c;
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(230, 81, 0, 0.4);
-    border-color: #e65100;
+    box-shadow: 0 6px 20px rgba(191, 54, 12, 0.5);
+    border-color: #ff6d00;
 }
 
 .btn-primary:disabled {
@@ -162,44 +164,46 @@
 }
 
 .btn-outline-secondary {
-    border: 2px solid #6c757d;
-    color: #6c757d;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     padding: 12px 30px;
     font-weight: 600;
     transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .btn-outline-secondary:hover {
-    background: #6c757d;
+    background: rgba(255, 255, 255, 0.2);
     color: white;
     transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.9);
 }
 
 .character-count {
     font-size: 0.875rem;
-    color: #7c2d12;
+    color: #ffe0b2;
 }
 
 .character-count.warning {
-    color: #ffc107;
+    color: #ffd54f;
     font-weight: 500;
 }
 
 .character-count.danger {
-    color: #dc3545;
+    color: #ffab91;
     font-weight: 600;
 }
 
 .file-counter {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(124, 45, 18, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 6px;
     padding: 8px 12px;
     margin-bottom: 10px;
     font-size: 14px;
     font-weight: 500;
-    color: #7c2d12;
+    color: #ffe0b2;
 }
 
 .file-info {
@@ -226,18 +230,18 @@
 }
 
 .form-text {
-    color: #7c2d12;
-    opacity: 0.8;
+    color: #ffe0b2;
+    opacity: 0.9;
     font-size: 0.875rem;
 }
 
 .text-danger {
-    color: #dc3545 !important;
+    color: #ffab91 !important;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .edit-post-card {
+    .create-post-card {
         margin: 0 -15px;
         border-radius: 0;
     }

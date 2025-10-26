@@ -64,9 +64,19 @@ document.addEventListener('DOMContentLoaded', function() {
     shareButtons.forEach(button => {
         button.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
-            const postTitle = this.closest('.card')?.querySelector('.post-title')?.textContent?.trim() || 
-                            this.closest('.post-item')?.querySelector('.post-title')?.textContent?.trim() || 
-                            '';
+
+
+           // Улучшенный поиск заголовка поста для разных структур
+            let postTitle = '';
+            const card = this.closest('.card');
+            if (card) {
+                const titleElement = card.querySelector('.card-title a') || 
+                                   card.querySelector('.post-title') ||
+                                   card.querySelector('h5') ||
+                                   card.querySelector('h1');
+                postTitle = titleElement ? titleElement.textContent.trim() : '';
+            }
+            
             openShareModal(postId, postTitle);
         });
     });

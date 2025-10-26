@@ -37,6 +37,6 @@ class CommentForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Write a comment...',
                 'rows': 3,
-                'id': 'comment-content'
+                'id': 'write_comment'
             })
         }

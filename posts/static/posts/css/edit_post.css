@@ -1,28 +1,30 @@
-/* edit_post.css - Стили как у login.html */
+/* edit_post.css - Светлый оранжевый для редактирования поста */
 .edit-post-card {
     border: none;
     box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
     border-radius: 12px;
     overflow: hidden;
-    background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+    background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
 }
 
 .edit-post-header {
-    background: transparent;
-    color: #7c2d12;
+    background: rgba(255, 167, 38, 0.9);
+    color: #5d4037;
     padding: 1.5rem;
-    border-bottom: 1px solid rgba(124, 45, 18, 0.2);
+    border-bottom: 2px solid rgba(93, 64, 55, 0.2);
     text-align: center;
 }
 
 .edit-post-header h4 {
     font-weight: 600;
     margin-bottom: 0.5rem;
+    color: #5d4037;
 }
 
 .edit-post-header p {
     opacity: 0.9;
     margin-bottom: 0;
+    color: #5d4037;
 }
 
 .form-control, .form-select {
@@ -32,7 +34,7 @@
     transition: all 0.2s ease;
     font-size: 14px;
     background: rgba(255, 255, 255, 0.95);
-    color: #7c2d12;
+    color: #5d4037;
     width: 100%;
     box-sizing: border-box;
 }
@@ -50,7 +52,7 @@
 }
 
 .form-label {
-    color: #7c2d12;
+    color: #5d4037;
     font-weight: 500;
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
@@ -137,22 +139,22 @@
 }
 
 .btn-primary {
-    background: #e65100;
+    background: #f57c00;
     color: #ffffff;
     border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     padding: 12px 30px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(230, 81, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(245, 124, 0, 0.3);
 }
 
 .btn-primary:hover {
-    background: #e65100;
+    background: #ef6c00;
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(230, 81, 0, 0.4);
-    border-color: #e65100;
+    box-shadow: 0 6px 20px rgba(239, 108, 0, 0.4);
+    border-color: #ff9800;
 }
 
 .btn-primary:disabled {
@@ -178,28 +180,28 @@
 
 .character-count {
     font-size: 0.875rem;
-    color: #7c2d12;
+    color: #5d4037;
 }
 
 .character-count.warning {
-    color: #ffc107;
+    color: #ff8f00;
     font-weight: 500;
 }
 
 .character-count.danger {
-    color: #dc3545;
+    color: #e65100;
     font-weight: 600;
 }
 
 .file-counter {
     background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(124, 45, 18, 0.2);
+    border: 1px solid rgba(93, 64, 55, 0.2);
     border-radius: 6px;
     padding: 8px 12px;
     margin-bottom: 10px;
     font-size: 14px;
     font-weight: 500;
-    color: #7c2d12;
+    color: #5d4037;
 }
 
 .file-info {
@@ -226,13 +228,13 @@
 }
 
 .form-text {
-    color: #7c2d12;
+    color: #5d4037;
     opacity: 0.8;
     font-size: 0.875rem;
 }
 
 .text-danger {
-    color: #dc3545 !important;
+    color: #e65100 !important;
 }
 
 /* Адаптивность */
