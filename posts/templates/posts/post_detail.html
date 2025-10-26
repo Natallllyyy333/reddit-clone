@@ -224,10 +224,19 @@
                         </div>
                     </div>
                     
-                    {% if user.is_authenticated and user == post.author %}
+{% if user.is_authenticated %}
+    {% if user == post.author or user.is_staff or user.is_superuser %}
+    {% endif %}
 <div class="post-actions mt-3">
     <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Редактировать</a>
     <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
+    
+    {% if user.is_staff and user != post.author %}
+    <span class="badge bg-warning ms-2">Модерация</span>
+    {% endif %}
+    {% if user.is_superuser and user != post.author %}
+    <span class="badge bg-danger ms-2">Админ</span>
+    {% endif %}
 </div>
 {% endif %}
                 </div>

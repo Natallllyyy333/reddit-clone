@@ -76,6 +76,8 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'posts/post_edit.html'
     
     def get_queryset(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Post.objects.all()
         return Post.objects.filter(author=self.request.user)
     
     def get_success_url(self):
@@ -84,7 +86,8 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Добавляем существующие медиафайлы в контекст
-        context['existing_media'] = self.object.media_files.all()
+        # context['existing_media'] = self.object.media_files.all()
+        context['is_moderator_action'] = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         return context
     
     def form_valid(self, form):
@@ -121,6 +124,8 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('post_list')
     
     def get_queryset(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Post.objects.all()
         return Post.objects.filter(author=self.request.user)
     
     def delete(self, request, *args, **kwargs):

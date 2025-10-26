@@ -30,6 +30,23 @@
                         {{ post.title }}
                     </a>
                 </h5>
+                {% if user.is_authenticated %}
+    {% if user == post.author or user.is_staff or user.is_superuser %}
+    <div class="admin-actions mt-2">
+        <small>
+            <a href="{% url 'post_edit' post.pk %}" class="text-decoration-none">✏️</a>
+            <a href="{% url 'post_delete' post.pk %}" class="text-decoration-none text-danger ms-2">🗑️</a>
+            
+            {% if user.is_staff and user != post.author %}
+            <span class="badge bg-warning ms-2">Mod</span>
+            {% endif %}
+            {% if user.is_superuser and user != post.author %}
+            <span class="badge bg-danger ms-2">Admin</span>
+            {% endif %}
+        </small>
+    </div>
+    {% endif %}
+{% endif %}
             </div>
         </div>
 

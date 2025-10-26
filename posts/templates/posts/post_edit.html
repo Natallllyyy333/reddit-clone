@@ -17,6 +17,11 @@
                 </div>
                 
                 <div class="card-body p-4">
+                    {% if is_moderator_action %}
+<div class="alert alert-warning">
+    <strong>⚠️ Внимание:</strong> Вы редактируете чужой пост как модератор/администратор.
+</div>
+{% endif %}
                     <form method="post" enctype="multipart/form-data" id="postForm">
                         {% csrf_token %}
                         
