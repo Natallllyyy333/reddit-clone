@@ -6,9 +6,12 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from .models import Post, Comment, PostMedia
+from django.db import transaction
+from .models import Post, Comment, PostMedia, Share
 from .forms import PostForm, CommentForm
 from django.conf import settings
+
+
 
 
 class PostListView(ListView):
@@ -79,7 +82,8 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.user.is_staff or self.request.user.is_superuser:
             return Post.objects.all()
         return Post.objects.filter(author=self.request.user)
-    
+
+
     def get_success_url(self):
         return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
     
@@ -129,18 +133,51 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         return Post.objects.filter(author=self.request.user)
     
     def form_valid(self, form):
-        # ---------- ПРОСТАЯ И НАДЕЖНАЯ РЕАЛИЗАЦИЯ ----------
+        
         post_author = self.object.author.username
         is_moderator = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         
-        response = super().form_valid(form)
-        
-        if is_moderator:
-            messages.success(self.request, f'Post by {post_author} has been deleted by moderator.')
-        else:
-            messages.success(self.request, 'Post deleted successfully!')
-        
-        return response
+        try:
+            # Используем транзакцию для безопасного удаления
+            with transaction.atomic():
+                # Сначала вручную удаляем все связанные объекты
+                print(f"Deleting related objects for post {self.object.id}")
+                
+                # 1. Удаляем медиафайлы
+                media_count = PostMedia.objects.filter(post=self.object).count()
+                PostMedia.objects.filter(post=self.object).delete()
+                print(f"Deleted {media_count} media files")
+                
+                # 2. Удаляем комментарии
+                comment_count = Comment.objects.filter(post=self.object).count()
+                Comment.objects.filter(post=self.object).delete()
+                print(f"Deleted {comment_count} comments")
+                
+                # 3. Удаляем shares
+                share_count = Share.objects.filter(post=self.object).count()
+                Share.objects.filter(post=self.object).delete()
+                print(f"Deleted {share_count} shares")
+                
+                # 4. Очищаем ManyToMany поля (upvotes и downvotes)
+                self.object.upvotes.clear()
+                self.object.downvotes.clear()
+                print("Cleared vote relationships")
+                
+                # 5. Теперь удаляем сам пост
+                response = super().form_valid(form)
+                print("Post deleted successfully")
+            
+            if is_moderator:
+                messages.success(self.request, f'Post by {post_author} has been deleted by moderator.')
+            else:
+                messages.success(self.request, 'Post deleted successfully!')
+            
+            return response
+            
+        except Exception as e:
+            print(f"Error during post deletion: {str(e)}")
+            messages.error(self.request, f'Error deleting post: {str(e)}')
+            return redirect('post_detail', pk=self.object.pk)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
