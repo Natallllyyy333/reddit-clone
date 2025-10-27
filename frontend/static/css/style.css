@@ -112,3 +112,39 @@
     }
 }
 
+
+.navbar-nav .nav-link.text-light {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+
+.navbar-nav .nav-link.text-light:hover {
+    color: rgba(255, 255, 255, 1) !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Улучшение отображения мобильного меню */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-nav .nav-item {
+        margin-bottom: 5px;
+    }
+    
+    /* Стили для приветствия в мобильном меню */
+    .navbar-nav .nav-link.text-light {
+        font-weight: 500;
+        padding: 8px 15px;
+        border-radius: 4px;
+    }
+}
+
+.navbar-nav .navbar-text {
+    color: rgba(255, 255, 255, 0.9);
+    padding: 8px 0;
+}

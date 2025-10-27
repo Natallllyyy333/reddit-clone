@@ -112,11 +112,11 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     
     def dispatch(self, request, *args, **kwargs):
         # Дополнительная проверка, что пользователь - автор поста
-        obj = self.get_object()
-        if obj.author != request.user:
-            messages.error(request, "You don't have permission to edit this post.")
-            return redirect('post_detail', pk=obj.pk)
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        if hasattr(self, 'object') and self.object:
+            if request.user != self.object.author and (request.user.is_staff or request.user.is_superuser):
+                messages.info(request, f'You are editing the post of user {self.object.author.username} as a moderator')
+        return response
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
@@ -128,33 +128,26 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
             return Post.objects.all()
         return Post.objects.filter(author=self.request.user)
     
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Post deleted successfully!')
-        return super().delete(request, *args, **kwargs)
-    
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        if obj.author != request.user:
-            messages.error(request, "You don't have permission to delete this post.")
-            return redirect('post_detail', pk=obj.pk)
-        return super().dispatch(request, *args, **kwargs)
-    
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+    def form_valid(self, form):
+        # ---------- ПРОСТАЯ И НАДЕЖНАЯ РЕАЛИЗАЦИЯ ----------
+        post_author = self.object.author.username
+        is_moderator = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         
-        if 'content' in request.POST and request.user.is_authenticated:
-            comment_form = CommentForm(request.POST)
-            if comment_form.is_valid():
-                comment = comment_form.save(commit=False)
-                comment.post = self.object
-                comment.author = request.user
-                comment.save()
-                messages.success(request, 'Comment added successfully.')
-            else:
-                messages.error(request, 'Error adding comment. Please check your input.')
+        response = super().form_valid(form)
         
-        return redirect('post_detail', pk=self.object.pk)
-
+        if is_moderator:
+            messages.success(self.request, f'Post by {post_author} has been deleted by moderator.')
+        else:
+            messages.success(self.request, 'Post deleted successfully!')
+        
+        return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_moderator_action'] = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
+        return context
+    
+   
 @require_POST
 # @login_required
 @require_POST
