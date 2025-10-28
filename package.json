@@ -1,0 +1,52 @@
+{
+  "name": "reddit-clone",
+  "version": "1.0.0",
+  "description": "Reddit Clone - Full Stack Web Application",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:debug": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Natallllyyy333/reddit-clone.git"
+  },
+  "keywords": [
+    "django",
+    "reddit",
+    "clone",
+    "fullstack"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Natallllyyy333/reddit-clone/issues"
+  },
+  "homepage": "https://github.com/Natallllyyy333/reddit-clone#readme",
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "roots": [
+      "<rootDir>/frontend/tests"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/frontend/tests/setup.js"
+    ],
+    "collectCoverageFrom": [
+      "frontend/static/js/**/*.js",
+      "frontend/static/posts/js/**/*.js"
+    ],
+    "coverageDirectory": "frontend/tests/coverage",
+    "moduleNameMapper": {
+      "\\.(css|less|scss)$": "<rootDir>/frontend/tests/__mocks__/styleMock.js"
+    }
+  }
+}
