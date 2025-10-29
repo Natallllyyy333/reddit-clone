@@ -10,20 +10,23 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('posts', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Community',
+            name='Comment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('description', models.TextField()),
+                ('content', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('members', models.ManyToManyField(blank=True, related_name='communities', to=settings.AUTH_USER_MODEL)),
-                ('moderators', models.ManyToManyField(blank=True, related_name='moderated_communities', to=settings.AUTH_USER_MODEL)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='posts.post')),
             ],
+            options={
+                'ordering': ['created_at'],
+            },
         ),
     ]

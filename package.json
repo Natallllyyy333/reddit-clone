@@ -7,10 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:debug": "jest --verbose"
+    "test": "jest frontend/tests/unit/ --verbose",
+    "test:python": "python manage.py test --verbosity=1",
+    "test:all": "npm run test:python && npm run test"
   },
   "repository": {
     "type": "git",

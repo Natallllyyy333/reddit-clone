@@ -1,6 +1,7 @@
 from django import forms
-from .models import Post, Comment
+from .models import Post
 from communities.models import Community
+from comments.models import Comment
 
 class PostForm(forms.ModelForm):
     class Meta:

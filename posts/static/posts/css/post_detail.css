@@ -102,6 +102,143 @@
     color: #0079d3;
 }
 
+/* Стили для действий с комментариями */
+.comment-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.comment-actions .btn {
+    margin-right: 8px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+.comment-actions .btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.comment-actions .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+.comment-actions .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.comment-actions .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Стили для карточки редактирования комментария */
+.edit-comment-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.edit-comment-card .card-header {
+    background-color: #f8f9fa !important;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.comment-textarea {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.comment-textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Стили для комментариев */
+.comment-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-header {
+    font-size: 0.9rem;
+}
+
+.comment-author {
+    color: #1a1a1b;
+    font-weight: 500;
+}
+
+.comment-content {
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-title {
+    color: #1a1a1b;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 20px;
+    color: #1a1a1b;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 16px 20px;
+}
+
+/* Delete button styles */
+.btn-danger {
+    background-color: #ff4500;
+    border-color: #ff4500;
+    font-weight: 500;
+}
+
+.btn-danger:hover {
+    background-color: #e03c00;
+    border-color: #e03c00;
+}
+
+.btn-secondary {
+    background-color: #878a8c;
+    border-color: #878a8c;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #6c6e70;
+    border-color: #6c6e70;
+}
+
 /* Сайдбар */
 .sidebar-card {
     border: none;

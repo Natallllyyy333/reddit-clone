@@ -74,26 +74,26 @@ class CommunityForm(forms.ModelForm):
         return name
 
 
-def clean_description(self):
-        description = self.cleaned_data['description'].strip()
-        
-        # Проверка на пустое описание
-        if not description:
-            raise ValidationError('Описание сообщества не может быть пустым')
-        
-        # Проверка длины описания
-        if len(description) < 10:
-            raise ValidationError('Описание должно содержать минимум 10 символов')
-        
-        if len(description) > 1000:
-            raise ValidationError('Описание не может превышать 1000 символов')
-        
-        # Проверка на нецензурные слова в описании
-        profanity_list = ['badword1', 'badword2']
-        if any(profanity in description.lower() for profanity in profanity_list):
-            raise ValidationError('Описание содержит запрещенные слова')
-        
-        return description
+    def clean_description(self):
+            description = self.cleaned_data['description'].strip()
+            
+            # Проверка на пустое описание
+            if not description:
+                raise ValidationError('Описание сообщества не может быть пустым')
+            
+            # Проверка длины описания
+            if len(description) < 10:
+                raise ValidationError('Описание должно содержать минимум 10 символов')
+            
+            if len(description) > 1000:
+                raise ValidationError('Описание не может превышать 1000 символов')
+            
+            # Проверка на нецензурные слова в описании
+            profanity_list = ['badword1', 'badword2']
+            if any(profanity in description.lower() for profanity in profanity_list):
+                raise ValidationError('Описание содержит запрещенные слова')
+            
+            return description
 
 class CommunityEditForm(forms.ModelForm):
     """Форма для редактирования существующего сообщества"""

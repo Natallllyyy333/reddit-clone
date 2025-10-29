@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Communities</title>
+</head>
+<body>
+    <h1>My Communities</h1>
+    
+    <h2>My Memberships</h2>
+    <ul>
+        {% for community in user_communities %}
+            <li>{{ community.name }}</li>
+        {% empty %}
+            <li>No communities found</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Moderated Communities</h2>
+    <ul>
+        {% for community in moderated_communities %}
+            <li>{{ community.name }}</li>
+        {% empty %}
+            <li>No moderated communities</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

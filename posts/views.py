@@ -7,9 +7,11 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.db import transaction
-from .models import Post, Comment, PostMedia, Share
+from .models import Post, PostMedia, Share
 from .forms import PostForm, CommentForm
 from django.conf import settings
+from comments.models import Comment
+
 
 
 
@@ -24,29 +26,23 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'posts/post_detail.html'
-    context_object_name = 'post'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.all().order_by('-created_at')
+        post = self.object
+        
+        # Получаем комментарии и передаем текущего пользователя
+        comments = post.comments.all()
+        for comment in comments:
+            comment._current_user = self.request.user
+            
+        context['comments'] = comments
+        
+        # Форма для комментариев (если нужно)
+        from comments.forms import CommentForm  # Создайте форму если нужно
         context['comment_form'] = CommentForm()
+        
         return context
-    
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        
-        if 'content' in request.POST and request.user.is_authenticated:
-            comment_form = CommentForm(request.POST)
-            if comment_form.is_valid():
-                comment = comment_form.save(commit=False)
-                comment.post = self.object
-                comment.author = request.user
-                comment.save()
-                messages.success(request, 'Comment added successfully.')
-            else:
-                messages.error(request, 'Error adding comment.Please check your input.')
-        
-        return redirect('post_detail', pk=self.object.pk)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

@@ -9,9 +9,9 @@ import logging
 from .models import Community
 from .forms import CommunityForm
 from posts.models import Post
+from django.http import Http404
 
 logger = logging.getLogger(__name__)
-
 
 def community_list(request):
     try:
@@ -48,10 +48,13 @@ def community_detail(request, community_name):
             'is_member': is_member,
             'is_moderator': is_moderator
         })
+    except Http404:
+        # Пробрасываем 404 дальше, не перехватываем
+        raise
     except Exception as e:
         logger.error(f"Error loading community {community_name}: {e}")
         messages.error(request, "Community loading error.")
-        return redirect('communities:community_list')
+        return redirect('communities:community_list')  # ИСПРАВЛЕНО
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -69,7 +72,7 @@ def create_community(request):
                 community.members.add(request.user)
                 
                 messages.success(request, f'Community r/{community.name} created!')
-                return redirect('community_detail', community_name=community.name)
+                return redirect('communities:community_detail', community_name=community.name)  # ИСПРАВЛЕНО
             except Exception as e:
                 logger.error(f"Error creating community: {e}")
                 messages.error(request, "Community create error.")
@@ -90,7 +93,7 @@ def join_community(request, community_name):
         else:
             messages.info(request, f'Вы уже участник r/{community.name}')
         
-        return redirect('community_detail', community_name=community.name)
+        return redirect('communities:community_detail', community_name=community.name)  # ИСПРАВЛЕНО
     except Exception as e:
         logger.error(f"Error joining community {community_name}: {e}")
         messages.error(request, "Error joining the community.")
@@ -107,12 +110,9 @@ def leave_community(request, community_name):
                 messages.error(request, 'Creator cannot leave their own community.')
             else:
                 community.members.remove(request.user)
+                messages.success(request, f'You left r/{community.name}')
         
-                if request.user in community.members.all():
-                    community.members.remove(request.user)
-                    messages.success(request, f'You left r/{community.name}')
-        
-        return redirect('community_detail', community_name=community.name)
+        return redirect('communities:community_detail', community_name=community.name)  # ИСПРАВЛЕНО
     except Exception as e:
         logger.error(f"Error leaving community {community_name}: {e}")
         messages.error(request, "Error leaving the community.")
@@ -135,4 +135,4 @@ def my_communities(request):
         return render(request, 'communities/my_communities.html', {
             'user_communities': [],
             'moderated_communities': []
-        })   
+        })

@@ -80,14 +80,24 @@
                                         <img src="{{ media.media_file.url }}" 
                                              alt="Post media {{ forloop.counter }}" 
                                              class="img-fluid rounded media-image">
-                                        {% elif media.media_type == 'video' %}
-                                        <div class="video-item">
-                                            <video controls class="img-fluid rounded media-video">
-                                                <source src="{{ media.media_file.url }}" type="video/mp4">
-                                                Ваш браузер не поддерживает видео.
-                                            </video>
-                                        </div>
-                                        {% endif %}
+                                      {% elif media.media_type == 'video' %}
+<div class="video-container">
+    <video class="video-preview img-fluid rounded" preload="metadata" 
+           onclick="handleVideoClick(this)">
+        <source src="{{ media.media_file.url }}#t=0.1" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+    <div class="video-overlay" onclick="handleVideoOverlayClick(this)">
+        <i class="fas fa-play-circle fa-4x video-play-button" 
+           onclick="handlePlayButtonClick(event, this)"></i>
+    </div>
+    <video class="video-player img-fluid rounded d-none" controls 
+           onclick="handleVideoPlayerClick(this)">
+        <source src="{{ media.media_file.url }}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+</div>
+{% endif %}
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -164,20 +174,21 @@
                         <h5 class="mb-0" >💬 Comments ({{ post.comments.count }})</h5>
                     </div>
                     <div class="card-body">
-                        {% if user.is_authenticated %}
-                            <!-- Форма добавления комментария -->
-                            <form method="post" class="comment-form mb-4">
-    {% csrf_token %}
-    <div class="mb-3">
-        {{ comment_form.content }}
+                        
+                         {% if user.is_authenticated %}
+    <!-- Форма добавления комментария -->
+    <form method="post" action="{% url 'comments:add_comment' post.id %}" class="comment-form mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <textarea id = "write_comment" name="content" rows="3" placeholder="Write your comment here..." class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Leave your comment</button>
+    </form>
+{% else %}
+    <div class="alert alert-info">
+        <a href="{% url 'login' %}">Log in</a> to leave a comment.
     </div>
-    <button type="submit" class="btn btn-primary">Leave your comment</button>
-</form>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <a href="{% url 'login' %}">Log in</a> to leave a comment.
-                            </div>
-                        {% endif %}
+{% endif %}
                         
                         <!-- Список комментариев -->
                         <div class="comments-list">
@@ -189,8 +200,11 @@
                                     </div>
                                     <div class="comment-content">
                                         <p class="mb-0">{{ comment.content|linebreaksbr }}</p>
+                                        
                                     </div>
+                                    
                                 </div>
+                                {% include 'comments/comment_actions.html' with comment=comment %}
                             {% empty %}
                                 <div class="text-center text-muted py-4">
                                     <p>No comments yet. Be the first!</p>
@@ -251,6 +265,7 @@
     <!-- <script src="{% static 'posts/js/post_detail.js' %}"></script> -->
     <script src="{% static 'js/share.js' %}"></script>
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-    <!-- <script src="{% static 'posts/js/votes.js' %}"></script> -->
+    <script src="{% static 'posts/js/video_player.js' %}"></script>
+     <script src="{% static 'js/comments.js' %}"></script>
     <script src="{% static 'posts/js/ajax_handler.js' %}"></script>
 {% endblock %}
