@@ -3,6 +3,7 @@ from .views import (
     PostListView, PostDetailView, PostCreateView, 
     PostUpdateView, PostDeleteView, vote_post
 )
+from . import views
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),

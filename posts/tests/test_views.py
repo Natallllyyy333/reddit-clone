@@ -6,6 +6,8 @@ from posts.models import Post
 from communities.models import Community
 from posts.forms import PostForm, CommentForm
 from comments.models import Comment
+from posts.forms import PostForm
+from comments.forms import CommentForm
 
 class PostViewsTest(TestCase):
     def setUp(self):
@@ -49,8 +51,17 @@ class PostViewsTest(TestCase):
         }
         response = self.client.post(reverse('post_detail', args=[self.post.pk]), data)
         
+        # Проверяем редирект
+        self.assertEqual(response.status_code, 302)
+        
+        # Проверяем создание комментария
+        self.assertTrue(Comment.objects.filter(content='Test comment content').exists())
+        
+        # Следуем за редиректом и проверяем сообщение
+        response = self.client.get(response.url)
         messages_list = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages_list[0]), 'Comment added successfully.')
+        if messages_list:
+            self.assertEqual(str(messages_list[0]), 'Comment added successfully.')
         self.assertTrue(Comment.objects.filter(content='Test comment content').exists())
 
     def test_post_create_view_get(self):

@@ -23,7 +23,7 @@ class CommentViewsTest(TestCase):
         )
 
     def test_add_comment_authenticated(self):
-        """Тест добавления комментария аутентифицированным пользователем"""
+        """Test adding comment by authenticated user"""
         self.client.login(username='testuser', password='testpass123')
         data = {
             'content': 'Test comment content'
@@ -34,7 +34,7 @@ class CommentViewsTest(TestCase):
         self.assertTrue(Comment.objects.filter(content='Test comment content').exists())
         
         messages_list = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages_list[0]), 'Комментарий добавлен')
+        self.assertEqual(str(messages_list[0]), 'Comment added.')
 
     def test_add_comment_empty_content(self):
         """Тест добавления пустого комментария"""
@@ -45,19 +45,19 @@ class CommentViewsTest(TestCase):
         response = self.client.post(reverse('comments:add_comment', args=[self.post.id]), data)
         
         messages_list = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages_list[0]), 'Комментарий не может быть пустым')
+        self.assertEqual(str(messages_list[0]), 'Comment cannot be empty')
         self.assertFalse(Comment.objects.filter(content='').exists())
 
     def test_add_comment_unauthenticated(self):
-        """Тест добавления комментария неаутентифицированным пользователем"""
+        """Test adding comment by unauthenticated user"""
         data = {
             'content': 'Test comment'
         }
         response = self.client.post(reverse('comments:add_comment', args=[self.post.id]), data)
-        self.assertEqual(response.status_code, 302)  # Редирект на логин
+        self.assertEqual(response.status_code, 302)  
 
     def test_delete_comment_owner(self):
-        """Тест удаления комментария владельцем"""
+        """Test comment deletion by owner"""
         self.client.login(username='testuser', password='testpass123')
         comment = Comment.objects.create(
             post=self.post,
@@ -71,23 +71,24 @@ class CommentViewsTest(TestCase):
         self.assertFalse(Comment.objects.filter(id=comment.id).exists())
         
         messages_list = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages_list[0]), 'Комментарий удален')
+        self.assertEqual(str(messages_list[0]), 'Comment deleted successfully')
 
     def test_delete_comment_not_owner(self):
-        """Тест попытки удаления чужого комментария"""
+        """Test attempt to delete someone else's comment"""
         self.client.login(username='otheruser', password='otherpass123')
         comment = Comment.objects.create(
             post=self.post,
-            author=self.user,  # Другой автор
+            author=self.user,  # Different author
             content='Test comment'
         )
         
         response = self.client.post(reverse('comments:delete_comment', args=[comment.id]))
         
-        # Ожидаем редирект с сообщением об ошибке, а не 404
-        self.assertEqual(response.status_code, 302)  # ИСПРАВЛЕНО: 302 вместо 404
-        self.assertTrue(Comment.objects.filter(id=comment.id).exists())  # Комментарий все еще существует
         
-        # Проверяем, что было сообщение об ошибке
+        self.assertEqual(response.status_code, 302)  
+        self.assertTrue(Comment.objects.filter(id=comment.id).exists())  
+        
+        
         messages_list = list(get_messages(response.wsgi_request))
         self.assertTrue(len(messages_list) > 0)
+        self.assertEqual(str(messages_list[0]), 'You do not have permission to delete this comment')

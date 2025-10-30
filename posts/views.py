@@ -39,10 +39,33 @@ class PostDetailView(DetailView):
         context['comments'] = comments
         
         # Форма для комментариев (если нужно)
-        from comments.forms import CommentForm  as CommentsCommentForm # Создайте форму если нужно
+        from comments.forms import CommentForm  
         context['comment_form'] = CommentForm()
         
         return context
+    
+    def post(self, request, *args, **kwargs):
+        """Обработка добавления комментария через детальную страницу"""
+        self.object = self.get_object()
+        
+        # Проверяем аутентификацию
+        if not request.user.is_authenticated:
+            messages.error(request, 'Please log in to comment.')
+            return redirect('login')
+        
+        # Обрабатываем комментарий
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            Comment.objects.create(
+                post=self.object,
+                author=request.user,
+                content=form.cleaned_data['content']
+            )
+            messages.success(request, 'Comment added successfully.')
+        else:
+            messages.error(request, 'Error adding comment.')
+        
+        return redirect('post_detail', pk=self.object.pk)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
