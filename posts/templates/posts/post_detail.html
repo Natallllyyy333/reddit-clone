@@ -1,35 +1,33 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
-    <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}" />
+<link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}" />
+{% endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <!-- Основной контент поста -->
-        <div class="col-lg-8 px-3">
-            <div class="post-detail-card card">
-                <!-- Заголовок и информация -->
-                <div class="card-header post-header">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h1 class="post-title">{{ post.title }}</h1>
-                            <div class="post-meta">
-                                <span class="author">{{ post.author.username }}</span>
-                                <span class="separator">•</span>
-                                <span class="date">{{ post.created_at|timesince }} ago</span>
-                                {% if post.community %}
-                                    <span class="separator">•</span>
-                                    <span class="community">in 
-                                        <a href="#" class="community-link">{{ post.community.name }}</a>
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <!-- <div class="vote-section">
+  <div class="row justify-content-center">
+    <!-- Основной контент поста -->
+    <div class="col-lg-8 px-3">
+      <div class="post-detail-card card">
+        <!-- Заголовок и информация -->
+        <div class="card-header post-header">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h1 class="post-title">{{ post.title }}</h1>
+              <div class="post-meta">
+                <span class="author">{{ post.author.username }}</span>
+                <span class="separator">•</span>
+                <span class="date">{{ post.created_at|timesince }} ago</span>
+                {% if post.community %}
+                <span class="separator">•</span>
+                <span class="community"
+                  >in
+                  <a href="#" class="community-link"
+                    >{{ post.community.name }}</a
+                  >
+                </span>
+                {% endif %}
+              </div>
+            </div>
+            <!-- <div class="vote-section">
                             <div class="vote-buttons text-center">
                                 <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline">
                                     {% csrf_token %}
@@ -52,220 +50,253 @@
                                 </form>
                             </div>
                         </div> -->
-                    </div>
-                </div>
-                
-                <!-- Содержание и медиа -->
-                <div class="card-body ">
-                    <div class="post-content mb-4">
-                        <p>{{ post.content|linebreaksbr }}</p>
-                    </div>
-                    
+          </div>
+        </div>
 
+        <!-- Содержание и медиа -->
+        <div class="card-body">
+          <div class="post-content mb-4">
+            <p>{{ post.content|linebreaksbr }}</p>
+          </div>
 
-
-
-
-
-
-
-{% if post.media_files.exists %}
-                    <div class="post-media-container mb-4">
-                        <div class="media-carousel detail-view">
-                            <div class="media-scroll-wrapper">
-                                <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
-                                    {% for media in post.media_files.all %}
-                                    <div class="media-item">
-                                        {% if media.media_type == 'image' %}
-                                        <img src="{{ media.media_file.url }}" 
-                                             alt="Post media {{ forloop.counter }}" 
-                                             class="img-fluid rounded media-image">
-                                      {% elif media.media_type == 'video' %}
-<div class="video-container">
-    <video class="video-preview img-fluid rounded" preload="metadata" 
-           onclick="handleVideoClick(this)">
-        <source src="{{ media.media_file.url }}#t=0.1" type="video/mp4">
+          {% if post.media_files.exists %}
+          <div class="post-media-container mb-4 position-relative">
+            <div class="media-carousel detail-view position-relative">
+              <div class="media-scroll-wrapper">
+                <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                  {% for media in post.media_files.all %}
+                  <div class="media-item">
+                    {% if media.media_type == 'image' %}
+                    <img
+                      src="{{ media.media_file.url }}"
+                      alt="Post media {{ forloop.counter }}"
+                      class="img-fluid rounded media-image"
+                    />
+{% elif media.media_type == 'video' %}
+<div class="video-container position-relative">
+    <!-- Видео элемент -->
+    <video
+        class="img-fluid rounded media-video"
+        preload="metadata"
+        playsinline
+        webkit-playsinline
+    >
+        <source
+            src="{{ media.media_file.url }}"
+            type="video/mp4"
+        />
         Ваш браузер не поддерживает видео.
     </video>
-    <div class="video-overlay" onclick="handleVideoOverlayClick(this)">
-        <i class="fas fa-play-circle fa-4x video-play-button" 
-           onclick="handlePlayButtonClick(event, this)"></i>
-    </div>
-    <video class="video-player img-fluid rounded d-none" controls 
-           onclick="handleVideoPlayerClick(this)">
-        <source src="{{ media.media_file.url }}" type="video/mp4">
-        Ваш браузер не поддерживает видео.
-    </video>
-</div>
-{% endif %}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
-                            {% if post.media_files.count > 1 %}
-                            <div class="carousel-controls">
-                                <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        {% if post.media_files.count > 1 %}
-                        <div class="media-counter">
-                            <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    
-                    
-                    <!-- Статистика поста -->
-                   <div class="card-footer d-flex justify-content-start align-items-center">
-                
-   <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline vote-form"  >
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn  btn-outline-success vote-btn  me-1 px-3" 
-                                            data-post-id="{{ post.pk }}" data-vote-type="upvote">
-                                        <i class="fa fa-thumbs-up fa-lg me-1 "></i> 
-                                    </button>
-                                </form>
-                <span class="vote-count" id="vote-count-{{ post.pk }}"><strong>{{ post.total_votes }}</strong></span>
-    <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline vote-form">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
-                                            data-post-id="{{ post.pk }}" data-vote-type="downvote">
-                                      <i class="fa fa-thumbs-down fa-lg ms-1 me-1"></i> 
-                                    </button>
-                                </form>
-                            
-               <a href="{% url 'post_detail' post.pk %}#write_comment" class="btn btn-outline-secondary btn me-3">
-                    <i class="fas fa-comment fa-2xl"></i> {{ post.comments.count }}
-                </a>
 
-     
-   
-           
-
-     
-               
-           
-                
-
-
-                 <!-- Кнопка Share -->
-            <button class="btn btn-outline-secondary  share-btn fa-2xl" 
-                                data-post-id="{{ post.id }}">
-                            <i class="fas fa-share fa-2xl"></i> Share
-                        </button>
-             </div>
-            </div>
-            
-            </div>
-            
-            <!-- Секция комментариев -->
-            <div class="comments-section mt-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0" >💬 Comments ({{ post.comments.count }})</h5>
-                    </div>
-                    <div class="card-body">
-                        
-                         {% if user.is_authenticated %}
-    <!-- Форма добавления комментария -->
-    <form method="post" action="{% url 'comments:add_comment' post.id %}" class="comment-form mb-4">
-        {% csrf_token %}
-        <div class="mb-3">
-            <textarea id = "write_comment" name="content" rows="3" placeholder="Write your comment here..." class="form-control" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Leave your comment</button>
-    </form>
-{% else %}
-    <div class="alert alert-info">
-        <a href="{% url 'login' %}">Log in</a> to leave a comment.
-    </div>
-{% endif %}
-                        
-                        <!-- Список комментариев -->
-                        <div class="comments-list">
-                            {% for comment in comments %}
-                                <div class="comment-item mb-3 pb-3 border-bottom">
-                                    <div class="comment-header d-flex justify-content-between mb-2">
-                                        <strong class="comment-author">{{ comment.author.username }}</strong>
-                                        <small class="text-muted">{{ comment.created_at|timesince }} назад</small>
-                                    </div>
-                                    <div class="comment-content">
-                                        <p class="mb-0">{{ comment.content|linebreaksbr }}</p>
-                                        
-                                    </div>
-                                    
-                                </div>
-                                {% include 'comments/comment_actions.html' with comment=comment %}
-                            {% empty %}
-                                <div class="text-center text-muted py-4">
-                                    <p>No comments yet. Be the first!</p>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Сайдбар -->
-        <div class="col-lg-4">
-            <div class="sidebar-card card">
-                <div class="card-body">
-                    <h6>Информация о посте</h6>
-                    <div class="sidebar-info">
-                        <div class="info-item">
-                            <strong>Автор:</strong> {{ post.author.username }}
-                        </div>
-                        <div class="info-item">
-                            <strong>Опубликован:</strong> {{ post.created_at|date:"d M Y H:i" }}
-                        </div>
-                        {% if post.community %}
-                        <div class="info-item">
-                            <strong>Сообщество:</strong> {{ post.community.name }}
-                        </div>
-                        {% endif %}
-                        <div class="info-item">
-                            <strong>Комментарии:</strong> {{ post.comments.count }}
-                        </div>
-                    </div>
-                    
-{% if user.is_authenticated %}
-    {% if user == post.author or user.is_staff or user.is_superuser %}
-    {% endif %}
-<div class="post-actions mt-3">
-    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Редактировать</a>
-    <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
+    <!-- Постер будет создан автоматически -->
     
-    {% if user.is_staff and user != post.author %}
-    <span class="badge bg-warning ms-2">Модерация</span>
-    {% endif %}
-    {% if user.is_superuser and user != post.author %}
-    <span class="badge bg-danger ms-2">Админ</span>
-    {% endif %}
+    <!-- Кнопка воспроизведения -->
+    <div
+        class="video-play-button"
+        onclick="handleVideoPlay(this)"
+    >
+        <i class="fas fa-play-circle"></i>
+    </div>
 </div>
 {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Кнопки навигации карусели - ВНЕ video-container -->
+              {% if post.media_files.count > 1 %}
+              <button
+                class="carousel-btn prev"
+                onclick="scrollMedia('{{ post.pk }}', -1)"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button
+                class="carousel-btn next"
+                onclick="scrollMedia('{{ post.pk }}', 1)"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              {% endif %}
+            </div>
+
+            {% if post.media_files.count > 1 %}
+            <div class="media-counter">
+              <span class="current">1</span>/<span class="total"
+                >{{ post.media_files.count }}</span
+              >
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Статистика поста -->
+          <div
+            class="card-footer d-flex justify-content-start align-items-center"
+          >
+            <form
+              method="post"
+              action="{% url 'vote_post' post.pk 'upvote' %}"
+              class="d-inline vote-form"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="btn btn-outline-success vote-btn me-1 px-3"
+                data-post-id="{{ post.pk }}"
+                data-vote-type="upvote"
+              >
+                <i class="fa fa-thumbs-up fa-lg me-1"></i>
+              </button>
+            </form>
+            <span class="vote-count" id="vote-count-{{ post.pk }}"
+              ><strong>{{ post.total_votes }}</strong></span
+            >
+            <form
+              method="post"
+              action="{% url 'vote_post' post.pk 'downvote' %}"
+              class="d-inline vote-form"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="btn btn-outline-danger vote-btn ms-1 me-3 px-3"
+                data-post-id="{{ post.pk }}"
+                data-vote-type="downvote"
+              >
+                <i class="fa fa-thumbs-down fa-lg ms-1 me-1"></i>
+              </button>
+            </form>
+
+            <a
+              href="{% url 'post_detail' post.pk %}#write_comment"
+              class="btn btn-outline-secondary btn me-3"
+            >
+              <i class="fas fa-comment fa-2xl"></i> {{ post.comments.count }}
+            </a>
+
+            <!-- Кнопка Share -->
+            <button
+              class="btn btn-outline-secondary share-btn fa-2xl"
+              data-post-id="{{ post.id }}"
+            >
+              <i class="fas fa-share fa-2xl"></i> Share
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Секция комментариев -->
+      <div class="comments-section mt-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">💬 Comments ({{ post.comments.count }})</h5>
+          </div>
+          <div class="card-body">
+            {% if user.is_authenticated %}
+            <!-- Форма добавления комментария -->
+            <form
+              method="post"
+              action="{% url 'comments:add_comment' post.id %}"
+              class="comment-form mb-4"
+            >
+              {% csrf_token %}
+              <div class="mb-3">
+                <textarea
+                  id="write_comment"
+                  name="content"
+                  rows="3"
+                  placeholder="Write your comment here..."
+                  class="form-control"
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Leave your comment
+              </button>
+            </form>
+            {% else %}
+            <div class="alert alert-info">
+              <a href="{% url 'login' %}">Log in</a> to leave a comment.
+            </div>
+            {% endif %}
+
+            <!-- Список комментариев -->
+            <div class="comments-list">
+              {% for comment in comments %}
+              <div class="comment-item mb-3 pb-3 border-bottom">
+                <div class="comment-header d-flex justify-content-between mb-2">
+                  <strong class="comment-author"
+                    >{{ comment.author.username }}</strong
+                  >
+                  <small class="text-muted"
+                    >{{ comment.created_at|timesince }} назад</small
+                  >
+                </div>
+                <div class="comment-content">
+                  <p class="mb-0">{{ comment.content|linebreaksbr }}</p>
+                </div>
+              </div>
+              {% include 'comments/comment_actions.html' with comment=comment %}
+              {% empty %}
+              <div class="text-center text-muted py-4">
+                <p>No comments yet. Be the first!</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Сайдбар -->
+<div class="col-lg-4">
+    <div class="sidebar-card card">
+        <div class="card-body">
+            <h6>Информация о посте</h6>
+            <div class="sidebar-info">
+                <div class="info-item">
+                    <strong>Автор:</strong> {{ post.author.username }}
+                </div>
+                <div class="info-item">
+                    <strong>Опубликован:</strong> {{ post.created_at|date:"d M Y H:i" }}
+                </div>
+                {% if post.community %}
+                <div class="info-item">
+                    <strong>Сообщество:</strong> {{ post.community.name }}
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <strong>Комментарии:</strong> {{ post.comments.count }}
                 </div>
             </div>
+
+            {% if user.is_authenticated %}
+                {% if user == post.author or user.is_staff or user.is_superuser %}
+                <div class="post-actions mt-3">
+                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Редактировать</a>
+                    <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
+
+                    {% if user.is_staff and user != post.author %}
+                    <span class="badge bg-warning ms-2">Модерация</span>
+                    {% endif %}
+                    {% if user.is_superuser and user != post.author %}
+                    <span class="badge bg-danger ms-2">Админ</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 </div>
-{% include 'posts/includes/share_modal.html' %}
-{% endblock %}
-
+  </div>
+</div>
+{% include 'posts/includes/share_modal.html' %} {% endblock %} 
 {% block extra_js %}
-    <!-- <script src="{% static 'posts/js/post_detail.js' %}"></script> -->
-    <script src="{% static 'js/share.js' %}"></script>
-    <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-    <script src="{% static 'posts/js/video_player.js' %}"></script>
-     <script src="{% static 'js/comments.js' %}"></script>
-    <script src="{% static 'posts/js/ajax_handler.js' %}"></script>
+<script src="{% static 'posts/js/video_handler.js' %}"></script>
+<script src="{% static 'js/share.js' %}"></script>
+<script src="{% static 'posts/js/media_carousel.js' %}"></script>
+<script src="{% static 'js/comments.js' %}"></script>
+<!-- Убрать дублирование ajax_handler.js -->
 {% endblock %}

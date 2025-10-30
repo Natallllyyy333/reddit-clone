@@ -39,34 +39,11 @@
     position: relative;
 }
 
-.video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
-    z-index: 2;
-}
-
-.carousel-controls {
+/* СТИЛИ ДЛЯ КНОПОК КАРУСЕЛИ */
+.carousel-btn {
     position: absolute;
     top: 50%;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
     transform: translateY(-50%);
-    padding: 0 10px;
-    z-index: 3;
-}
-
-.carousel-btn {
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 50%;
@@ -78,11 +55,21 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 20;
+}
+
+/* Позиционирование кнопок по бокам с отступом 10px */
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
 }
 
 .carousel-btn:hover {
     background: white;
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .media-counter {
@@ -94,7 +81,7 @@
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 14px;
-    z-index: 2;
+    z-index: 15;
 }
 
 /* Скрыть scrollbar для Webkit браузеров */
@@ -103,90 +90,220 @@
 }
 
 .media-scroll {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Стили для видео контейнера */
 .video-container {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 400px;
     background: #000;
     border-radius: 8px;
     overflow: hidden;
+    cursor: pointer;
 }
 
-.video-preview {
+.video-container video {
     width: 100%;
     height: 100%;
     object-fit: contain;
     cursor: pointer;
-    background: #000;
+    
 }
 
-.video-player {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #000;
-}
-
-.video-overlay {
+/* Кнопка воспроизведения поверх видео */
+.video-play-button {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: auto;
+    cursor: pointer;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    z-index: 2;
-    pointer-events: auto !important;
-}
-
-.video-play-button {
-    color: white;
-    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
     transition: all 0.3s ease;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    z-index: 3;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .video-play-button:hover {
-    opacity: 1;
-    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* Убедитесь, что никакие другие стили не переопределяют pointer-events */
-.video-container * {
+.video-play-button i {
+    color: white;
+    font-size: 2.5rem;
+    margin-left: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* Скрываем кнопку когда видео играет */
+.video-container.playing .video-play-button {
+    display: none;
+}
+
+/* Стили для элементов управления видео */
+.video-container video::-webkit-media-controls-panel {
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+
+.video-container video::-webkit-media-controls-play-button {
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+/* Гарантируем, что видео элементы всегда кликабельны */
+.video-item video {
     pointer-events: auto !important;
+    position: relative;
+    z-index: 1;
 }
 
-/* Убедитесь, что видео правильно отображается в карусели */
-.media-item .video-container {
+/* Защита от перекрытия другими элементами */
+.media-item * {
+    pointer-events: auto;
+}
+
+.media-carousel * {
+    box-sizing: border-box;
+}
+
+/* Стили для постера видео */
+.video-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    z-index: 5;
+    border-radius: 8px;
 }
 
-.media-video {
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-    object-fit: contain;
+/* Скрываем постер когда видео играет */
+.video-container.playing .video-preview {
+    display: none !important;
 }
 
-/* Стили для иконки воспроизведения */
-.fa-play-circle {
+/* Гарантируем, что видео всегда поверх постера */
+.video-container video {
+    position: relative;
+    z-index: 6;
+    cursor: pointer;
+}
+
+/* Убедимся, что контейнер кликабелен */
+.video-container {
+    cursor: pointer;
+    position: relative; /* Важно для позиционирования */
+}
+
+/* Стили для кнопки воспроизведения */
+.video-play-button {
+    display: flex !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: auto; /* Разрешаем события мыши */
+    cursor: pointer;
+    width: 80px;
+    height: 80px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.video-play-button:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.video-play-button i {
+    color: white;
+    font-size: 2.5rem;
+    margin-left: 5px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
 }
 
-.video-container:hover .fa-play-circle {
-    opacity: 1;
+/* Скрываем кнопку когда видео играет */
+.video-container.playing .video-play-button {
+    display: none !important;
 }
+
+/* Убираем стандартные controls */
+.video-container video {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.video-container video::-webkit-media-controls {
+    display: none !important;
+}
+
+.video-container video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.video-container video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.video-container video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+}
+
+/* Адаптивность */
+/* @media (max-width: 768px) {
+    .video-loading {
+        font-size: 1.5rem;
+    }
+
+    .media-item img,
+    .media-item video {
+        height: 300px;
+    }
+    
+    .video-container {
+        height: 300px;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .carousel-btn.prev {
+        left: 5px;
+    }
+    
+    .carousel-btn.next {
+        right: 5px;
+    }
+    
+    .media-counter {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+    
+    .video-play-button {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .video-play-button i {
+        font-size: 2rem;
+    }
+} */

@@ -71,23 +71,27 @@
                          class="img-fluid rounded media-image">
                     {% elif media.media_type == 'video' %}
                     <div class="video-container position-relative">
-                        <!-- Видео для превью (первый кадр) -->
-                        <video class="img-fluid rounded media-video video-preview" 
-                               preload="metadata"
-                               muted
-                               onclick="toggleVideoPlayback(this)">
-                            <source src="{{ media.media_file.url }}" type="video/mp4">
+                        <!-- Видео элемент -->
+                        <video
+                            class="img-fluid rounded media-video"
+                            preload="metadata"
+                            playsinline
+                            webkit-playsinline
+                        >
+                            <source
+                                src="{{ media.media_file.url }}"
+                                type="video/mp4"
+                            />
+                            Ваш браузер не поддерживает видео.
                         </video>
-                        <div class="video-play-button position-absolute top-50 start-50 translate-middle">
-                            <i class="fas fa-play-circle fa-3x text-white opacity-75"></i>
+
+                        <!-- Кнопка воспроизведения -->
+                        <div
+                            class="video-play-button"
+                            onclick="handleVideoPlay(this)"
+                        >
+                            <i class="fas fa-play-circle"></i>
                         </div>
-                        <!-- Скрытый видео-плеер для воспроизведения -->
-                        <video class="img-fluid rounded media-video video-player d-none" 
-                               controls 
-                               preload="metadata">
-                            <source src="{{ media.media_file.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
                     </div>
                     {% endif %}
                 </div>
@@ -128,7 +132,7 @@
                 </form>
 
                 <!-- Счетчик голосов -->
-                <span class="vote-count" id="vote-count-{{ post.pk }}">
+                <span class="video-count" id="vote-count-{{ post.pk }}">
                     <strong>{{ post.total_votes }}</strong>
                 </span>
 
@@ -166,9 +170,9 @@
 {% block extra_js %}
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
+    <!-- Подключаем единый обработчик видео -->
+    <script src="{% static 'posts/js/video_handler.js' %}"></script>
     <!-- ТОЛЬКО ОДИН СКРИПТ ДЛЯ ГОЛОСОВАНИЯ -->
     <!-- <script src="{% static 'posts/js/ajax_handler.js' %}"></script> -->
-    <script src="{% static 'posts/js/video_player.js' %}"></script>
-        <!-- <script src="{% static 'js/debug_votes.js' %}"></script> -->
-
+    <!-- <script src="{% static 'js/debug_votes.js' %}"></script> -->
 {% endblock %}
