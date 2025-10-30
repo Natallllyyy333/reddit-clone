@@ -1,8 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from posts.models import Post, Community
+from posts.models import Post
 from comments.models import Comment
+from communities.models import Community
 
 class UserWorkflowTest(TestCase):
     """Тестирование полного рабочего процесса пользователя"""
