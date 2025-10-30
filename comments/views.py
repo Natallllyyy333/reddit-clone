@@ -19,9 +19,9 @@ def add_comment(request, post_id):
                 author=request.user,
                 content=content
             )
-            messages.success(request, 'Комментарий добавлен')
+            messages.success(request, 'Comment added successfully.')
         else:
-            messages.error(request, 'Комментарий не может быть пустым')
+            messages.error(request, 'Comment cannot be empty')
     
     return redirect('post_detail', pk=post_id)
 

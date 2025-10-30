@@ -39,7 +39,7 @@ class PostDetailView(DetailView):
         context['comments'] = comments
         
         # Форма для комментариев (если нужно)
-        from comments.forms import CommentForm  # Создайте форму если нужно
+        from comments.forms import CommentForm  as CommentsCommentForm # Создайте форму если нужно
         context['comment_form'] = CommentForm()
         
         return context
