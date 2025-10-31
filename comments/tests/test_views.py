@@ -34,7 +34,7 @@ class CommentViewsTest(TestCase):
         self.assertTrue(Comment.objects.filter(content='Test comment content').exists())
         
         messages_list = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages_list[0]), 'Comment added.')
+        self.assertEqual(str(messages_list[0]), 'Comment added successfully.')
 
     def test_add_comment_empty_content(self):
         """Тест добавления пустого комментария"""

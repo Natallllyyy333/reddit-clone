@@ -1,4 +1,3 @@
-// ========== НАЧАЛО ИСПРАВЛЕННОГО КОДА ==========
 (function() {
     if (window.voteHandlerInitialized) {
         console.log('Vote handler already initialized, skipping...');
@@ -11,8 +10,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🔧 AJAX Handler: DOM loaded, setting up handlers');
         
-        // ========== ИСПРАВЛЕНИЕ ДВОЙНОГО СРАБАТЫВАНИЯ ==========
-        // Удаляем все существующие обработчики перед добавлением новых
+       
         const voteForms = document.querySelectorAll('form.vote-form');
         voteForms.forEach(form => {
             // Создаем новую копию формы чтобы сбросить обработчики
@@ -20,7 +18,7 @@
             form.parentNode.replaceChild(newForm, form);
         });
 
-        // ========== ИНИЦИАЛИЗАЦИЯ АВТОМАТИЧЕСКОГО СКРЫТИЯ УВЕДОМЛЕНИЙ ==========
+       
         function initializeAlertAutoDismiss() {
             console.log('🔔 Alert Auto-Dismiss: Initializing...');
             
@@ -54,7 +52,7 @@
         }
         initializeAlertAutoDismiss();
 
-        // ========== ОБРАБОТЧИКИ ГОЛОСОВАНИЯ С ЗАЩИТОЙ ОТ ДВОЙНОГО СРАБАТЫВАНИЯ ==========
+        
         const refreshedForms = document.querySelectorAll('form.vote-form');
         console.log(`🔧 Vote Handler: Found ${refreshedForms.length} vote forms`);
         
@@ -250,4 +248,3 @@
         }
     });
 })();
-// ========== КОНЕЦ ИСПРАВЛЕННОГО КОДА ==========

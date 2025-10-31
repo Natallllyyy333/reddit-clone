@@ -7,9 +7,13 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest frontend/tests/unit/ --verbose",
+    "test": "jest --verbose",
     "test:python": "python manage.py test --verbosity=1",
-    "test:all": "npm run test:python && npm run test"
+    "test:all": "npm run test:python && npm run test",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest frontend/tests/integration/ --verbose",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
