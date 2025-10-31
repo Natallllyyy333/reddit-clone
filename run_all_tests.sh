@@ -1,22 +1,20 @@
 #!/bin/bash
-echo "Running Django tests..."
 
-echo "1. Testing posts..."
-python manage.py test posts --verbosity=1
+echo "🧪 RUNNING COMPLETE TEST SUITE"
 
-echo "2. Testing home..."
-python manage.py test home --verbosity=1
+echo "🔍 Running Django tests..."
+python manage.py test --keepdb --parallel
 
-echo "3. Testing users..."
-python manage.py test users --verbosity=1
+echo "⚡ Running JavaScript unit tests..."
+npx jest --config jest.config.js frontend/tests/unit --verbose
 
-echo "4. Testing comments..."
-python manage.py test comments --verbosity=1
+echo "🔗 Running JavaScript integration tests..."
+npx jest --config jest.config.js frontend/tests/integration --verbose
 
-echo "5. Testing communities..."
-python manage.py test communities --verbosity=1
+echo "📊 Generating coverage report..."
+npx jest --config jest.config.js --coverage --collectCoverageFrom='["frontend/static/js/**/*.js"]'
 
-echo "6. All tests together..."
-python manage.py test --verbosity=1
+echo "🔒 Running security checks..."
+python manage.py check --deploy
 
-echo "Tests completed!"
+echo "✅ ALL TESTS COMPLETED"

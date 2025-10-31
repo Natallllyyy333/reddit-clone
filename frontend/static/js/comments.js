@@ -45,13 +45,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (deleteCommentModal) {
         deleteCommentModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            const commentId = button.getAttribute('data-comment-id');
-            const deleteUrl = button.getAttribute('data-comment-url');
-            
-            // Update the form action
-            const form = document.getElementById('deleteCommentForm');
-            if (form) {
-                form.action = deleteUrl;
+            if (!button) {
+            console.warn('No relatedTarget found in delete comment modal event');
+            return;
+        }
+        
+        const commentId = button.getAttribute('data-comment-id');
+        const deleteUrl = button.getAttribute('data-comment-url');
+        
+        // Update the form action
+        const form = document.getElementById('deleteCommentForm');
+        if (form) {
+            form.action = deleteUrl;
             }
         });
     }

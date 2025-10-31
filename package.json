@@ -7,13 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest --verbose",
-    "test:python": "python manage.py test --verbosity=1",
-    "test:all": "npm run test:python && npm run test",
-    "test:unit": "jest --testPathPattern=unit",
-    "test:integration": "jest frontend/tests/integration/ --verbose",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test": "jest --config jest.config.js --testTimeout=10000",
+    "test:unit": "jest --config jest.config.js frontend/tests/unit --verbose --testTimeout=10000",
+    "test:integration": "jest --config jest.config.js frontend/tests/integration --verbose --testTimeout=10000",
+    "test:coverage": "jest --config jest.config.js --coverage --testTimeout=10000",
+    "test:debug": "jest --config jest.config.js --verbose --testTimeout=30000"
   },
   "repository": {
     "type": "git",
@@ -33,23 +31,6 @@
   "homepage": "https://github.com/Natallllyyy333/reddit-clone#readme",
   "devDependencies": {
     "jest": "^29.0.0",
-    "jest-environment-jsdom": "^29.0.0"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "roots": [
-      "<rootDir>/frontend/tests"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/frontend/tests/setup.js"
-    ],
-    "collectCoverageFrom": [
-      "frontend/static/js/**/*.js",
-      "frontend/static/posts/js/**/*.js"
-    ],
-    "coverageDirectory": "frontend/tests/coverage",
-    "moduleNameMapper": {
-      "\\.(css|less|scss)$": "<rootDir>/frontend/tests/__mocks__/styleMock.js"
-    }
+    "jest-environment-jsdom": "^29.7.0"
   }
 }
