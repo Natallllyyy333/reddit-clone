@@ -1,7 +1,8 @@
-// frontend/tests/unit/dom_integrity.test.js
+// frontend/tests/unit/dom_integrity.test.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
+
 describe('DOM Integrity Check', () => {
     test('DOM elements persist after script loading', () => {
-        // Полная HTML структура
+        // Полная DOM структура
         document.body.innerHTML = `
             <button class="share-btn" data-post-id="123">Share</button>
             <button class="comments-btn">Comments</button>
@@ -25,9 +26,9 @@ describe('DOM Integrity Check', () => {
             <input name="csrfmiddlewaretoken" value="test-csrf">
         `;
 
-        // Используем абсолютные пути от корня проекта
-        require('../../../static/js/share.js');
-        require('../../../static/js/comments.js');
+        // ИСПРАВЛЕННЫЕ ПУТИ - используем правильные относительные пути
+        require('../../static/js/share.js');      // Исправленный путь
+        require('../../static/js/comments.js');   // Исправленный путь
 
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
