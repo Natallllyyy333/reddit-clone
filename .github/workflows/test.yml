@@ -1,0 +1,86 @@
+name: Test Suite
+
+on: 
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install coverage pytest-django
+    
+    - name: Install JavaScript dependencies
+      run: npm install
+    
+    - name: Install Playwright
+      run: npx playwright install
+    
+    - name: Setup test database
+      run: |
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+    
+    - name: Run Python tests with coverage
+      run: |
+        coverage run --source='.' manage.py test
+        coverage xml
+    
+    - name: Run JavaScript unit tests
+      run: npm run test:unit
+    
+    - name: Run JavaScript integration tests  
+      run: npm run test:integration
+    
+    - name: Run E2E tests
+      run: npm run test:e2e
+    
+    - name: Generate JavaScript coverage report
+      run: npm run test:coverage
+    
+    - name: Upload Python coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: python
+    
+    - name: Upload JavaScript coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: javascript
