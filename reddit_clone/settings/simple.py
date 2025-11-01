@@ -4,10 +4,9 @@ from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
 # DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
-
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
 if not DEBUG:
     # Production settings
     SECURE_HSTS_SECONDS = 31536000  # 1 year
@@ -65,8 +64,7 @@ ROOT_URLCONF = 'reddit_clone.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'frontend' / 'templates',
-         ],
+        'DIRS': [BASE_DIR / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-
+# Базовые настройки базы данных (SQLite)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -93,10 +91,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -108,34 +104,70 @@ LOGOUT_REDIRECT_URL = '/'
 # Custom user model
 # AUTH_USER_MODEL = 'users.User'
 
-# if not DEBUG:
-#     SECURE_SSL_REDIRECT = True
-#     SESSION_COOKIE_SECURE = True
-#     CSRF_COOKIE_SECURE = True
-#     SECURE_BROWSER_XSS_FILTER = True
-#     SECURE_CONTENT_TYPE_NOSNIFF = True
-#     SECURE_HSTS_SECONDS = 31536000  # 1 year
-#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-#     SECURE_HSTS_PRELOAD = True
-
 LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'ERROR',
-                'class': 'logging.FileHandler',
-                'filename': BASE_DIR / 'django_errors.log',
-            },
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'django_errors.log',
         },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
         },
-    }
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Heroku production settings - ИСПРАВЛЕННАЯ ВЕРСИЯ
+if not DEBUG:
+    try:
+        import dj_database_url
+        # Конфигурация базы данных для Heroku
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=os.environ.get('DATABASE_URL'),
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+    except ImportError:
+        # Если dj_database_url не установлен, используем SQLite с предупреждением
+        print("WARNING: dj-database-url not installed. Using SQLite for production is not recommended!")
+    
+    # Статические файлы для Heroku
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    
+    try:
+        # Добавляем whitenoise middleware
+        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    except ImportError:
+        print("WARNING: whitenoise not installed. Static files may not work properly in production!")
+    
+    # Настройки безопасности для продакшена
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Internationalization for easy text changes
+LANGUAGES = [
+    ('en', 'English'),
+    ('ru', 'Russian'),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+# Добавляем LocaleMiddleware для поддержки перевода
+MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')

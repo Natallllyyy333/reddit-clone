@@ -21,7 +21,7 @@ class Comment(models.Model):
 
     @property
     def can_edit(self):
-        """Проверяет, может ли текущий пользователь редактировать комментарий"""
+        """Checks if the current user can edit the comment"""
         from django.contrib.auth.models import AnonymousUser
         user = getattr(self, '_current_user', None)
         
@@ -32,7 +32,7 @@ class Comment(models.Model):
 
     @property
     def can_delete(self):
-        """Проверяет, может ли текущий пользователь удалить комментарий"""
+        """Checks if the current user can delete a comment"""
         from django.contrib.auth.models import AnonymousUser
         from communities.models import Community
         

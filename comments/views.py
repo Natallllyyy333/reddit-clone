@@ -7,7 +7,7 @@ from posts.models import Post
 
 @login_required
 def add_comment(request, post_id):
-    """Добавление комментария к посту"""
+    """Adding a comment to the post"""
     post = get_object_or_404(Post, id=post_id)
     
     if request.method == 'POST':
@@ -27,15 +27,15 @@ def add_comment(request, post_id):
 
 @login_required
 def edit_comment(request, comment_id):
-    """Редактирование комментария"""
+    """Editing a comment"""
     comment = get_object_or_404(Comment, id=comment_id)
     
-    # Устанавливаем текущего пользователя для проверки прав
+    # Setting the current user to check permissions
     comment._current_user = request.user
     
-    # Проверяем права на редактирование (теперь это свойство, а не метод)
+    # Checking edit permissions (now it's a property, not a method)
     if not comment.can_edit:
-        messages.error(request, 'У вас нет прав для редактирования этого комментария')
+        messages.error(request, 'You do not have permission to edit this comment')
         return redirect('post_detail', pk=comment.post.id)
     
     if request.method == 'POST':
@@ -44,21 +44,21 @@ def edit_comment(request, comment_id):
         if content:
             comment.content = content
             comment.save()
-            messages.success(request, 'Комментарий обновлен')
+            messages.success(request, 'Comment updated')
         else:
-            messages.error(request, 'Комментарий не может быть пустым')
+            messages.error(request, 'The comment cannot be empty')
         
         return redirect('post_detail', pk=comment.post.id)
     
-    # GET запрос - показываем форму редактирования
+    # GET request - displaying the edit form
     return render(request, 'comments/edit_comment.html', {
         'comment': comment
     })
 
 @login_required
 def delete_comment(request, comment_id):
-    """Удаление комментария"""
-    if request.method == 'POST':  # Убедитесь, что проверяется POST
+    """Delete comment"""
+    if request.method == 'POST':  
         comment = get_object_or_404(Comment, id=comment_id)
         comment._current_user = request.user
         
@@ -71,5 +71,5 @@ def delete_comment(request, comment_id):
         messages.success(request, 'Comment deleted successfully')
         return redirect('post_detail', pk=post_id)
     
-    # Если пришел не POST запрос
+    # If a non-POST request was received
     return redirect('post_list')

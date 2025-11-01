@@ -37,7 +37,7 @@ class CommentViewsTest(TestCase):
         self.assertEqual(str(messages_list[0]), 'Comment added successfully.')
 
     def test_add_comment_empty_content(self):
-        """Тест добавления пустого комментария"""
+        """Test of adding an empty comment"""
         self.client.login(username='testuser', password='testpass123')
         data = {
             'content': ''
