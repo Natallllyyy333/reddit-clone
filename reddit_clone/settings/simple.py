@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'home',
     'communities',
     'tests', 
+    'cloudinary',
+    'cloudinary_storage'
 ]
 
 MIDDLEWARE = [
@@ -194,3 +196,12 @@ if not DEBUG:
         raise ValueError("ALLOWED_HOSTS must be set in production environment!")
     
     print("🚀 Production mode: All security settings are enabled")
+
+    # Cloudinary configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'), 
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
