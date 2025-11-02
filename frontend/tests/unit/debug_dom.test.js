@@ -1,4 +1,3 @@
-// frontend/tests/unit/debug_dom.test.js
 describe('DOM Debug Test', () => {
     test('debug DOM changes', () => {
         const initialHTML = `
@@ -22,7 +21,7 @@ describe('DOM Debug Test', () => {
         console.log('comments-btn exists:', !!document.querySelector('.comments-btn'));
         console.log('Full DOM:', document.body.innerHTML);
 
-        // Просто проверяем, что скрипты загрузились без ошибок
+        // Just checking that the scripts loaded without errors
         expect(true).toBe(true);
     });
 });

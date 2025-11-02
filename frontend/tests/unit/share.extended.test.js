@@ -47,19 +47,19 @@ describe('Share Extended Tests', () => {
         const copyBtn = document.getElementById('copyShareUrlBtn');
         const originalHTML = copyBtn.innerHTML;
 
-        // Устанавливаем URL для копирования
+        // Setting the URL for copying
         document.getElementById('shareUrl').value = 'http://test.com';
         
-        // ВМЕСТО вызова window.copyShareUrl() - симулируем реальный клик
+        // INSTEAD of calling window.copyShareUrl() - we simulate a real click
         copyBtn.click();
 
-        await new Promise(resolve => setTimeout(resolve, 50)); // Увеличиваем задержку
+        await new Promise(resolve => setTimeout(resolve, 50)); // Increasing the delay
         
-        // Проверяем что clipboard был вызван
+        // Checking that the clipboard was called
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://test.com');
         
-        // Проверяем что UI изменился (кнопка показывает "Copied")
+        // We check that the UI has changed (the button shows 'Copied')
         expect(copyBtn.innerHTML).not.toBe(originalHTML);
-        expect(copyBtn.innerHTML).toContain('Copied'); // или другую ожидаемую текстовку
+        expect(copyBtn.innerHTML).toContain('Copied'); // or another expected text
     });
 });

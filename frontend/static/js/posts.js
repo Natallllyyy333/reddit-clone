@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Posts page loaded');
     
-    // Анимация появления постов
+    // Post appearance animation
     const postCards = document.querySelectorAll('.post-card');
     postCards.forEach((card, index) => {
         card.style.opacity = '0';
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 100);
     });
     
-    // Ленивая загрузка изображений (если будут)
+    // Lazy loading of images (if any)
     const lazyImages = document.querySelectorAll('img[data-src]');
     
     const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// AJAX шаринг
+// AJAX sharing
 document.addEventListener('DOMContentLoaded', function() {
     const shareForms = document.querySelectorAll('#shareForm');
     
@@ -53,12 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Обновить счетчик шаров
+                    // Update sharing counter
                     const shareBadge = document.querySelector(`[data-post-id="${postId}"] .badge`);
                     if (shareBadge) {
                         shareBadge.textContent = data.shares_count;
                     }
-                    // Закрыть модальное окно
+                    // Close modal window
                     bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
                 }
             });

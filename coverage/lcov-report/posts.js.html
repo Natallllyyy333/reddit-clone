@@ -198,7 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">document.addEventListener('DOMContentLoaded', function() {
     console.log('Posts page loaded');
     
-    // Анимация появления постов
+    // Post appearance animation
     const postCards = document.querySelectorAll('.post-card');
     postCards.forEach((card, index) =&gt; {
         card.style.opacity = '0';
@@ -211,7 +211,7 @@
         }, index * 100);
     });
     
-    // Ленивая загрузка изображений (если будут)
+    // Lazy loading of images (if any)
     const lazyImages = document.querySelectorAll('img[data-src]');
     
     const imageObserver = new IntersectionObserver(<span class="fstat-no" title="function not covered" >(e</span>ntries, observer) =&gt; {
@@ -229,7 +229,7 @@
 });
 &nbsp;
 &nbsp;
-// AJAX шаринг
+// AJAX sharing functionality
 document.addEventListener('DOMContentLoaded', function() {
     const shareForms = document.querySelectorAll('#shareForm');
     
@@ -250,12 +250,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; <span class="cstat-no" title="statement not covered" >response.json())</span>
             .then(<span class="fstat-no" title="function not covered" >da</span>ta =&gt; {
 <span class="cstat-no" title="statement not covered" >                if (data.success) {</span>
-                    // Обновить счетчик шаров
+                    // Update sharing counter
                     const shareBadge = <span class="cstat-no" title="statement not covered" >document.querySelector(`[data-post-id="${postId}"] .badge`);</span>
 <span class="cstat-no" title="statement not covered" >                    if (shareBadge) {</span>
 <span class="cstat-no" title="statement not covered" >                        shareBadge.textContent = data.shares_count;</span>
                     }
-                    // Закрыть модальное окно
+                    // Close modal window
 <span class="cstat-no" title="statement not covered" >                    bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();</span>
                 }
             });

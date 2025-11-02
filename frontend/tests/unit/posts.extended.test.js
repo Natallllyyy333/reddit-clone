@@ -1,4 +1,3 @@
-// frontend/tests/unit/posts.extended.test.js
 describe('Posts Extended Tests', () => {
     beforeEach(() => {
         document.body.innerHTML = `

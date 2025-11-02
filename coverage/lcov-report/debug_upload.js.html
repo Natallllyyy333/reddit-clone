@@ -149,7 +149,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// debug_upload.js - для диагностики дублирования
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// debug_upload.js - for duplication diagnostics
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== UPLOAD DEBUGGER STARTED ===');
     
@@ -166,23 +166,23 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Upload area found:', !!uploadArea);
     console.log('File preview found:', !!filePreview);
     
-    // Проверяем обработчики событий
+    // Checking event handlers
     console.log('Event listeners on file input:');
     <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof getEventListeners === 'function') {
 <span class="cstat-no" title="statement not covered" >        console.log(getEventListeners(fileInput));</span>
     }
     
-    // Добавляем простой обработчик для отслеживания
+    // Adding a simple handler for tracking
     fileInput.addEventListener('change', <span class="fstat-no" title="function not covered" >fu</span>nction(e) {
 <span class="cstat-no" title="statement not covered" >        console.log('=== FILE INPUT CHANGE ===');</span>
 <span class="cstat-no" title="statement not covered" >        console.log('Files selected:', e.target.files.length);</span>
 <span class="cstat-no" title="statement not covered" >        console.log('Files:', Array.from(e.target.files).map(<span class="fstat-no" title="function not covered" >f </span>=&gt; <span class="cstat-no" title="statement not covered" >f.name)</span>);</span>
         
-        // Проверяем текущее состояние превью
+        // Checking the current state of the preview
 <span class="cstat-no" title="statement not covered" >        console.log('Current preview items:', filePreview?.children.length || 0);</span>
     });
     
-    // Проверяем drag &amp; drop обработчики
+    // Checking  drag &amp; drop handlers
     <span class="missing-if-branch" title="else path not taken" >E</span>if (uploadArea) {
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName =&gt; {
             uploadArea.addEventListener(eventName, <span class="fstat-no" title="function not covered" >fu</span>nction(e) {

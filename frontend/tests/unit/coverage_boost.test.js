@@ -6,7 +6,7 @@ describe('Coverage Boost Tests', () => {
         require('../../static/js/debug_votes.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
         
-        // Проверяем, что debug скрипт что-то логирует
+        // Checking that the debug script logs something
         expect(consoleSpy).toHaveBeenCalled();
         consoleSpy.mockRestore();
     });

@@ -339,16 +339,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
 <span class="cstat-no" title="statement not covered" >            if (!postId) {</span>
 <span class="cstat-no" title="statement not covered" >                console.error('Post ID not found. Check data-post-id attribute');</span>
-<span class="cstat-no" title="statement not covered" >                showNotification('Ошибка: ID поста не найден', 'error');</span>
+<span class="cstat-no" title="statement not covered" >                showNotification('Error: Post ID not found', 'error');</span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
             
-            // Блокируем кнопку на время запроса
+            // We block the button during the request
             const originalText = <span class="cstat-no" title="statement not covered" >this.innerHTML;</span>
 <span class="cstat-no" title="statement not covered" >            this.innerHTML = '...';</span>
 <span class="cstat-no" title="statement not covered" >            this.disabled = true;</span>
             
-            // Отправляем запрос
+            // Sending request
 <span class="cstat-no" title="statement not covered" >            fetch(`/posts/${postId}/vote/${voteType}/`, {</span>
                 method: 'POST',
                 headers: {
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function <span class="fstat-no" title="function not covered" >updateVoteCounters(</span>data, postId) {
 <span class="cstat-no" title="statement not covered" >        console.log('Updating counters for post:', postId, 'with data:', data);</span>
         
-        // Обновляем счетчики на детальной странице
+        // Updating counters on the detailed page
         const scoreElement = <span class="cstat-no" title="statement not covered" >document.getElementById('post-score');</span>
         const upvotesElement = <span class="cstat-no" title="statement not covered" >document.getElementById('upvotes-count');</span>
         const downvotesElement = <span class="cstat-no" title="statement not covered" >document.getElementById('downvotes-count');</span>
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <span class="cstat-no" title="statement not covered" >        if (upvotesElement) <span class="cstat-no" title="statement not covered" >upvotesElement.textContent = data.upvotes;</span></span>
 <span class="cstat-no" title="statement not covered" >        if (downvotesElement) <span class="cstat-no" title="statement not covered" >downvotesElement.textContent = data.downvotes;</span></span>
         
-        // Обновляем счетчики в списке постов
+        // Updating counters in the post list
         const listScoreElement = <span class="cstat-no" title="statement not covered" >document.getElementById(`post-score-${postId}`);</span>
 <span class="cstat-no" title="statement not covered" >        if (listScoreElement) {</span>
 <span class="cstat-no" title="statement not covered" >            listScoreElement.textContent = data.score;</span>
@@ -420,19 +420,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function <span class="fstat-no" title="function not covered" >updateButtonStyles(</span>clickedButton, voteType) {
         const allButtons = <span class="cstat-no" title="statement not covered" >document.querySelectorAll('.vote-btn');</span>
         
-        // Сбрасываем стили всех кнопок
+        // Reset all button styles
 <span class="cstat-no" title="statement not covered" >        allButtons.forEach(<span class="fstat-no" title="function not covered" >bt</span>n =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >            btn.classList.remove('active');</span>
         });
         
-        // Применяем стиль к активной кнопке
+        // Apply style to the active button
 <span class="cstat-no" title="statement not covered" >        if (voteType === 'upvote' || voteType === 'downvote') {</span>
 <span class="cstat-no" title="statement not covered" >            clickedButton.classList.add('active');</span>
         }
     }
     
     function <span class="fstat-no" title="function not covered" >showNotification(</span>message, type = <span class="branch-0 cbranch-no" title="branch not covered" >'info')</span> {
-        // Временное решение - используем alert для отладки
+        // Temporary solution - using alert for debugging
 <span class="cstat-no" title="statement not covered" >        alert(`${type.toUpperCase()}: ${message}`);</span>
     }
 });</pre></td></tr></table></pre>

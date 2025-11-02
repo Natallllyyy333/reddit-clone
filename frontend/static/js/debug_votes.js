@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== VOTE DEBUGGER STARTED ===');
     
-    // Проверяем все формы голосования
+    // We check all voting forms
     const voteForms = document.querySelectorAll('form.vote-form');
     console.log(`Found ${voteForms.length} vote forms`);
     
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Form action: ${form.action}`);
         console.log(`Form classes: ${form.className}`);
         
-        // Добавляем обработчик с подробным логированием
+        // Adding a handler with detailed logging
         form.addEventListener('submit', function(e) {
             console.log('=== FORM SUBMISSION DETECTED ===');
             console.log('Event target:', e.target);
@@ -20,12 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             console.log('After preventDefault - default prevented:', e.defaultPrevented);
             
-            // Проверяем, есть ли другие обработчики
+            // Checking if there are any other handlers
             console.log('Event listeners on this form:');
             const listeners = getEventListeners(form);
             console.log(listeners);
             
-            // Имитируем успешный AJAX запрос для тестирования
+            // Simulating a successful AJAX request for testing
             setTimeout(() => {
                 const postId = form.querySelector('button')?.dataset.postId;
                 if (postId) {
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Проверяем кнопки голосования
+    // Checking the voting buttons
     const voteButtons = document.querySelectorAll('.vote-btn');
     console.log(`Found ${voteButtons.length} vote buttons`);
     

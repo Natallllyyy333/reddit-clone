@@ -2,18 +2,18 @@ describe('Share Functionality', () => {
     let originalConsoleError;
 
     beforeAll(() => {
-        // Сохраняем оригинальный console.error
+        // Keep the originalconsole.error
         originalConsoleError = console.error;
         console.error = jest.fn(); // Отключаем ошибки в тестах
     });
 
     afterAll(() => {
-        // Восстанавливаем console.error
+        // Restoring console.error
         console.error = originalConsoleError;
     });
 
     beforeEach(() => {
-        // Простой и чистый DOM
+        // Simple and clean DOM
         document.body.innerHTML = `
             <button class="share-btn" data-post-id="123">Share</button>
             <div id="shareModal">
@@ -22,7 +22,7 @@ describe('Share Functionality', () => {
             </div>
         `;
 
-        // Минимальные моки
+        // Minimal моки
         global.bootstrap = {
             Modal: {
                 getOrCreateInstance: jest.fn(() => ({
@@ -57,13 +57,13 @@ describe('Share Functionality', () => {
         const shareBtnBefore = document.querySelector('.share-btn');
         expect(shareBtnBefore).toBeTruthy();
 
-        // Загружаем скрипт
+        // Loading script
         require('../../static/js/share.js');
         
-        // Инициализируем
+        // Initializing
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
-        // Проверяем, что элементы все еще существуют
+        // Checking that the elements still exist
         const shareBtnAfter = document.querySelector('.share-btn');
         expect(shareBtnAfter).toBeTruthy();
     });

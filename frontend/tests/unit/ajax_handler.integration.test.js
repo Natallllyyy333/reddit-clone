@@ -1,5 +1,3 @@
-// frontend/tests/unit/ajax_handler_improved.test.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
-
 describe('AJAX Handler - Improved Tests', () => {
     let originalFetch;
     let consoleSpy;
@@ -33,7 +31,6 @@ describe('AJAX Handler - Improved Tests', () => {
         document.body.innerHTML = '';
         jest.clearAllMocks();
         
-        // ОБНОВЛЕННЫЙ DOM с правильным CSRF токеном
         document.body.innerHTML = `
             <form class="vote-form" action="/posts/1/vote/upvote/" method="post" data-post-id="1">
                 <input type="hidden" name="csrfmiddlewaretoken" value="test-csrf-token">

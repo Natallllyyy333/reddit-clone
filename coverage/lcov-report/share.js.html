@@ -263,16 +263,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// frontend/static/js/share.js
 &nbsp;
-// Функция для открытия модального окна с данными поста
+// Function to open a modal window with post data
 function <span class="fstat-no" title="function not covered" >openShareModal(</span>postId, postTitle) {
     const shareUrl = <span class="cstat-no" title="statement not covered" >`${window.location.origin}/posts/${postId}/`;</span>
     const encodedUrl = <span class="cstat-no" title="statement not covered" >encodeURIComponent(shareUrl);</span>
     const encodedTitle = <span class="cstat-no" title="statement not covered" >encodeURIComponent(postTitle || 'Check this post');</span>
     
-    // Устанавливаем URL для копирования
+    // Setting the URL for copying
 <span class="cstat-no" title="statement not covered" >    document.getElementById('shareUrl').value = shareUrl;</span>
     
-    // Устанавливаем ссылки для социальных сетей
+    // Setting up links for social networks
 <span class="cstat-no" title="statement not covered" >    document.getElementById('twitterShare').href = </span>
         `https://twitter.com/intent/tweet?text=${encodedTitle}&amp;url=${encodedUrl}`;
 <span class="cstat-no" title="statement not covered" >    document.getElementById('facebookShare').href = </span>
@@ -282,30 +282,30 @@ function <span class="fstat-no" title="function not covered" >openShareModal(</s
 <span class="cstat-no" title="statement not covered" >    document.getElementById('telegramShare').href = </span>
         `https://t.me/share/url?url=${encodedUrl}&amp;text=${encodedTitle}`;
     
-    // Показываем модальное окно
+    // Showing a modal window
     const shareModal = <span class="cstat-no" title="statement not covered" >new bootstrap.Modal(document.getElementById('shareModal'));</span>
 <span class="cstat-no" title="statement not covered" >    shareModal.show();</span>
 }
 &nbsp;
-// Функция для копирования URL
+// Function for copying URL
 function copyShareUrl() {
     const shareUrl = document.getElementById('shareUrl');
     shareUrl.select();
     shareUrl.setSelectionRange(0, 99999); // Для мобильных устройств
     
     try {
-        // Современный способ копирования
+        // Modern way of copying
         navigator.clipboard.writeText(shareUrl.value).then(() =&gt; {
             showCopyFeedback();
         });
     } catch (err) {
-        // Старый способ для совместимости
+        // Old method for compatibility
 <span class="cstat-no" title="statement not covered" >        document.execCommand('copy');</span>
 <span class="cstat-no" title="statement not covered" >        showCopyFeedback();</span>
     }
 }
 &nbsp;
-// Показать feedback при копировании
+// Show feedback when copying
 function showCopyFeedback() {
     const copyBtn = document.getElementById('copyShareUrlBtn');
     const originalText = copyBtn.innerHTML;
@@ -320,16 +320,16 @@ function showCopyFeedback() {
     }, 2000);
 }
 &nbsp;
-// Инициализация кнопок шаринга после загрузки страницы
+// Initializing sharing buttons after the page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация кнопок шаринга
+    // Initializing sharing buttons
     const shareButtons = document.querySelectorAll('.share-btn');
     shareButtons.forEach(button =&gt; {
         button.addEventListener('click', <span class="fstat-no" title="function not covered" >fu</span>nction() {
             const postId = <span class="cstat-no" title="statement not covered" >this.getAttribute('data-post-id');</span>
 &nbsp;
 &nbsp;
-           // Улучшенный поиск заголовка поста для разных структур
+           // Improved post title search for different structures
             let postTitle = <span class="cstat-no" title="statement not covered" >'';</span>
             const card = <span class="cstat-no" title="statement not covered" >this.closest('.card');</span>
 <span class="cstat-no" title="statement not covered" >            if (card) {</span>
@@ -344,13 +344,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Инициализация кнопки копирования
+    // Initializing the copy button
     const copyBtn = document.getElementById('copyShareUrlBtn');
     if (copyBtn) {
         copyBtn.addEventListener('click', copyShareUrl);
     }
     
-    // Закрытие модального окна при клике вне его
+    // Closing the modal window when clicking outside of it
     const shareModal = document.getElementById('shareModal');
     if (shareModal) {
         shareModal.addEventListener('click', function(event) {

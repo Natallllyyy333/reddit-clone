@@ -10,12 +10,12 @@
                     {% if is_member %}
                     <form method="post" action="{% url 'communities:leave_community' community.name %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-danger">Покинуть</button>
+                        <button type="submit" class="btn btn-outline-danger">Leave</button>
                     </form>
                     {% else %}
                     <form method="post" action="{% url 'communities:join_community' community.name %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Присоединиться</button>
+                        <button type="submit" class="btn btn-primary">Join</button>
                     </form>
                     {% endif %}
                 {% endif %}
@@ -23,36 +23,36 @@
             
             <p class="lead">{{ community.description }}</p>
             <div class="text-muted mb-4">
-                Участников: {{ community.member_count }} | 
-                Создано: {{ community.created_at|date:"d.m.Y" }}
+                Members: {{ community.member_count }} | 
+                Created: {{ community.created_at|date:"d.m.Y" }}
             </div>
 
-            <h3>Посты сообщества</h3>
+            <h3>Community posts</h3>
             {% for post in posts %}
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ post.title }}</h5>
                     <p class="card-text">{{ post.content|truncatewords:30 }}</p>
                     <div class="text-muted small">
-                        Автор: {{ post.author.username }} | 
-                        Дата: {{ post.created_at|date:"d.m.Y H:i" }}
+                        Author: {{ post.author.username }} | 
+                        Date: {{ post.created_at|date:"d.m.Y H:i" }}
                     </div>
-                    <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-primary mt-2">Читать</a>
+                    <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-primary mt-2">Read</a>
                 </div>
             </div>
             {% empty %}
-            <p>В этом сообществе пока нет постов.</p>
+            <p>There are no posts in this community yet.</p>
             {% endfor %}
         </div>
         
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">О сообществе</h5>
+                    <h5 class="card-title">About the community</h5>
                     <p>{{ community.description }}</p>
                     {% if is_moderator %}
                     <div class="alert alert-info small">
-                        Вы модератор этого сообщества
+                        You are the moderator of this community
                     </div>
                     {% endif %}
                 </div>

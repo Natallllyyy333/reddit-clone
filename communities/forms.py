@@ -10,44 +10,44 @@ class CommunityForm(forms.ModelForm):
         fields = ['name', 'description']
         widgets = {
             'name': forms.TextInput(attrs={
-                'placeholder': 'Название сообщества',
+                'placeholder': 'Community Name',
                 'class': 'form-control'
             }),
             'description': forms.Textarea(attrs={
                 'rows': 4,
-                'placeholder': 'Опишите ваше сообщество...',
+                'placeholder': 'Describe your community...',
                 'class': 'form-control'
             }),
         }
         labels = {
-            'name': 'Название сообщества',
-            'description': 'Описание'
+            'name': 'Community Name',
+            'description': 'Description'
         }
         help_texts = {
-            'name': 'Только буквы, цифры и подчеркивания. Не более 50 символов.',
-            'description': 'Опишите тему и правила вашего сообщества.'
+            'name': 'Only letters, numbers, and underscores. No more than 50 characters.',
+            'description': 'Describe the topic and rules of your community.'
         }
     
     
     def clean_name(self):
         name = self.cleaned_data['name'].strip()
         if not name:
-            raise ValidationError('Название сообщества не может быть пустым')
+            raise ValidationError('The community name cannot be empty')
         
-        # Проверка длины
+        # Length check
         if len(name) < 3:
-            raise ValidationError('Название должно содержать минимум 3 символа')
+            raise ValidationError('The name must contain at least 3 characters')
         
         if len(name) > 50:
-            raise ValidationError('Название не может превышать 50 символов')
+            raise ValidationError('The title cannot exceed 50 characters')
         
-        # Проверка на разрешенные символы
+        # Check for allowed characters
         if not re.match(r'^[a-zA-Z0-9_]+$', name):
             raise ValidationError(
-                'Название может содержать только латинские буквы, цифры и подчеркивания'
+                'The name can only contain Latin letters, numbers, and underscores'
             )
         
-        # Запрещенные имена (резервированные слова)
+        # Prohibited Names (Reserved Words)
         reserved_names = [
             'admin', 'api', 'auth', 'create', 'delete', 'edit', 'login', 
             'logout', 'register', 'settings', 'profile', 'search', 'help',
@@ -56,20 +56,20 @@ class CommunityForm(forms.ModelForm):
         ]
         
         if name.lower() in reserved_names:
-            raise ValidationError('Это название зарезервировано и не может быть использовано')
+            raise ValidationError('This name is reserved and cannot be used')
         
-        # Проверка на нецензурные слова (базовый пример)
-        profanity_list = ['badword1', 'badword2']  # Заполните реальным списком
+        # Profanity check (basic example)
+        profanity_list = ['badword1', 'badword2']  # Fill in with a real list
         if any(profanity in name.lower() for profanity in profanity_list):
-            raise ValidationError('Название содержит запрещенные слова')
+            raise ValidationError('The title contains prohibited words')
         
-        # Приводим к нижнему регистру
+        # Convert to lowercase
         name = name.lower()
         
-        # Проверка на уникальность (ModelForm делает это автоматически, 
-        # но можно добавить кастомную проверку)
+        # Uniqueness check (ModelForm does this automatically, 
+        # but you can add a custom check)
         if Community.objects.filter(name=name).exists():
-            raise ValidationError('Сообщество с таким названием уже существует')
+            raise ValidationError('A community with this name already exists')
         
         return name
 
@@ -77,50 +77,50 @@ class CommunityForm(forms.ModelForm):
     def clean_description(self):
             description = self.cleaned_data['description'].strip()
             
-            # Проверка на пустое описание
+            # Check for empty description
             if not description:
-                raise ValidationError('Описание сообщества не может быть пустым')
+                raise ValidationError('The community description cannot be empty')
             
-            # Проверка длины описания
+            # Checking the description length
             if len(description) < 10:
-                raise ValidationError('Описание должно содержать минимум 10 символов')
+                raise ValidationError('The description must contain at least 10 characters')
             
             if len(description) > 1000:
-                raise ValidationError('Описание не может превышать 1000 символов')
+                raise ValidationError('The description cannot exceed 1000 characters')
             
-            # Проверка на нецензурные слова в описании
+            # Check for obscene words in the description
             profanity_list = ['badword1', 'badword2']
             if any(profanity in description.lower() for profanity in profanity_list):
-                raise ValidationError('Описание содержит запрещенные слова')
+                raise ValidationError('The description contains prohibited words')
             
             return description
 
 class CommunityEditForm(forms.ModelForm):
-    """Форма для редактирования существующего сообщества"""
+    """Form for editing an existing community"""
     class Meta:
         model = Community
         fields = ['description']
         widgets = {
             'description': forms.Textarea(attrs={
                 'rows': 4,
-                'placeholder': 'Опишите ваше сообщество...',
+                'placeholder': 'Describe your communityо...',
                 'class': 'form-control'
             }),
         }
         labels = {
-            'description': 'Описание сообщества'
+            'description': 'Community Description'
         }
     
     def clean_description(self):
         description = self.cleaned_data['description'].strip()
         
         if not description:
-            raise ValidationError('Описание сообщества не может быть пустым')
+            raise ValidationError('The community description cannot be empty')
         
         if len(description) < 10:
-            raise ValidationError('Описание должно содержать минимум 10 символов')
+            raise ValidationError('The description must contain at least 10 characters')
         
         if len(description) > 1000:
-            raise ValidationError('Описание не может превышать 1000 символов')
+            raise ValidationError('The description cannot exceed 1000 characters')
         
         return description

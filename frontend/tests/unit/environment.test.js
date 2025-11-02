@@ -1,14 +1,10 @@
-/**
- * @jest-environment jsdom
- */
-
 test('Jest DOM environment basic check', () => {
     console.log('=== ENVIRONMENT CHECK ===');
     console.log('document:', typeof document);
     console.log('document.body:', document.body);
     console.log('document.body.innerHTML:', document.body.innerHTML);
     
-    // Проверим базовые возможности DOM
+    // the basic capabilities of the DOM check 
     document.body.innerHTML = '<div id="test">Hello World</div>';
     console.log('After setting innerHTML:', document.body.innerHTML);
     

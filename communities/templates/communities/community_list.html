@@ -3,9 +3,9 @@
 {% block content %}
 <div class="container mt-4" >
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Сообщества</h1>
+        <h1>Communities</h1>
         {% if user.is_authenticated %}
-        <a href="{% url 'communities:create_community' %}" class="btn btn-primary">Создать сообщество</a>
+        <a href="{% url 'communities:create_community' %}" class="btn btn-primary">Create a community</a>
         {% endif %}
     </div>
 
@@ -21,15 +21,15 @@
                     </h5>
                     <p class="card-text">{{ community.description|truncatewords:20 }}</p>
                     <div class="text-muted small">
-                        Участников: {{ community.member_count }} | 
-                        Постов: {{ community.post_count }}
+                        Members: {{ community.member_count }} | 
+                        Posts: {{ community.post_count }}
                     </div>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12">
-            <p>Пока нет сообществ. <a href="{% url 'communities:create_community' %}">Создайте первое!</a></p>
+            <p>There are no communities yet. <a href="{% url 'communities:create_community' %}">Create the first one!</a></p>
         </div>
         {% endfor %}
     </div>

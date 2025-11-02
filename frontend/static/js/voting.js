@@ -1,4 +1,3 @@
-// frontend/static/js/voting.js
 document.addEventListener('DOMContentLoaded', function() {
     const voteButtons = document.querySelectorAll('.vote-btn');
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -26,16 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!postId) {
                 console.error('Post ID not found. Check data-post-id attribute');
-                showNotification('Ошибка: ID поста не найден', 'error');
+                showNotification('Error: Post ID not found', 'error');
                 return;
             }
             
-            // Блокируем кнопку на время запроса
+            // Disable the button during the request
             const originalText = this.innerHTML;
             this.innerHTML = '...';
             this.disabled = true;
             
-            // Отправляем запрос
+            // Sending request
             fetch(`/posts/${postId}/vote/${voteType}/`, {
                 method: 'POST',
                 headers: {
@@ -55,14 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     updateVoteCounters(data, postId);
                     updateButtonStyles(this, voteType);
-                    showNotification('Голос учтен!', 'success');
+                    showNotification('Vote counted!', 'success');
                 } else {
-                    showNotification('Ошибка: ' + data.error, 'error');
+                    showNotification('Error: ' + data.error, 'error');
                 }
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                showNotification('Произошла ошибка при голосовании: ' + error.message, 'error');
+                showNotification('An error occurred while voting: ' + error.message, 'error');
             })
             .finally(() => {
                 this.innerHTML = originalText;
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateVoteCounters(data, postId) {
         console.log('Updating counters for post:', postId, 'with data:', data);
         
-        // Обновляем счетчики на детальной странице
+        // Updating counters on the detailed page
         const scoreElement = document.getElementById('post-score');
         const upvotesElement = document.getElementById('upvotes-count');
         const downvotesElement = document.getElementById('downvotes-count');
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (upvotesElement) upvotesElement.textContent = data.upvotes;
         if (downvotesElement) downvotesElement.textContent = data.downvotes;
         
-        // Обновляем счетчики в списке постов
+        // Updating counters in the post list
         const listScoreElement = document.getElementById(`post-score-${postId}`);
         if (listScoreElement) {
             listScoreElement.textContent = data.score;
@@ -107,19 +106,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateButtonStyles(clickedButton, voteType) {
         const allButtons = document.querySelectorAll('.vote-btn');
         
-        // Сбрасываем стили всех кнопок
+        // Reset all button styles
         allButtons.forEach(btn => {
             btn.classList.remove('active');
         });
         
-        // Применяем стиль к активной кнопке
+        // Apply style to the active button
         if (voteType === 'upvote' || voteType === 'downvote') {
             clickedButton.classList.add('active');
         }
     }
     
     function showNotification(message, type = 'info') {
-        // Временное решение - используем alert для отладки
+        // Temporary solution - using alert for debugging
         alert(`${type.toUpperCase()}: ${message}`);
     }
 });

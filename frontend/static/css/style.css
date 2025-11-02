@@ -3,7 +3,7 @@
     min-height: calc(100vh - 130px);
 }
 
-/* Стили для блока голосования и действий */
+/* Styles for the voting and action block */
 .vote-container {
     display: flex;
     align-items: center;
@@ -52,13 +52,13 @@
     color: #7193ff !important;
 }
 
-/* Стили для блока действий */
+/* Styles for the action block */
 .post-actions {
     border-top: 1px solid #e5e5e5;
     padding-top: 12px;
 }
 
-/* Модальное окно */
+/* Modal window */
 .modal-backdrop {
     z-index: 1040;
 }
@@ -89,14 +89,14 @@
     padding: 1rem 1.5rem;
 }
 
-/* Кнопки социальных сетей */
+/* Social media buttons */
 .share-platforms .btn {
     flex: 1;
     min-width: 120px;
     margin: 2px;
 }
 
-/* Адаптивность */
+/* Adaptability */
 @media (max-width: 768px) {
     .post-actions {
         flex-wrap: wrap;
@@ -124,7 +124,7 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Улучшение отображения мобильного меню */
+/* Improving the display of the mobile menu */
 @media (max-width: 991.98px) {
     .navbar-collapse {
         margin-top: 10px;
@@ -136,7 +136,7 @@
         margin-bottom: 5px;
     }
     
-    /* Стили для приветствия в мобильном меню */
+    /* Greeting styles in the mobile menu */
     .navbar-nav .nav-link.text-light {
         font-weight: 500;
         padding: 8px 15px;

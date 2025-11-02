@@ -28,7 +28,7 @@
      {% csrf_token %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <!-- Ссылка на главную страницу с постами -->
+            <!-- Link to the main page with posts -->
             <a class="navbar-brand" href="{% url 'post_list' %}">
                 <i class="fas fa-reddit"></i> Reddit Clone
             </a>
@@ -39,26 +39,26 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <!-- Ссылка на список постов -->
+                    <!-- Link to the list of posts -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'post_list' %}">
-                            <i class="fas fa-home"></i> Все посты
+                            <i class="fas fa-home"></i> All posts
                         </a>
                     </li>
                     
-                    <!-- Ссылка на создание поста -->
+                    <!-- Link to create a post -->
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_post' %}">
-                            <i class="fas fa-plus"></i> Создать пост
+                            <i class="fas fa-plus"></i> Create a post
                         </a>
                     </li>
                     {% endif %}
                     
-                    <!-- Ссылка на сообщества -->
+                    <!-- Link to communities -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'communities:community_list' %}">
-                            <i class="fas fa-users"></i> Сообщества
+                            <i class="fas fa-users"></i> Communities
                         </a>
                     </li>
 
@@ -90,12 +90,12 @@
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}">
-                                <i class="fas fa-sign-in-alt"></i> Войти
+                                <i class="fas fa-sign-in-alt"></i> Log In
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'register' %}">
-                                <i class="fas fa-user-plus"></i> Регистрация
+                                <i class="fas fa-user-plus"></i> Registration
                             </a>
                         </li>
                     {% endif %}
@@ -120,7 +120,7 @@
 
     <footer class="footer bg-dark text-white py-3">
         <div class="container text-center">
-            <p>&copy; 2024 Reddit Clone. Все права защищены.</p>
+            <p>&copy; 2024 Reddit Clone. All rights reserved.</p>
         </div>
     </footer>
 

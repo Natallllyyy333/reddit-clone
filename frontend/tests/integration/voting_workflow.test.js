@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 describe('Voting Workflow Integration', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -33,7 +29,7 @@ describe('Voting Workflow Integration', () => {
             })
         });
 
-        // Используем тот же подход что работает
+        // Let's use the same approach that works
         const forms = document.querySelectorAll('form');
         expect(forms.length).toBeGreaterThan(0);
         const form = forms[0];
@@ -53,7 +49,7 @@ describe('Voting Workflow Integration', () => {
         expect(button.classList.contains('btn-outline-success')).toBe(true);
         expect(button.classList.contains('btn-success')).toBe(false);
 
-        // Симулируем обработку формы
+        // Simulating form processing
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -135,7 +131,7 @@ describe('Voting Workflow Integration', () => {
             </form>
         `;
 
-        // Используем тот же подход что работает в других тестах
+        // We use the same approach that works in other tests
         const forms = document.querySelectorAll('form');
         expect(forms.length).toBe(1);
         

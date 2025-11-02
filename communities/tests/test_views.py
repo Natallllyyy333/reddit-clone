@@ -22,26 +22,26 @@ class CommunityViewsTest(TestCase):
         self.community.moderators.add(self.user)
 
     def test_community_list_view(self):
-        """Тест отображения списка сообществ"""
+        """Test of community list display"""
         response = self.client.get(reverse('communities:community_list'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'communities/community_list.html')
         self.assertContains(response, 'testcommunity')
 
     def test_community_detail_view(self):
-        """Тест детальной страницы сообщества"""
+        """Community page detail test"""
         response = self.client.get(reverse('communities:community_detail', args=['testcommunity']))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'communities/community_detail.html')
         self.assertContains(response, 'testcommunity')
 
     def test_community_detail_view_not_found(self):
-        """Тест несуществующего сообщества"""
+        """Test of a nonexistent community"""
         response = self.client.get(reverse('communities:community_detail', args=['nonexistent']))
         self.assertEqual(response.status_code, 404)
 
     def test_create_community_view_get(self):
-        """Тест GET запроса создания сообщества"""
+        """Test of GET request for creating a community"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('communities:create_community'))
         self.assertEqual(response.status_code, 200)
@@ -49,7 +49,7 @@ class CommunityViewsTest(TestCase):
         self.assertIsInstance(response.context['form'], CommunityForm)
 
     def test_create_community_view_post_valid(self):
-        """Тест POST запроса создания сообщества с валидными данными"""
+        """POST request test for creating a community with valid data"""
         self.client.login(username='testuser', password='testpass123')
         data = {
             'name': 'newcommunity',
@@ -57,19 +57,19 @@ class CommunityViewsTest(TestCase):
         }
         response = self.client.post(reverse('communities:create_community'), data)
         
-        # Проверяем успешное создание
+        # Checking successful creation
         self.assertTrue(Community.objects.filter(name='newcommunity').exists())
         new_community = Community.objects.get(name='newcommunity')
         self.assertEqual(new_community.created_by, self.user)
         
-        # Упрощенная проверка редиректа
-        self.assertEqual(response.status_code, 302)  # Просто проверяем что редирект
+        # Simplified redirect check
+        self.assertEqual(response.status_code, 302)  # Just checking that it's a redirect
 
     def test_create_community_view_post_invalid(self):
-        """Тест POST запроса создания сообщества с невалидными данными"""
+        """POST request test for creating a community with invalid data"""
         self.client.login(username='testuser', password='testpass123')
         data = {
-            'name': 'ab',  # слишком короткое имя
+            'name': 'ab',  # too short a name
             'description': 'short'
         }
         response = self.client.post(reverse('communities:create_community'), data)
@@ -77,10 +77,10 @@ class CommunityViewsTest(TestCase):
         self.assertFalse(Community.objects.filter(name='ab').exists())
 
     def test_join_community_authenticated(self):
-        """Тест присоединения к сообществу аутентифицированным пользователем"""
+        """Test of joining a community by an authenticated user"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Создаем новое сообщество, где пользователь еще не состоит
+        # Creating a new community where the user is not yet a member
         new_comm = Community.objects.create(name='newcomm', description='Test', created_by=self.user)
         
         response = self.client.post(reverse('communities:join_community', args=['newcomm']))
@@ -88,17 +88,17 @@ class CommunityViewsTest(TestCase):
         self.assertIn(self.user, new_comm.members.all())
 
     def test_join_community_unauthenticated(self):
-        """Тест присоединения к сообществу неаутентифицированным пользователем"""
+        """Test of joining the community by an unauthenticated user"""
         response = self.client.post(reverse('communities:join_community', args=['testcommunity']))
-        # Должен быть редирект на страницу логина
+        # There should be a redirect to the login page
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith('/users/login/'))
 
     def test_leave_community(self):
-        """Тест выхода из сообщества"""
+        """Test of leaving the community"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Создаем сообщество с другим создателем
+        # create a community with another creator
         other_user = User.objects.create_user(username='otheruser', password='testpass123')
         leave_comm = Community.objects.create(
             name='leavecomm', 
@@ -110,12 +110,12 @@ class CommunityViewsTest(TestCase):
         response = self.client.post(reverse('communities:leave_community', args=['leavecomm']))
         self.assertEqual(response.status_code, 302)
         
-        # Обновляем объект из базы
+        # Updating the object from the database
         leave_comm.refresh_from_db()
         self.assertNotIn(self.user, leave_comm.members.all())
 
     def test_my_communities_view(self):
-        """Тест страницы моих сообществ"""
+        """Test of my communities page"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('communities:my_communities'))
         self.assertEqual(response.status_code, 200)
@@ -124,6 +124,6 @@ class CommunityViewsTest(TestCase):
         self.assertIn('moderated_communities', response.context)
 
     def test_community_list_exception_handling(self):
-        """Тест обработки исключений в списке сообществ"""
-        # Здесь можно протестировать обработку ошибок, если нужно
+        """Exception handling test in the community list"""
+        # You can test error handling here if needed
         pass

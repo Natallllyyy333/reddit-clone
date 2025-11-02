@@ -198,7 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">document.addEventListener('DOMContentLoaded', function() {
     console.log('Posts page loaded');
     
-    // Анимация появления постов
+    // Post appearance animation
     const postCards = document.querySelectorAll('.post-card');
     postCards.forEach((card, index) =&gt; {
         card.style.opacity = '0';
@@ -211,7 +211,7 @@
         }, index * 100);
     });
     
-    // Ленивая загрузка изображений (если будут)
+    // Lazy loading of images (if any)
     const lazyImages = document.querySelectorAll('img[data-src]');
     
     const imageObserver = new IntersectionObserver(<span class="fstat-no" title="function not covered" >(e</span>ntries, observer) =&gt; {
@@ -229,7 +229,7 @@
 });
 &nbsp;
 &nbsp;
-// AJAX шаринг
+// AJAX share functionality
 document.addEventListener('DOMContentLoaded', function() {
     const shareForms = document.querySelectorAll('#shareForm');
     
@@ -250,12 +250,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response =&gt; response.json())
             .then(data =&gt; {
                 <span class="missing-if-branch" title="else path not taken" >E</span>if (data.success) {
-                    // Обновить счетчик шаров
+                    // Update sharing counter
                     const shareBadge = document.querySelector(`[data-post-id="${postId}"] .badge`);
                     <span class="missing-if-branch" title="if path not taken" >I</span>if (shareBadge) {
 <span class="cstat-no" title="statement not covered" >                        shareBadge.textContent = data.shares_count;</span>
                     }
-                    // Закрыть модальное окно
+                    // Close modal window
                     bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
                 }
             });

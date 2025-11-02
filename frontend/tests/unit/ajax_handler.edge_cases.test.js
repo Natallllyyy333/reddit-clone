@@ -1,17 +1,16 @@
-// frontend/tests/unit/ajax_handler_reliable.test.js
 describe('AJAX Handler - Reliable Tests', () => {
     let ajaxHandler;
 
     beforeAll(() => {
-        // Загружаем скрипт один раз для всех тестов
+        // Load the script once for all tests
         ajaxHandler = require('../../../posts/static/posts/js/ajax_handler.js');
     });
 
     beforeEach(() => {
-        // ВАЖНО: сначала очищаем DOM, потом устанавливаем
+        //  First we clear the DOM, then we set it up
         document.body.innerHTML = '';
         
-        // Создаем полную DOM структуру
+        // Creating a complete DOM structure
         document.body.innerHTML = `
             <form class="vote-form" action="/posts/1/vote/upvote/" method="post" data-post-id="1">
                 <input type="hidden" name="csrfmiddlewaretoken" value="test-csrf">
@@ -24,7 +23,7 @@ describe('AJAX Handler - Reliable Tests', () => {
             <div class="alert alert-success">Test Alert</div>
         `;
         
-        // Очищаем все моки
+        // Clearing all mocks
         jest.clearAllMocks();
     });
 
@@ -44,10 +43,10 @@ describe('AJAX Handler - Reliable Tests', () => {
     test('DOMContentLoaded event initializes handlers', () => {
         const consoleSpy = jest.spyOn(console, 'error');
         
-        // Диспатчим событие DOMContentLoaded
+        // Dispatching the DOMContentLoaded event
         document.dispatchEvent(new Event('DOMContentLoaded'));
         
-        // Проверяем что не было ошибок
+        // Checking that there were no errors
         expect(consoleSpy).not.toHaveBeenCalled();
         consoleSpy.mockRestore();
     });
@@ -66,7 +65,7 @@ describe('AJAX Handler - Reliable Tests', () => {
         const form = document.querySelector('.vote-form');
         expect(form).toBeTruthy();
         
-        // Просто проверяем что форма доступна для событий
+        // Just checking that the form is available for events
         expect(() => {
             form.dispatchEvent(new Event('submit', { bubbles: true }));
         }).not.toThrow();

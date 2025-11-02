@@ -173,7 +173,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== VOTE DEBUGGER STARTED ===');
     
-    // Проверяем все формы голосования
+    // We check all voting forms
     const voteForms = document.querySelectorAll('form.vote-form');
     console.log(`Found ${voteForms.length} vote forms`);
     
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Form action: ${form.action}`);
         console.log(`Form classes: ${form.className}`);
         
-        // Добавляем обработчик с подробным логированием
+        // Adding a handler with detailed logging
         form.addEventListener('submit', <span class="fstat-no" title="function not covered" >fu</span>nction(e) {
 <span class="cstat-no" title="statement not covered" >            console.log('=== FORM SUBMISSION DETECTED ===');</span>
 <span class="cstat-no" title="statement not covered" >            console.log('Event target:', e.target);</span>
@@ -191,12 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <span class="cstat-no" title="statement not covered" >            e.preventDefault();</span>
 <span class="cstat-no" title="statement not covered" >            console.log('After preventDefault - default prevented:', e.defaultPrevented);</span>
             
-            // Проверяем, есть ли другие обработчики
+            // Checking if there are any other handlers
 <span class="cstat-no" title="statement not covered" >            console.log('Event listeners on this form:');</span>
             const listeners = <span class="cstat-no" title="statement not covered" >getEventListeners(form);</span>
 <span class="cstat-no" title="statement not covered" >            console.log(listeners);</span>
             
-            // Имитируем успешный AJAX запрос для тестирования
+            // Simulating a successful AJAX request for testing
 <span class="cstat-no" title="statement not covered" >            setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
                 const postId = <span class="cstat-no" title="statement not covered" >form.querySelector('button')?.dataset.postId;</span>
 <span class="cstat-no" title="statement not covered" >                if (postId) {</span>
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Проверяем кнопки голосования
+    // Checking the voting buttons
     const voteButtons = document.querySelectorAll('.vote-btn');
     console.log(`Found ${voteButtons.length} vote buttons`);
     

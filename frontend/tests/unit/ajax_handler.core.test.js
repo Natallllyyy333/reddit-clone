@@ -33,7 +33,7 @@ describe('AJAX Handler - Final Working Tests', () => {
         `;
 
         expect(() => {
-            // ПРАВИЛЬНЫЙ ПУТЬ
+            
             require('../../../posts/static/posts/js/ajax_handler.js');
             document.dispatchEvent(new Event('DOMContentLoaded'));
         }).not.toThrow();
@@ -47,7 +47,7 @@ describe('AJAX Handler - Final Working Tests', () => {
             </form>
         `;
 
-        // ПРАВИЛЬНЫЙ ПУТЬ
+        
         require('../../../posts/static/posts/js/ajax_handler.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
@@ -70,7 +70,7 @@ describe('AJAX Handler - Final Working Tests', () => {
             </form>
         `;
 
-        // ПРАВИЛЬНЫЙ ПУТЬ
+       
         require('../../../posts/static/posts/js/ajax_handler.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
@@ -110,7 +110,7 @@ describe('AJAX Handler - Final Working Tests', () => {
             </form>
         `;
 
-        // ПРАВИЛЬНЫЙ ПУТЬ
+       
         require('../../../posts/static/posts/js/ajax_handler.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 

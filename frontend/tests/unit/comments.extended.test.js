@@ -32,11 +32,11 @@ describe('Comments Extended Tests', () => {
         commentsBtn.click();
         expect(commentsSection.classList.contains('hidden')).toBe(true);
 
-        // Test smooth scroll - проверяем что функция вызывается, но не обязательно scrollTo
+        // Test smooth scroll - checking that the function is called, but scrollTo is not necessarily required
         window.location.hash = '#write_comment';
         window.dispatchEvent(new Event('hashchange'));
         
-        // Вместо проверки scrollTo, проверяем что обработчик сработал
+        //Instead of checking scrollTo, we check that the handler was triggered
         expect(window.location.hash).toBe('#write_comment');
     });
 
@@ -55,7 +55,7 @@ describe('Comments Extended Tests', () => {
         modal.dispatchEvent(event);
 
         const form = document.getElementById('deleteCommentForm');
-        // Используем toContain вместо toBe для частичного совпадения URL
+        //Use toContain instead of toBe for partial URL matching
         expect(form.action).toContain('/comments/123/delete/');
     });
 });

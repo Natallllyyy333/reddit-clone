@@ -13,7 +13,7 @@ class CommunityFormTest(TestCase):
         )
 
     def test_community_form_valid_data(self):
-        """Тест валидных данных формы сообщества"""
+        """Community form valid data test"""
         form_data = {
             'name': 'validcommunity',
             'description': 'This is a valid community description with more than 10 characters.'
@@ -22,7 +22,7 @@ class CommunityFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_community_form_invalid_short_name(self):
-        """Тест слишком короткого названия"""
+        """Test of a too short title"""
         form_data = {
             'name': 'ab',
             'description': 'Valid description length here'
@@ -32,7 +32,7 @@ class CommunityFormTest(TestCase):
         self.assertIn('name', form.errors)
 
     def test_community_form_invalid_long_name(self):
-        """Тест слишком длинного названия"""
+        """Test of a too long title"""
         form_data = {
             'name': 'a' * 51,
             'description': 'Valid description length here'
@@ -42,7 +42,7 @@ class CommunityFormTest(TestCase):
         self.assertIn('name', form.errors)
 
     def test_community_form_invalid_characters(self):
-        """Тест недопустимых символов в названии"""
+        """Test of invalid characters in the name"""
         form_data = {
             'name': 'invalid@name',
             'description': 'Valid description length here'
@@ -52,7 +52,7 @@ class CommunityFormTest(TestCase):
         self.assertIn('name', form.errors)
 
     def test_community_form_reserved_names(self):
-        """Тест зарезервированных имен"""
+        """Reserved names test"""
         reserved_names = ['admin', 'create', 'login', 'register']
         for name in reserved_names:
             form_data = {
@@ -64,7 +64,7 @@ class CommunityFormTest(TestCase):
             self.assertIn('name', form.errors)
 
     def test_community_form_duplicate_name(self):
-        """Тест дублирования имени сообщества"""
+        """Test of duplicating the community name"""
         form_data = {
             'name': 'existing',
             'description': 'Valid description length here'
@@ -74,7 +74,7 @@ class CommunityFormTest(TestCase):
         self.assertIn('name', form.errors)
 
     def test_community_form_short_description(self):
-        """Тест слишком короткого описания"""
+        """Test of a too short description"""
         form_data = {
             'name': 'validname',
             'description': 'short'
@@ -84,7 +84,7 @@ class CommunityFormTest(TestCase):
         self.assertIn('description', form.errors)
 
     def test_community_edit_form_valid(self):
-        """Тест формы редактирования сообщества"""
+        """Community Edit Form Test"""
         form_data = {
             'description': 'This is a valid updated description with enough length'
         }
@@ -92,7 +92,7 @@ class CommunityFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_community_edit_form_invalid(self):
-        """Тест невалидной формы редактирования"""
+        """Invalid edit form test"""
         form_data = {
             'description': 'short'
         }
