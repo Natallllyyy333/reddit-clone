@@ -2,7 +2,7 @@
 Production settings for reddit_clone
 """
 import os
-from .simple import *
+from .base import *
 
 # Security settings for production
 DEBUG = False

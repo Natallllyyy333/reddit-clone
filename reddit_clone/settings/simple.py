@@ -4,35 +4,51 @@ from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Debug mode - through environment variables
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+# SECRET KEY 
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+if DEBUG:
+    # In development, we use a random key if one is not set
+    if not SECRET_KEY:
+        SECRET_KEY = get_random_secret_key()
+        print("⚠️  WARNING: Using random SECRET_KEY for development")
+else:
+    # In production, the key is REQUIRED
+    if not SECRET_KEY:
+        raise ValueError(
+            "SECRET_KEY must be set in production environment! "
+            "Set SECRET_KEY environment variable."
+        )
+    if len(SECRET_KEY) < 50 or SECRET_KEY.startswith('django-insecure-'):
+        raise ValueError(
+            "Please set a long, random SECRET_KEY environment variable for production. "
+            "Current key is too short or uses the default insecure pattern."
+        )
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Security settings
 if not DEBUG:
-    # Production settings
+    # Production security
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 else:
-    # Development settings
+    # Development security (relaxed)
     SECURE_HSTS_SECONDS = 0
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
-
-SECRET_KEY = os.environ.get('SECRET_KEY', get_random_secret_key())
-
-if not DEBUG and (len(SECRET_KEY) < 50 or SECRET_KEY.startswith('django-insecure-')):
-    raise ValueError(
-        "Please set a long, random SECRET_KEY environment variable for production. "
-        "Current key is too short or uses the default insecure pattern."
-    )
-
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -77,7 +93,7 @@ TEMPLATES = [
     },
 ]
 
-# Basic database settings (SQLite)
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -101,8 +117,6 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Custom user model
-# AUTH_USER_MODEL = 'users.User'
 
 LOGGING = {
     'version': 1,
@@ -113,10 +127,14 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'django_errors.log',
         },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'ERROR',
             'propagate': True,
         },
@@ -138,9 +156,9 @@ if not DEBUG:
                 ssl_require=True
             )
         }
+        print("✅ Production: Using PostgreSQL database")
     except ImportError:
-        # If dj_database_url is not set, we use SQLite with a warning
-        print("WARNING: dj-database-url not installed. Using SQLite for production is not recommended!")
+        print("❌ WARNING: dj-database-url not installed. Using SQLite for production is not recommended!")
     
     # Static files for Heroku
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -149,15 +167,9 @@ if not DEBUG:
         # Adding whitenoise middleware
         MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        print("✅ Production: WhiteNoise configured for static files")
     except ImportError:
-        print("WARNING: whitenoise not installed. Static files may not work properly in production!")
-    
-    # Security settings for production
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+        print("❌ WARNING: whitenoise not installed. Static files may not work properly in production!")
 
 # Internationalization for easy text changes
 LANGUAGES = [
@@ -171,3 +183,11 @@ LOCALE_PATHS = [
 
 # Adding LocaleMiddleware to support translation
 MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')
+
+# Production checks
+if not DEBUG:
+    # Additional production checks
+    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
+        raise ValueError("ALLOWED_HOSTS must be set in production environment!")
+    
+    print("🚀 Production mode: All security settings are enabled")
