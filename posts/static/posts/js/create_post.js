@@ -87,7 +87,7 @@ class CreatePostForm {
         for (let file of files) {
             // Checking file limit
             if (this.uploadedFiles.length >= this.maxFiles) {
-                this.showError(`Максимальное количество файлов: ${this.maxFiles}`);
+                this.showError(`Maximum number of files: ${this.maxFiles}`);
                 break;
             }
             if (this.isValidFile(file)) {
@@ -97,7 +97,7 @@ class CreatePostForm {
                     filesAdded++;
                 }
             } else {
-                this.showError(`Файл "${file.name}" не поддерживается. Разрешены только изображения и видео до 10MB.`);
+                this.showError(`File "${file.name}" not supported. Only images and videos up to 10MB.`);
             }
         }
         
@@ -182,7 +182,7 @@ class CreatePostForm {
         }
 
         // Updating the counter
-        fileCounter.textContent = `Файлов: ${this.uploadedFiles.length}/${this.maxFiles}`;
+        fileCounter.textContent = `Files: ${this.uploadedFiles.length}/${this.maxFiles}`;
         
         // The upload area hides ONLY when the limit is reached
         if (this.uploadedFiles.length >= this.maxFiles) {
@@ -195,7 +195,7 @@ class CreatePostForm {
         const uploadText = fileUploadArea.querySelector('h5');
         if (uploadText) {
             const remaining = this.maxFiles - this.uploadedFiles.length;
-            uploadText.textContent = `Перетащите файлы сюда (осталось: ${remaining})`;
+            uploadText.textContent = `Drag files here (remaining: ${remaining})`;
         }
         
         // Show a message when the limit is reached
@@ -207,8 +207,7 @@ class CreatePostForm {
                 maxFilesMessage.className = 'alert alert-info mt-2';
                 maxFilesMessage.innerHTML = `
                     <i class="fas fa-info-circle"></i>
-                    Достигнут лимит в ${this.maxFiles} файлов. 
-                    Удалите некоторые файлы чтобы добавить новые.
+                    Limit reached in ${this.maxFiles} Files. Delete some files to add new ones.
                 `;
                 fileUploadArea.parentNode.appendChild(maxFilesMessage);
             }
@@ -250,14 +249,14 @@ class CreatePostForm {
 
             if (!title) {
                 e.preventDefault();
-                this.showError('Пожалуйста, введите заголовок поста');
+                this.showError('Please enter the post title');
                 titleInput?.focus();
                 return;
             }
 
             if (!content) {
                 e.preventDefault();
-                this.showError('Пожалуйста, введите содержание поста');
+                this.showError('Please enter the content of the post');
                 contentInput?.focus();
                 return;
             }

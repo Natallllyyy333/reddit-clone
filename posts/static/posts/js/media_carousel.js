@@ -31,11 +31,11 @@ function scrollMedia(postId, direction) {
         behavior: 'smooth'
     });
     
-    // Обновляем счетчик (если есть)
+    // Updating the counter (if any)
     updateMediaCounter(postId);
 }
 
-// Функция для обновления счетчика медиа
+// Function to update the media counter
 function updateMediaCounter(postId) {
     const mediaScroll = document.getElementById(`mediaScroll-${postId}`);
     const mediaItems = mediaScroll.querySelectorAll('.media-item');

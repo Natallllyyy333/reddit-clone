@@ -90,7 +90,7 @@ class PostDetail {
                 const textarea = this.querySelector('textarea');
                 if (textarea.value.trim().length === 0) {
                     e.preventDefault();
-                    alert('Пожалуйста, введите текст комментария');
+                    alert('Please enter the comment text');
                     textarea.focus();
                 }
             });
