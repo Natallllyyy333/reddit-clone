@@ -1,7 +1,11 @@
-{% extends 'base.html' %} {% load static %} {% block extra_css %}
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}" />
 <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}" />
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <!-- Main content of the post -->
@@ -36,11 +40,51 @@
             <p>{{ post.content|linebreaksbr }}</p>
           </div>
 
-          {% if post.media_files.exists %}
+          <!-- Media block -->
+          {% if post.media_file or post.media_files.exists %}
           <div class="post-media-container mb-4 position-relative">
             <div class="media-carousel detail-view position-relative">
               <div class="media-scroll-wrapper">
                 <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                  {# Old posts with media_file #}
+                  {% if post.media_file %}
+                  <div class="media-item">
+                    {% if post.media_type == 'image' %}
+                    <img
+                      src="{{ post.media_file.url }}"
+                      alt="{{ post.title }}"
+                      class="img-fluid rounded media-image"
+                      onerror="this.style.display='none'"
+                    />
+                    {% elif post.media_type == 'video' %}
+                    <div class="video-container position-relative">
+                      <video
+                          class="img-fluid rounded media-video"
+                          preload="metadata"
+                          playsinline
+                          webkit-playsinline
+                          onerror="this.style.display='none'"
+                      >
+                          <source
+                              src="{{ post.media_file.url }}"
+                              type="video/mp4"
+                          />
+                          Your browser does not support video.
+                      </video>
+                      
+                      <!-- Play button -->
+                      <div
+                          class="video-play-button"
+                          onclick="handleVideoPlay(this)"
+                      >
+                          <i class="fas fa-play-circle"></i>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+
+                  {# New posts with media_files #}
                   {% for media in post.media_files.all %}
                   <div class="media-item">
                     {% if media.media_type == 'image' %}
@@ -48,39 +92,41 @@
                       src="{{ media.media_file.url }}"
                       alt="Post media {{ forloop.counter }}"
                       class="img-fluid rounded media-image"
+                      onerror="this.style.display='none'"
                     />
-{% elif media.media_type == 'video' %}
-<div class="video-container position-relative">
-    <!-- Video element -->
-    <video
-        class="img-fluid rounded media-video"
-        preload="metadata"
-        playsinline
-        webkit-playsinline
-    >
-        <source
-            src="{{ media.media_file.url }}"
-            type="video/mp4"
-        />
-        Your browser does not support video.
-    </video>
-    
-    <!-- Play button -->
-    <div
-        class="video-play-button"
-        onclick="handleVideoPlay(this)"
-    >
-        <i class="fas fa-play-circle"></i>
-    </div>
-</div>
-{% endif %}
+                    {% elif media.media_type == 'video' %}
+                    <div class="video-container position-relative">
+                      <!-- Video element -->
+                      <video
+                          class="img-fluid rounded media-video"
+                          preload="metadata"
+                          playsinline
+                          webkit-playsinline
+                          onerror="this.style.display='none'"
+                      >
+                          <source
+                              src="{{ media.media_file.url }}"
+                              type="video/mp4"
+                          />
+                          Your browser does not support video.
+                      </video>
+                      
+                      <!-- Play button -->
+                      <div
+                          class="video-play-button"
+                          onclick="handleVideoPlay(this)"
+                      >
+                          <i class="fas fa-play-circle"></i>
+                      </div>
+                    </div>
+                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
               </div>
 
-              <!-- Carousel navigation buttons - OFF video-container -->
-              {% if post.media_files.count > 1 %}
+              <!-- Carousel navigation buttons -->
+              {% if post.media_files.count > 1 or post.media_file and post.media_files.count > 0 %}
               <button
                 class="carousel-btn prev"
                 onclick="scrollMedia('{{ post.pk }}', -1)"
@@ -96,11 +142,15 @@
               {% endif %}
             </div>
 
-            {% if post.media_files.count > 1 %}
+            {% if post.media_files.count > 1 or post.media_file and post.media_files.count > 0 %}
             <div class="media-counter">
-              <span class="current">1</span>/<span class="total"
-                >{{ post.media_files.count }}</span
-              >
+              <span class="current">1</span>/<span class="total">
+                {% if post.media_file %}
+                  {{ post.media_files.count|add:1 }}
+                {% else %}
+                  {{ post.media_files.count }}
+                {% endif %}
+              </span>
             </div>
             {% endif %}
           </div>
@@ -267,10 +317,85 @@
 </div>
   </div>
 </div>
-{% include 'posts/includes/share_modal.html' %} {% endblock %} 
+{% include 'posts/includes/share_modal.html' %} 
+{% endblock %} 
+
 {% block extra_js %}
 <script src="{% static 'posts/js/video_handler.js' %}"></script>
 <script src="{% static 'js/share.js' %}"></script>
 <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 <script src="{% static 'js/comments.js' %}"></script>
+
+{# CLOUDINARY SCRIPT FOR ERROR HANDLING  #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handling media file upload errors
+    const mediaContainers = document.querySelectorAll('.post-media-container');
+    
+    mediaContainers.forEach(container => {
+        const images = container.querySelectorAll('img');
+        const videos = container.querySelectorAll('video');
+        let hasVisibleMedia = false;
+        
+        // Checking images
+        images.forEach(img => {
+            // Checking if the image exists
+            const testImage = new Image();
+            testImage.onload = function() {
+                hasVisibleMedia = true;
+            };
+            testImage.onerror = function() {
+                img.style.display = 'none';
+                console.log('Image failed to load:', img.src);
+            };
+            testImage.src = img.src;
+        });
+        
+        // Checking the video
+        videos.forEach(video => {
+            const source = video.querySelector('source');
+            if (source) {
+                // Checking video availability
+                fetch(source.src)
+                    .then(response => {
+                        if (response.ok) {
+                            hasVisibleMedia = true;
+                        } else {
+                            video.style.display = 'none';
+                            const playButton = video.parentElement.querySelector('.video-play-button');
+                            if (playButton) playButton.style.display = 'none';
+                        }
+                    })
+                    .catch(() => {
+                        video.style.display = 'none';
+                        const playButton = video.parentElement.querySelector('.video-play-button');
+                        if (playButton) playButton.style.display = 'none';
+                    });
+            }
+        });
+        
+        // Hide the container if there is no visible media
+        setTimeout(() => {
+            const visibleImages = Array.from(images).filter(img => img.style.display !== 'none');
+            const visibleVideos = Array.from(videos).filter(video => video.style.display !== 'none');
+            
+            if (visibleImages.length === 0 && visibleVideos.length === 0) {
+                container.style.display = 'none';
+                console.log('Hiding media container - no visible media');
+            }
+        }, 1500);
+    });
+    
+    // Additional check for video elements
+    const videoElements = document.querySelectorAll('video');
+    videoElements.forEach(video => {
+        video.addEventListener('error', function() {
+            console.log('Video error:', this.src);
+            this.style.display = 'none';
+            const playButton = this.parentElement.querySelector('.video-play-button');
+            if (playButton) playButton.style.display = 'none';
+        });
+    });
+});
+</script>
 {% endblock %}
