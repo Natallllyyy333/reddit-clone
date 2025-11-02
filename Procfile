@@ -1,2 +1,2 @@
 web: gunicorn reddit_clone.wsgi --log-file -
-release: python manage.py migrate && python manage.py compilemessages
+release: python manage.py migrate
