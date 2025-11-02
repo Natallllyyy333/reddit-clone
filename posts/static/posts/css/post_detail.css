@@ -74,7 +74,7 @@
     font-size: 0.9rem;
 }
 
-/* Комментарии */
+/* Comments */
 .comments-section .card {
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -102,7 +102,7 @@
     color: #0079d3;
 }
 
-/* Стили для действий с комментариями */
+/* Styles for comment actions */
 .comment-actions {
     margin-top: 8px;
     padding-top: 8px;
@@ -136,7 +136,7 @@
     color: white;
 }
 
-/* Стили для карточки редактирования комментария */
+/* Styles for the comment edit card */
 .edit-comment-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -163,7 +163,7 @@
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
-/* Стили для комментариев */
+/* Styles for comments */
 .comment-item {
     border-bottom: 1px solid #f0f0f0;
     padding-bottom: 16px;
@@ -239,7 +239,7 @@
     border-color: #6c6e70;
 }
 
-/* Сайдбар */
+/* Sidebar */
 .sidebar-card {
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -262,7 +262,7 @@
     gap: 0.5rem;
 }
 
-/* Адаптивность */
+/* Adaptability */
 @media (max-width: 768px) {
     .post-title {
         font-size: 1.5rem;

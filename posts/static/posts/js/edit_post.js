@@ -83,7 +83,7 @@ class EditPostForm {
     }
 
     setupExistingMedia() {
-        // Обработка удаления существующих медиафайлов
+        // Processing the deletion of existing media files
         const existingMediaItems = document.querySelectorAll('.existing-media-item');
         existingMediaItems.forEach(item => {
             const removeBtn = item.querySelector('.remove-existing-file');
@@ -92,7 +92,7 @@ class EditPostForm {
                     const mediaId = item.getAttribute('data-media-id');
                     this.deletedMediaIds.push(mediaId);
                     
-                    // Создаем скрытое поле для удаления
+                    // Creating a hidden field for deletion
                     const deleteInput = document.createElement('input');
                     deleteInput.type = 'hidden';
                     deleteInput.name = 'delete_media';
@@ -111,7 +111,7 @@ class EditPostForm {
 
         for (let file of files) {
             if (this.uploadedFiles.length >= this.maxFiles) {
-                this.showError(`Максимальное количество файлов: ${this.maxFiles}`);
+                this.showError(`Maximum number of files: ${this.maxFiles}`);
                 break;
             }
             if (this.isValidFile(file)) {
@@ -121,7 +121,7 @@ class EditPostForm {
                     filesAdded++;
                 }
             } else {
-                this.showError(`Файл "${file.name}" не поддерживается. Разрешены только изображения и видео до 10MB.`);
+                this.showError(`File "${file.name}" not supported. Only images and videos up to 10MB.`);
             }
         }
         
@@ -210,7 +210,7 @@ class EditPostForm {
         const uploadText = fileUploadArea.querySelector('h5');
         if (uploadText) {
             const remaining = this.maxFiles - totalFiles;
-            uploadText.textContent = `Перетащите файлы сюда (осталось: ${remaining})`;
+            uploadText.textContent = `Drag files here (left: ${remaining})`;
         }
     }
 
@@ -244,21 +244,21 @@ class EditPostForm {
 
             if (!title) {
                 e.preventDefault();
-                this.showError('Пожалуйста, введите заголовок поста');
+                this.showError('Please enter the post title');
                 titleInput?.focus();
                 return;
             }
 
             if (!content) {
                 e.preventDefault();
-                this.showError('Пожалуйста, введите содержание поста');
+                this.showError('Please enter the content of the post');
                 contentInput?.focus();
                 return;
             }
 
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Сохранение...';
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
             }
         });
     }

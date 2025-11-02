@@ -2,21 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Установка зависимостей
+# Installing dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование файлов зависимостей
+# Copying dependency files
 COPY pyproject.toml poetry.lock ./
 
-# Установка Poetry
+# Installing Poetry
 RUN pip install poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
-# Копирование исходного кода
+# Copying source code
 COPY . .
 
 EXPOSE 8000

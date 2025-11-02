@@ -2,10 +2,10 @@ from django.test import TestCase
 
 class PostModelImportTest(TestCase):
     def test_post_model_import(self):
-        """Проверяем что модель Post доступна для импорта"""
+        """Checking that the Post model is available for import"""
         try:
             from posts.models import Post
-            # Если импорт прошел успешно, тест считается пройденным
+            # If the import was successful, the test is considered passed
             self.assertTrue(True)
         except ImportError as e:
-            self.fail(f"Не удалось импортировать модель Post: {e}")
+            self.fail(f"Failed to import Post model: {e}")

@@ -11,7 +11,7 @@ class RegisterFormTest(TestCase):
         )
 
     def test_register_form_valid_data(self):
-        """Тест валидных данных формы регистрации"""
+        """Test of valid registration form data"""
         form_data = {
             'username': 'newuser',
             'email': 'newuser@example.com',
@@ -22,10 +22,10 @@ class RegisterFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_register_form_duplicate_email(self):
-        """Тест формы с существующим email"""
+        """Form test with an existing email"""
         form_data = {
             'username': 'differentuser',
-            'email': 'existing@example.com',  # Существующий email
+            'email': 'existing@example.com',  
             'password1': 'complexpass123',
             'password2': 'complexpass123'
         }
@@ -34,12 +34,12 @@ class RegisterFormTest(TestCase):
         self.assertIn('email', form.errors)
 
     def test_register_form_password_mismatch(self):
-        """Тест несовпадающих паролей"""
+        """Mismatched Password Test"""
         form_data = {
             'username': 'newuser',
             'email': 'new@example.com',
             'password1': 'password1',
-            'password2': 'password2'  # Разные пароли
+            'password2': 'password2'  # Different passwords
         }
         form = RegisterForm(data=form_data)
         self.assertFalse(form.is_valid())

@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-# Настройки для разработки
+# Development settings
 INSTALLED_APPS += [
     'debug_toolbar',
 ]

@@ -39,18 +39,18 @@ class PostAdmin(admin.ModelAdmin):
     get_votes.admin_order_field = 'upvotes'
     
     fieldsets = (
-        ('Основная информация', {
+        ('Basic Information', {
             'fields': ('title', 'content', 'author', 'community')
         }),
-        ('Медиа', {
+        ('Media', {
             'fields': ('media_file', 'media_type'),
             'classes': ('collapse',)
         }),
-        ('Голосование', {
+        ('Voting', {
             'fields': ('upvotes', 'downvotes'),
             'classes': ('collapse',)
         }),
-        ('Даты', {
+        ('Dates', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),

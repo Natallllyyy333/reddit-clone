@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                // Обновляем счетчик голосов
+                // Updating the vote counter
                 const voteCount = document.querySelector(`[data-post-id="${postId}"]`).closest('.vote-buttons').querySelector('.vote-count strong');
                 voteCount.textContent = data.total_votes;
                 
-                // Обновляем стили кнопок
+                // Updating button styles
                 updateButtonStyles(postId, data.user_vote);
             })
             .catch(error => console.error('Error:', error));

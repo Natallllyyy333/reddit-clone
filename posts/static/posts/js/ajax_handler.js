@@ -13,7 +13,7 @@
        
         const voteForms = document.querySelectorAll('form.vote-form');
         voteForms.forEach(form => {
-            // Создаем новую копию формы чтобы сбросить обработчики
+            // Creating a new copy of the form to reset the handlers
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
         });
@@ -66,11 +66,11 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                e.stopImmediatePropagation(); // Дополнительная защита
+                e.stopImmediatePropagation(); // Additional protection
                 
                 console.log('🔧 Vote Handler: Form submission intercepted');
                 
-                // Блокируем повторные отправки
+                // Blocking duplicate submissions
                 if (this.hasAttribute('data-processing')) {
                     console.log('🔧 Vote Handler: Request already in progress, skipping');
                     return;
@@ -88,10 +88,10 @@
                     return;
                 }
                 
-                // Сохраняем позицию прокрутки
+                // Save scroll position
                 const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
                 
-                // Индикатор загрузки
+                // Loading indicator
                 const originalHTML = button.innerHTML;
                 button.innerHTML = '⏳';
                 button.disabled = true;
@@ -124,7 +124,7 @@
                 .then(data => {
                     console.log('🔧 Vote Handler: Received data:', data);
                     
-                    // Восстанавливаем кнопку
+                    // Restoring the button
                     button.innerHTML = originalHTML;
                     button.disabled = false;
                     this.removeAttribute('data-processing');
@@ -135,13 +135,13 @@
                         return;
                     }
                     
-                    // Обновляем UI
+                    // Updating UI
                     updateVoteCount(postId, data.total_votes);
                     updateVoteButtons(postId, data.user_vote);
                     
                     console.log(`🔧 Vote Handler: Vote successful! Total: ${data.total_votes}, User vote: ${data.user_vote}`);
                     
-                    // Восстанавливаем позицию прокрутки
+                    // Restoring the scroll position
                     window.scrollTo(0, scrollPosition);
                     
                     if (data.message) {
@@ -154,7 +154,7 @@
                     button.disabled = false;
                     this.removeAttribute('data-processing');
                     
-                    // Восстанавливаем позицию прокрутки при ошибке
+                    //Restoring the scroll position on error
                     window.scrollTo(0, scrollPosition);
                     
                     if (!error.message.includes('Authentication required')) {
@@ -196,15 +196,15 @@
                 return;
             }
             
-            // Сбрасываем стили
+            // Reset styles
             upvoteBtn.classList.remove('btn-success', 'btn-outline-success');
             downvoteBtn.classList.remove('btn-danger', 'btn-outline-danger');
             
-            // Базовые стили
+            // Basic Styles
             upvoteBtn.classList.add('btn-outline-success');
             downvoteBtn.classList.add('btn-outline-danger');
             
-            // Активные стили
+            // Active Styles
             if (userVote === 1) {
                 upvoteBtn.classList.remove('btn-outline-success');
                 upvoteBtn.classList.add('btn-success');

@@ -31,29 +31,29 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         post = self.object
         
-        # Получаем комментарии и передаем текущего пользователя
+        # Get comments and pass the current user
         comments = post.comments.all()
         for comment in comments:
             comment._current_user = self.request.user
             
         context['comments'] = comments
         
-        # Форма для комментариев (если нужно)
+        # Comment form (if needed)
         from comments.forms import CommentForm  
         context['comment_form'] = CommentForm()
         
         return context
     
     def post(self, request, *args, **kwargs):
-        """Обработка добавления комментария через детальную страницу"""
+        """Processing the addition of a comment through the detail page"""
         self.object = self.get_object()
         
-        # Проверяем аутентификацию
+        # Checking authentication
         if not request.user.is_authenticated:
             messages.error(request, 'Please log in to comment.')
             return redirect('login')
         
-        # Обрабатываем комментарий
+        # Processing the comment
         form = CommentForm(request.POST)
         if form.is_valid():
             Comment.objects.create(
@@ -108,19 +108,19 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Добавляем существующие медиафайлы в контекст
+        # Adding existing media files to the context
         # context['existing_media'] = self.object.media_files.all()
         context['is_moderator_action'] = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         return context
     
     def form_valid(self, form):
         post = form.save()
-        # Обрабатываем удаление медиафайлов
+        # Processing media file deletion
         delete_media_ids = self.request.POST.getlist('delete_media')
         if delete_media_ids:
             PostMedia.objects.filter(id__in=delete_media_ids, post=post).delete()
         
-        # Добавляем новые медиафайлы
+        # Adding new media files
         media_files = self.request.FILES.getlist('media_files')
         for media_file in media_files:
             if media_file:
@@ -134,7 +134,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_invalid(form)
     
     def dispatch(self, request, *args, **kwargs):
-        # Дополнительная проверка, что пользователь - автор поста
+        # Additional verification that the user is the author of the post
         response = super().dispatch(request, *args, **kwargs)
         if hasattr(self, 'object') and self.object:
             if request.user != self.object.author and (request.user.is_staff or request.user.is_superuser):
@@ -157,32 +157,32 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         is_moderator = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         
         try:
-            # Используем транзакцию для безопасного удаления
+            # We use a transaction for safe deletion
             with transaction.atomic():
-                # Сначала вручную удаляем все связанные объекты
+                # First, manually delete all related objects
                 print(f"Deleting related objects for post {self.object.id}")
                 
-                # 1. Удаляем медиафайлы
+                # 1. Deleting media files
                 media_count = PostMedia.objects.filter(post=self.object).count()
                 PostMedia.objects.filter(post=self.object).delete()
                 print(f"Deleted {media_count} media files")
                 
-                # 2. Удаляем комментарии
+                # 2. Deleting comments
                 comment_count = Comment.objects.filter(post=self.object).count()
                 Comment.objects.filter(post=self.object).delete()
                 print(f"Deleted {comment_count} comments")
                 
-                # 3. Удаляем shares
+                # 3. Deleting shares
                 share_count = Share.objects.filter(post=self.object).count()
                 Share.objects.filter(post=self.object).delete()
                 print(f"Deleted {share_count} shares")
                 
-                # 4. Очищаем ManyToMany поля (upvotes и downvotes)
+                # 4. Clearing ManyToMany fields (upvotes and downvotes)
                 self.object.upvotes.clear()
                 self.object.downvotes.clear()
                 print("Cleared vote relationships")
                 
-                # 5. Теперь удаляем сам пост
+                # 5. Now we delete the post itself
                 response = super().form_valid(form)
                 print("Post deleted successfully")
             
@@ -210,7 +210,7 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 def vote_post(request, pk, vote_type):
     referer = request.META.get('HTTP_REFERER', '/posts/')
     
-    # Проверка аутентификации
+    # Authentication check
     if not request.user.is_authenticated:
         referer = request.META.get('HTTP_REFERER', '/')
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -245,7 +245,7 @@ def vote_post(request, pk, vote_type):
                 post.upvotes.remove(request.user)
                 action = 'downvoted'
         
-        # Обновляем объект из базы данных
+        # Updating the object from the database
         post.refresh_from_db()
         
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

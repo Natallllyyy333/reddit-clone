@@ -1,11 +1,9 @@
-// Функция для остановки всех видео в контейнере
-// Функция для остановки всех видео в контейнере
 function stopAllVideosInContainer(container) {
     const videos = container.querySelectorAll('.video-player:not(.d-none)');
     videos.forEach(video => {
         video.pause();
-        video.currentTime = 0; // Сбрасываем на начало
-        // Сбрасываем видео к превью
+        video.currentTime = 0; // Reset to the beginning
+        // Dropping the video to the preview
         const videoContainer = video.closest('.video-container');
         if (videoContainer) {
             const preview = videoContainer.querySelector('.video-preview');
@@ -19,13 +17,13 @@ function stopAllVideosInContainer(container) {
     });
 }
 
-// Функция для прокрутки медиа
+// Function for scrolling media
 function scrollMedia(postId, direction) {
     const mediaScroll = document.getElementById(`mediaScroll-${postId}`);
     const mediaItems = mediaScroll.querySelectorAll('.media-item');
     const scrollAmount = mediaItems[0].offsetWidth + 10; // 10px для gap
     
-    // Останавливаем видео перед прокруткой
+    // Pause the video before scrolling
     stopAllVideosInContainer(mediaScroll);
     
     mediaScroll.scrollBy({
@@ -42,7 +40,7 @@ function updateMediaCounter(postId) {
     const mediaScroll = document.getElementById(`mediaScroll-${postId}`);
     const mediaItems = mediaScroll.querySelectorAll('.media-item');
     const scrollLeft = mediaScroll.scrollLeft;
-    const itemWidth = mediaItems[0].offsetWidth + 10; // 10px для gap
+    const itemWidth = mediaItems[0].offsetWidth + 10; // 10px gap
     
     const currentIndex = Math.round(scrollLeft / itemWidth) + 1;
     const total = mediaItems.length;
@@ -54,9 +52,9 @@ function updateMediaCounter(postId) {
     }
 }
 
-// Инициализация карусели при загрузке
+// Carousel initialization on load
 document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем обработчики для прокрутки колесом мыши
+    // Adding handlers for mouse wheel scrolling
     const mediaScrolls = document.querySelectorAll('.media-scroll');
     mediaScrolls.forEach(scroll => {
         scroll.addEventListener('wheel', function(e) {

@@ -11,7 +11,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Связь с сообществом
+    # Community connection
     community = models.ForeignKey(
         'communities.Community', 
         on_delete=models.SET_NULL, 
@@ -23,7 +23,7 @@ class Post(models.Model):
     upvotes = models.ManyToManyField(User, related_name='upvoted_posts', blank=True)
     downvotes = models.ManyToManyField(User, related_name='downvoted_posts', blank=True)
     
-    # Поле для медиафайлов
+    # Media file field
     media_file = models.FileField(
         upload_to='post_media/%Y/%m/%d/',
         blank=True,
@@ -33,7 +33,7 @@ class Post(models.Model):
         )]
     )
     
-    # Поле для определения типа медиа
+    # Field for specifying the type of media
     MEDIA_TYPE_CHOICES = [
         ('image', 'Image'),
         ('video', 'Video'),
@@ -47,17 +47,17 @@ class Post(models.Model):
 
     @property
     def first_media(self):
-        """Возвращает первый медиафайл для обратной совместимости"""
+        """Returns the first media file for backward compatibility"""
         if self.media_files.exists():
             return self.media_files.first()
-        # Для старых постов с одним файлом
+        # For old posts with a single file
         if self.media_file:
             return self
         return None
     
     @property
     def has_multiple_media(self):
-        """Проверяет есть ли множественные медиафайлы"""
+        """Checks if there are multiple media files"""
         return self.media_files.count() > 1
     
 
@@ -79,7 +79,7 @@ class Post(models.Model):
         return 0
     
     def save(self, *args, **kwargs):
-        # Автоматически определяем тип медиа
+        # Automatically detect the type of media
         if self.media_file:
             file_extension = self.media_file.name.lower().split('.')[-1]
             if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
@@ -91,25 +91,6 @@ class Post(models.Model):
         
         super().save(*args, **kwargs)
 
-        # if self.media_file and not self.media_files.exists():
-        #     PostMedia.objects.create(
-        #         post=self,
-        #         media_file=self.media_file,
-        #         media_type=self.media_type
-        #     )
-
-# class Comment(models.Model):
-#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-#     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_comments')
-#     content = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-    
-#     def __str__(self):
-#         return f"Comment by {self.author} on {self.post.title}"
-    
-#     class Meta:
-#         ordering = ['created_at']
 
 class Share(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='shares')
@@ -131,13 +112,13 @@ class PostMedia(models.Model):
     )
     media_type = models.CharField(
         max_length=10,
-        choices=Post.MEDIA_TYPE_CHOICES,  # Используем те же choices что и у Post
+        choices=Post.MEDIA_TYPE_CHOICES,  # We use the same choices as in Post
         default='none'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        # Автоматически определяем тип медиа
+        # Automatically detect the media type
         if self.media_file:
             file_extension = self.media_file.name.lower().split('.')[-1]
             if file_extension in ['jpg', 'jpeg', 'png', 'gif']:

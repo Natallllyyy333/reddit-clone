@@ -4,10 +4,10 @@
 {% endblock %} {% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <!-- Основной контент поста -->
+    <!-- Main content of the post -->
     <div class="col-lg-8 px-3">
       <div class="post-detail-card card">
-        <!-- Заголовок и информация -->
+        <!-- Title and information -->
         <div class="card-header post-header">
           <div class="d-flex justify-content-between align-items-start">
             <div>
@@ -27,33 +27,10 @@
                 {% endif %}
               </div>
             </div>
-            <!-- <div class="vote-section">
-                            <div class="vote-buttons text-center">
-                                <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-lg btn-outline-success vote-btn" 
-                                            data-post-id="{{ post.pk }}" data-vote-type="upvote">
-                                        ▲
-                                    </button>
-                                </form>
-                                
-                                <div class="vote-count my-2">
-                                    <strong class="fs-5">{{ post.total_votes }}</strong>
-                                </div>
-                                
-                                <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-lg btn-outline-danger vote-btn" 
-                                            data-post-id="{{ post.pk }}" data-vote-type="downvote">
-                                        ▼
-                                    </button>
-                                </form>
-                            </div>
-                        </div> -->
           </div>
         </div>
 
-        <!-- Содержание и медиа -->
+        <!-- Content and Media -->
         <div class="card-body">
           <div class="post-content mb-4">
             <p>{{ post.content|linebreaksbr }}</p>
@@ -74,7 +51,7 @@
                     />
 {% elif media.media_type == 'video' %}
 <div class="video-container position-relative">
-    <!-- Видео элемент -->
+    <!-- Video element -->
     <video
         class="img-fluid rounded media-video"
         preload="metadata"
@@ -85,12 +62,10 @@
             src="{{ media.media_file.url }}"
             type="video/mp4"
         />
-        Ваш браузер не поддерживает видео.
+        Your browser does not support video.
     </video>
-
-    <!-- Постер будет создан автоматически -->
     
-    <!-- Кнопка воспроизведения -->
+    <!-- Play button -->
     <div
         class="video-play-button"
         onclick="handleVideoPlay(this)"
@@ -104,7 +79,7 @@
                 </div>
               </div>
 
-              <!-- Кнопки навигации карусели - ВНЕ video-container -->
+              <!-- Carousel navigation buttons - OFF video-container -->
               {% if post.media_files.count > 1 %}
               <button
                 class="carousel-btn prev"
@@ -131,7 +106,7 @@
           </div>
           {% endif %}
 
-          <!-- Статистика поста -->
+          <!-- Post statistics -->
           <div
             class="card-footer d-flex justify-content-start align-items-center"
           >
@@ -176,7 +151,7 @@
               <i class="fas fa-comment fa-2xl"></i> {{ post.comments.count }}
             </a>
 
-            <!-- Кнопка Share -->
+            <!-- Button Share -->
             <button
               class="btn btn-outline-secondary share-btn fa-2xl"
               data-post-id="{{ post.id }}"
@@ -187,7 +162,7 @@
         </div>
       </div>
 
-      <!-- Секция комментариев -->
+      <!-- Comments section -->
       <div class="comments-section mt-4">
         <div class="card">
           <div class="card-header">
@@ -195,7 +170,7 @@
           </div>
           <div class="card-body">
             {% if user.is_authenticated %}
-            <!-- Форма добавления комментария -->
+            <!-- Comment submission form -->
             <form
               method="post"
               action="{% url 'comments:add_comment' post.id %}"
@@ -222,7 +197,7 @@
             </div>
             {% endif %}
 
-            <!-- Список комментариев -->
+            <!-- List of comments -->
             <div class="comments-list">
               {% for comment in comments %}
               <div class="comment-item mb-3 pb-3 border-bottom">
@@ -250,39 +225,39 @@
       </div>
     </div>
 
-    <!-- Сайдбар -->
+    <!-- Sidebar -->
 <div class="col-lg-4">
     <div class="sidebar-card card">
         <div class="card-body">
-            <h6>Информация о посте</h6>
+            <h6>Post information</h6>
             <div class="sidebar-info">
                 <div class="info-item">
                     <strong>Автор:</strong> {{ post.author.username }}
                 </div>
                 <div class="info-item">
-                    <strong>Опубликован:</strong> {{ post.created_at|date:"d M Y H:i" }}
+                    <strong>Posted:</strong> {{ post.created_at|date:"d M Y H:i" }}
                 </div>
                 {% if post.community %}
                 <div class="info-item">
-                    <strong>Сообщество:</strong> {{ post.community.name }}
+                    <strong>Community:</strong> {{ post.community.name }}
                 </div>
                 {% endif %}
                 <div class="info-item">
-                    <strong>Комментарии:</strong> {{ post.comments.count }}
+                    <strong>Comments:</strong> {{ post.comments.count }}
                 </div>
             </div>
 
             {% if user.is_authenticated %}
                 {% if user == post.author or user.is_staff or user.is_superuser %}
                 <div class="post-actions mt-3">
-                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Редактировать</a>
+                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
                     <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
 
                     {% if user.is_staff and user != post.author %}
-                    <span class="badge bg-warning ms-2">Модерация</span>
+                    <span class="badge bg-warning ms-2">Moderation</span>
                     {% endif %}
                     {% if user.is_superuser and user != post.author %}
-                    <span class="badge bg-danger ms-2">Админ</span>
+                    <span class="badge bg-danger ms-2">Admin</span>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -298,5 +273,4 @@
 <script src="{% static 'js/share.js' %}"></script>
 <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 <script src="{% static 'js/comments.js' %}"></script>
-<!-- Убрать дублирование ajax_handler.js -->
 {% endblock %}

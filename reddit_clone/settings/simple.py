@@ -77,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-# Базовые настройки базы данных (SQLite)
+# Basic database settings (SQLite)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -126,11 +126,11 @@ LOGGING = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Heroku production settings - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# Heroku production settings 
 if not DEBUG:
     try:
         import dj_database_url
-        # Конфигурация базы данных для Heroku
+        # Database configuration for Heroku
         DATABASES = {
             'default': dj_database_url.config(
                 default=os.environ.get('DATABASE_URL'),
@@ -139,20 +139,20 @@ if not DEBUG:
             )
         }
     except ImportError:
-        # Если dj_database_url не установлен, используем SQLite с предупреждением
+        # If dj_database_url is not set, we use SQLite with a warning
         print("WARNING: dj-database-url not installed. Using SQLite for production is not recommended!")
     
-    # Статические файлы для Heroku
+    # Static files for Heroku
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     
     try:
-        # Добавляем whitenoise middleware
+        # Adding whitenoise middleware
         MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     except ImportError:
         print("WARNING: whitenoise not installed. Static files may not work properly in production!")
     
-    # Настройки безопасности для продакшена
+    # Security settings for production
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -169,5 +169,5 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
 
-# Добавляем LocaleMiddleware для поддержки перевода
+# Adding LocaleMiddleware to support translation
 MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')

@@ -3,12 +3,12 @@ from django.contrib.auth.models import User
 
 class PostBasicTest(TestCase):
     def test_basic_math(self):
-        """Проверяем что базовые математические операции работают"""
+        """Checking that basic mathematical operations work"""
         self.assertEqual(1 + 1, 2)
         self.assertEqual(2 * 2, 4)
     
     def test_user_creation(self):
-        """Проверяем создание пользователя"""
+        """Checking user creation"""
         user = User.objects.create_user(
             username='testuser',
             password='testpass123'

@@ -77,7 +77,7 @@ class CreatePostForm {
             this.updateFileInput();
         });
 
-        // Обновляем видимость области загрузки при инициализации
+        // Updating the visibility of the loading area during initialization
         this.updateUploadAreaVisibility();
     }
 
@@ -85,7 +85,7 @@ class CreatePostForm {
         let filesAdded = 0;
 
         for (let file of files) {
-            // Проверяем лимит файлов
+            // Checking file limit
             if (this.uploadedFiles.length >= this.maxFiles) {
                 this.showError(`Максимальное количество файлов: ${this.maxFiles}`);
                 break;
@@ -101,10 +101,10 @@ class CreatePostForm {
             }
         }
         
-        // Обновляем видимость области загрузки
+        // Updating the visibility of the loading area
         this.updateUploadAreaVisibility();
         
-        // Сбрасываем input чтобы можно было выбрать те же файлы снова
+        // We reset the input so that the same files can be selected again
         document.getElementById('mediaFiles').value = '';
     }
 
@@ -135,7 +135,7 @@ class CreatePostForm {
             previewItem.remove();
             this.uploadedFiles = this.uploadedFiles.filter(f => f !== file);
             this.updateFileInput();
-            this.updateUploadAreaVisibility(); // Обновляем видимость при удалении
+            this.updateUploadAreaVisibility(); // Updating visibility upon deletion
         };
 
         if (file.type.startsWith('image/')) {
@@ -153,7 +153,7 @@ class CreatePostForm {
             previewItem.appendChild(video);
         }
 
-        // Добавляем информацию о файле
+        // Adding information about the file
         const fileInfo = document.createElement('div');
         fileInfo.className = 'file-info';
         fileInfo.innerHTML = `
@@ -164,17 +164,15 @@ class CreatePostForm {
         previewItem.appendChild(removeBtn);
         filePreview.appendChild(previewItem);
         
-        // ВАЖНО: НЕ скрываем область загрузки здесь!
-        // Область загрузки будет управляться только через updateUploadAreaVisibility()
     }
 
-    // Метод для обновления видимости области загрузки
+    // Method for updating the visibility of the loading area
     updateUploadAreaVisibility() {
         const fileUploadArea = document.getElementById('fileUploadArea');
         
         if (!fileUploadArea) return;
 
-        // Создаем счетчик файлов если его нет
+        // Creating a file counter if it doesn't exist
         let fileCounter = document.getElementById('fileCounter');
         if (!fileCounter) {
             fileCounter = document.createElement('div');
@@ -183,24 +181,24 @@ class CreatePostForm {
             fileUploadArea.parentNode.insertBefore(fileCounter, fileUploadArea);
         }
 
-        // Обновляем счетчик
+        // Updating the counter
         fileCounter.textContent = `Файлов: ${this.uploadedFiles.length}/${this.maxFiles}`;
         
-        // ВАЖНОЕ ИСПРАВЛЕНИЕ: Область загрузки скрывается ТОЛЬКО при достижении лимита
+        // The upload area hides ONLY when the limit is reached
         if (this.uploadedFiles.length >= this.maxFiles) {
             fileUploadArea.style.display = 'none';
         } else {
-            fileUploadArea.style.display = 'block'; // Всегда показываем, если не достигнут лимит
+            fileUploadArea.style.display = 'block'; // Always show if the limit has not been reached
         }
 
-        // Обновляем текст в области загрузки чтобы показать сколько файлов осталось
+        // Updating the text in the upload area to show how many files are left
         const uploadText = fileUploadArea.querySelector('h5');
         if (uploadText) {
             const remaining = this.maxFiles - this.uploadedFiles.length;
             uploadText.textContent = `Перетащите файлы сюда (осталось: ${remaining})`;
         }
         
-        // Показываем сообщение при достижении лимита
+        // Show a message when the limit is reached
         let maxFilesMessage = document.getElementById('maxFilesMessage');
         if (this.uploadedFiles.length >= this.maxFiles) {
             if (!maxFilesMessage) {
@@ -273,12 +271,12 @@ class CreatePostForm {
     }
 
     showError(message) {
-        // Можно заменить на красивый toast или modal
+        
         alert(message);
     }
 }
 
-// Инициализация при загрузке документа
+// Initialization on document load
 document.addEventListener('DOMContentLoaded', function() {
     new CreatePostForm();
 });

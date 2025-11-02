@@ -1,7 +1,5 @@
-// frontend/tests/setup.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
-
 // =============================================
-// Mock для Bootstrap
+// Mock for Bootstrap
 // =============================================
 global.bootstrap = {
     Modal: {
@@ -25,7 +23,7 @@ global.bootstrap = {
 };
 
 // =============================================
-// Mock для fetch
+// Mock for fetch
 // =============================================
 global.fetch = jest.fn(() => 
     Promise.resolve({
@@ -44,7 +42,7 @@ global.fetch = jest.fn(() =>
 );
 
 // =============================================
-// Mock для window и DOM API
+// Mock for window and DOM API
 // =============================================
 window.scrollTo = jest.fn();
 
@@ -57,7 +55,7 @@ Element.prototype.getBoundingClientRect = jest.fn(() => ({
 }));
 
 // =============================================
-// Mock для Clipboard API
+// Mock for Clipboard API
 // =============================================
 Object.assign(navigator, {
     clipboard: {
@@ -66,7 +64,7 @@ Object.assign(navigator, {
 });
 
 // =============================================
-// Mock для остальных API
+// Mock for остальных API
 // =============================================
 global.IntersectionObserver = jest.fn(() => ({
     observe: jest.fn(),
@@ -80,7 +78,7 @@ global.ResizeObserver = jest.fn(() => ({
     disconnect: jest.fn()
 }));
 
-// Mock для matchMedia
+// Mock for matchMedia
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: jest.fn().mockImplementation(query => ({
@@ -91,16 +89,16 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 });
 
-// Mock для URL.createObjectURL
+// Mock for URL.createObjectURL
 global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
 
 // =============================================
-// Mock для History API
+// Mock for History API
 // =============================================
 window.history.pushState = jest.fn();
 window.history.replaceState = jest.fn();
 
-// Mock для location
+// Mock for location
 delete window.location;
 window.location = {
     href: 'http://localhost:8000/',
@@ -113,14 +111,14 @@ window.location = {
 };
 
 // =============================================
-// Mock для CSRF token
+// Mock for CSRF token
 // =============================================
 const originalQuerySelector = document.querySelector;
 document.querySelector = jest.fn((selector) => {
     if (selector === '[name=csrfmiddlewaretoken]') {
         return { value: 'test-csrf-token' };
     }
-    // Для всех других селекторов используем оригинальную реализацию
+    // for for all other selectors, we use the original implementation
     return originalQuerySelector.call(document, selector);
 });
 

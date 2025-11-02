@@ -10,11 +10,11 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Введите заголовок вашего поста...'
+                'placeholder': 'Enter the title of your post...'
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Расскажите что-нибудь интересное...',
+                'placeholder': 'Tell me something interesting...',
                 'rows': 6
             }),
             'community': forms.Select(attrs={
@@ -26,7 +26,7 @@ class PostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['community'].queryset = Community.objects.all()
         self.fields['community'].required = False
-        self.fields['community'].empty_label = "Выберите сообщество (необязательно)"
+        self.fields['community'].empty_label = "Select a community (optional)"
         self.fields['community'].label_from_instance = lambda obj: obj.name
 
 class CommentForm(forms.ModelForm):

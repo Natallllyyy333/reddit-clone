@@ -1,4 +1,3 @@
-/* create_post.css - Насыщенный оранжевый для создания поста */
 .create-post-card {
     border: none;
     box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
@@ -239,7 +238,7 @@
     color: #ffab91 !important;
 }
 
-/* Адаптивность */
+/* Adaptability */
 @media (max-width: 768px) {
     .create-post-card {
         margin: 0 -15px;
@@ -257,7 +256,7 @@
     }
 }
 
-/* Анимации */
+/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }

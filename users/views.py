@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from .forms import RegisterForm  # Импортируем кастомную форму
+from .forms import RegisterForm  # Import a custom form
 from django.contrib.auth import logout  
 from django.shortcuts import redirect
 
 def register(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)  # Используем кастомную форму
+        form = RegisterForm(request.POST)  # Using a custom form
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -16,7 +16,7 @@ def register(request):
         else:
             return render(request, 'registration/register.html', {'form': form})
     else:
-        form = RegisterForm()  # Используем кастомную форму
+        form = RegisterForm()  # Using a custom form
         return render(request, 'registration/register.html', {'form': form})
     
 

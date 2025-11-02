@@ -12,24 +12,24 @@
         <div class="col-md-10 col-lg-8">
             <div class="card create-post-card">
                 <div class="card-header create-post-header text-center">
-                    <h4 class="mb-0">📝 Создать новый пост</h4>
-                    <p class="mb-0 mt-2 opacity-75">Поделитесь своими мыслями с сообществом</p>
+                    <h4 class="mb-0">📝 Create a new post</h4>
+                    <p class="mb-0 mt-2 opacity-75">Share your thoughts with the community</p>
                 </div>
                 
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data" id="postForm">
                         {% csrf_token %}
                         
-                        <!-- Заголовок -->
+                        <!-- Title -->
                         <div class="mb-4">
                             <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
-                                📌 Заголовок поста
+                                📌 Post Title
                             </label>
                             <input type="text" 
                                    name="{{ form.title.name }}" 
                                    id="{{ form.title.id_for_label }}" 
                                    class="form-control" 
-                                   placeholder="Введите заголовок вашего поста..."
+                                   placeholder="Enter the title of your post..."
                                    maxlength="200"
                                    value="{{ form.title.value|default:'' }}">
                             <div class="character-count mt-1" id="titleCount">
@@ -50,12 +50,12 @@
                             <textarea name="{{ form.content.name }}" 
                                       id="{{ form.content.id_for_label }}" 
                                       class="form-control" 
-                                      placeholder="Расскажите что-нибудь интересное..."
+                                      placeholder="Tell me something interesting..."
                                       rows="6"
                                       maxlength="10000"
                                       style="min-height: 150px; resize: vertical;">{{ form.content.value|default:'' }}</textarea>
                             <div class="character-count mt-1" id="contentCount">
-                                <span id="contentCurrent">0</span>/<span id="contentMax">10000</span> символов
+                                <span id="contentCurrent">0</span>/<span id="contentMax">10000</span> characters
                             </div>
                             {% if form.content.errors %}
                                 <div class="text-danger small mt-1">
@@ -88,7 +88,7 @@
                         </div>
                         
                         
-                        <!-- Загрузка медиа -->
+                        <!-- Loading media -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold">
                                 🖼️ mediaFiles
@@ -139,5 +139,4 @@
 {% block extra_js %}
   <script src="{% static 'js/debug_upload.js' %}"></script>
     <script src="{% static 'posts/js/create_post.js' %}"></script>
-     <!-- <script src="{% static 'posts/js/multi_file_upload.js' %}"></script> -->
 {% endblock %}

@@ -39,7 +39,6 @@
     position: relative;
 }
 
-/* СТИЛИ ДЛЯ КНОПОК КАРУСЕЛИ */
 .carousel-btn {
     position: absolute;
     top: 50%;
@@ -58,7 +57,6 @@
     z-index: 20;
 }
 
-/* Позиционирование кнопок по бокам с отступом 10px */
 .carousel-btn.prev {
     left: 10px;
 }
@@ -84,7 +82,6 @@
     z-index: 15;
 }
 
-/* Скрыть scrollbar для Webkit браузеров */
 .media-scroll::-webkit-scrollbar {
     display: none;
 }
@@ -94,7 +91,7 @@
     scrollbar-width: none;
 }
 
-/* Стили для видео контейнера */
+
 .video-container {
     position: relative;
     width: 100%;
@@ -113,7 +110,6 @@
     
 }
 
-/* Кнопка воспроизведения поверх видео */
 .video-play-button {
     position: absolute;
     top: 50%;
@@ -144,12 +140,11 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
-/* Скрываем кнопку когда видео играет */
 .video-container.playing .video-play-button {
     display: none;
 }
 
-/* Стили для элементов управления видео */
+
 .video-container video::-webkit-media-controls-panel {
     background: linear-gradient(transparent, rgba(0,0,0,0.7));
 }
@@ -159,14 +154,14 @@
     border-radius: 50%;
 }
 
-/* Гарантируем, что видео элементы всегда кликабельны */
+/* We guarantee that video elements are always clickable */
 .video-item video {
     pointer-events: auto !important;
     position: relative;
     z-index: 1;
 }
 
-/* Защита от перекрытия другими элементами */
+/* Protection from being blocked by other elements */
 .media-item * {
     pointer-events: auto;
 }
@@ -175,7 +170,7 @@
     box-sizing: border-box;
 }
 
-/* Стили для постера видео */
+/* Styles for a video poster */
 .video-preview {
     position: absolute;
     top: 0;
@@ -188,12 +183,12 @@
     border-radius: 8px;
 }
 
-/* Скрываем постер когда видео играет */
+/* Hide the poster when the video is playing */
 .video-container.playing .video-preview {
     display: none !important;
 }
 
-/* Гарантируем, что видео всегда поверх постера */
+/* We guarantee that the video is always on top of the poster */
 .video-container video {
     position: relative;
     z-index: 6;
@@ -206,7 +201,7 @@
     position: relative; /* Важно для позиционирования */
 }
 
-/* Стили для кнопки воспроизведения */
+/* Styles for the play button */
 .video-play-button {
     display: flex !important;
     position: absolute;
@@ -214,7 +209,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    pointer-events: auto; /* Разрешаем события мыши */
+    pointer-events: auto; /* Enable mouse events */
     cursor: pointer;
     width: 80px;
     height: 80px;
@@ -237,12 +232,12 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
-/* Скрываем кнопку когда видео играет */
+/* Hide the button when the video is playing */
 .video-container.playing .video-play-button {
     display: none !important;
 }
 
-/* Убираем стандартные controls */
+/* Remove the defaults controls */
 .video-container video {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -265,45 +260,3 @@
     display: none !important;
 }
 
-/* Адаптивность */
-/* @media (max-width: 768px) {
-    .video-loading {
-        font-size: 1.5rem;
-    }
-
-    .media-item img,
-    .media-item video {
-        height: 300px;
-    }
-    
-    .video-container {
-        height: 300px;
-    }
-    
-    .carousel-btn {
-        width: 35px;
-        height: 35px;
-    }
-    
-    .carousel-btn.prev {
-        left: 5px;
-    }
-    
-    .carousel-btn.next {
-        right: 5px;
-    }
-    
-    .media-counter {
-        font-size: 12px;
-        padding: 3px 8px;
-    }
-    
-    .video-play-button {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .video-play-button i {
-        font-size: 2rem;
-    }
-} */

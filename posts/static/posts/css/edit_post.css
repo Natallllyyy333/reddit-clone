@@ -237,7 +237,7 @@
     color: #e65100 !important;
 }
 
-/* Адаптивность */
+/* Adaptability */
 @media (max-width: 768px) {
     .edit-post-card {
         margin: 0 -15px;
@@ -255,7 +255,7 @@
     }
 }
 
-/* Анимации */
+/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }

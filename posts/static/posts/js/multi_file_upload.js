@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filePreview = document.getElementById('filePreview');
     const uploadArea = document.getElementById('fileUploadArea');
     
-    // Обработка выбора файлов
+    // File selection handling
     fileInput.addEventListener('change', function(e) {
         handleFiles(e.target.files);
     });
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const previewItem = button.parentElement;
         previewItem.remove();
         
-        // Показываем область загрузки, если нет превью
+        // Show the loading area if there is no preview
         if (filePreview.children.length === 0) {
             uploadArea.style.display = 'block';
         }

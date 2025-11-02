@@ -87,7 +87,7 @@ class PostViewsTest(TestCase):
         self.assertTrue(Post.objects.filter(title='New Post Title').exists())
 
     def test_post_update_view_get(self):
-        """Тест GET запроса редактирования поста"""
+        """Тест GET post edit request"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('post_edit', args=[self.post.pk]))
         self.assertEqual(response.status_code, 200)

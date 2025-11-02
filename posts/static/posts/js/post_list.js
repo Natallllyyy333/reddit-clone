@@ -10,10 +10,6 @@ class PostList {
 
     setupVoteButtons() {
         const voteForms = document.querySelectorAll('form[action*="vote"]');
-
-        // const voteForms = document.querySelectorAll('form.vote-form');
-        // const voteForms = document.querySelectorAll('form[data-vote-form]');
-        // const voteForms = document.querySelectorAll('form:not([data-skip-js])');
         
         voteForms.forEach(form => {
             form.addEventListener('submit', async (e) => {
@@ -57,7 +53,7 @@ class PostList {
             voteCount.textContent = data.total_votes;
         }
         
-        // Обновляем стили кнопок
+        // Updating button styles
         this.updateButtonStyles(postId, data.user_vote);
     }
 
@@ -66,14 +62,14 @@ class PostList {
         const downvoteBtn = document.querySelector(`[data-post-id="${postId}"][data-vote-type="downvote"]`);
         
         if (upvoteBtn && downvoteBtn) {
-            // Сбрасываем стили
+            // Reset styles
             upvoteBtn.classList.remove('btn-success', 'active');
             upvoteBtn.classList.add('btn-outline-success');
             
             downvoteBtn.classList.remove('btn-danger', 'active');
             downvoteBtn.classList.add('btn-outline-danger');
             
-            // Применяем новые стили
+            // Applying new styles
             if (userVote === 1) {
                 upvoteBtn.classList.remove('btn-outline-success');
                 upvoteBtn.classList.add('btn-success', 'active');
@@ -85,12 +81,12 @@ class PostList {
     }
 
     setupPostInteractions() {
-        // Добавляем дополнительные взаимодействия если нужно
+        // We add additional interactions if needed
         console.log('Post list initialized');
     }
 }
 
-// Инициализация при загрузке документа
+// Initialization on document load
 document.addEventListener('DOMContentLoaded', function() {
     new PostList();
 });

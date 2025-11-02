@@ -44,19 +44,19 @@ class PostDetail {
     }
 
     updateVoteDisplay(data) {
-        // Обновляем счетчик голосов
+        // Updating the vote counter
         const voteCountElements = document.querySelectorAll('.vote-count strong');
         voteCountElements.forEach(element => {
             element.textContent = data.total_votes;
         });
 
-        // Обновляем статистику
+        // Updating the statistics
         const statsElement = document.querySelector('.post-stats .stat-item:first-child strong');
         if (statsElement) {
             statsElement.textContent = data.total_votes;
         }
 
-        // Обновляем стили кнопок
+        // Updating button styles
         this.updateButtonStyles(data.user_vote);
     }
 
@@ -65,14 +65,14 @@ class PostDetail {
         const downvoteBtn = document.querySelector('[data-vote-type="downvote"]');
         
         if (upvoteBtn && downvoteBtn) {
-            // Сбрасываем стили
+            // Reset styles
             upvoteBtn.classList.remove('btn-success', 'active');
             upvoteBtn.classList.add('btn-outline-success');
             
             downvoteBtn.classList.remove('btn-danger', 'active');
             downvoteBtn.classList.add('btn-outline-danger');
             
-            // Применяем новые стили
+            // Applying new styles
             if (userVote === 1) {
                 upvoteBtn.classList.remove('btn-outline-success');
                 upvoteBtn.classList.add('btn-success', 'active');
@@ -98,7 +98,7 @@ class PostDetail {
     }
 }
 
-// Инициализация при загрузке документа
+// Initialization on document load
 document.addEventListener('DOMContentLoaded', function() {
     new PostDetail();
 });

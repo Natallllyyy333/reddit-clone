@@ -16,13 +16,10 @@ def instant_logout(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
-    # path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('posts/', include('posts.urls')),
     path('communities/', include('communities.urls')),
     path('comments/', include('comments.urls')),
     path('users/', include('users.urls')), 
-    # path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    # path('logout/', instant_logout, name='logout'),
      path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='post_list'), name='logout'),
 

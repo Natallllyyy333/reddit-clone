@@ -1,4 +1,4 @@
-// ПРОСТОЙ СКРИПТ ДЛЯ ЛАЙКОВ НА POST_LIST
+// SIMPLE SCRIPT FOR LIKES ON POST_LIST
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Vote handler loaded for post_list');
     
@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.action;
             const postId = this.querySelector('button').dataset.postId;
             
-            // Добавляем CSRF token
+            // Adding CSRF token
             const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
             if (csrfInput) {
                 formData.append('csrfmiddlewaretoken', csrfInput.value);
             }
             
-            // ПРОСТОЙ FETCH БЕЗ СЛОЖНОЙ ЛОГИКИ
+            // A SIMPLE FETCH WITHOUT COMPLEX LOGIC
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 console.log('Vote successful:', data);
                 
-                // Обновляем счетчик
+                // Updating the counter
                 const voteCount = document.getElementById('vote-count-' + postId);
                 if (voteCount) {
                     const strongElement = voteCount.querySelector('strong');
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Vote error:', error);
-                // При ошибке просто перезагружаем страницу
+                // In case of an error, just reload the page
                 window.location.reload();
             });
         });

@@ -26,12 +26,12 @@ class PostModelTest(TestCase):
         self.assertEqual(str(self.post), 'Test Post')
 
     def test_post_absolute_url(self):
-        # Если у модели есть метод get_absolute_url
+        # If the model has a method get_absolute_url
         try:
             url = self.post.get_absolute_url()
             self.assertTrue(url)
         except:
-            # Если метода нет, это нормально
+            # If there is no method, that's okay
             pass
 
 class PostMediaModelTest(TestCase):
@@ -41,7 +41,7 @@ class PostMediaModelTest(TestCase):
         media = PostMedia.objects.create(post=post, media_file='test.jpg')
         self.assertEqual(str(media), f"Media for {post.title}")
 
-# comments/tests/test_models.py - создать
+# comments/tests/test_models.py - create
 class CommentModelTest(TestCase):
     def test_comment_permissions(self):
         user1 = User.objects.create_user(username='user1', password='pass')

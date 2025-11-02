@@ -1,5 +1,4 @@
-// video_handler.js - Обработчик видео с запуском/остановкой по клику на любую область
-
+// Video handler with start/stop on click anywhere
 console.log('🎬 Video handler loaded');
 
 function handleVideoPlay(button) {
@@ -14,14 +13,14 @@ function handleVideoPlay(button) {
         return;
     }
     
-    // Скрываем кнопку воспроизведения и превью
+    // Hiding the play button and preview
     button.style.display = 'none';
     if (videoPreview) videoPreview.style.display = 'none';
     
-    // Воспроизводим видео
+    // Playing the video
     video.play().catch(error => {
         console.error('❌ Error playing video:', error);
-        // Показываем кнопку обратно при ошибке
+        // Show the back button on error
         button.style.display = 'flex';
         if (videoPreview) videoPreview.style.display = 'block';
     });
@@ -37,7 +36,7 @@ function toggleVideoPlayback(container) {
     if (!video) return;
     
     if (video.paused) {
-        // Запускаем видео
+        // Starting the video
         if (playButton) playButton.style.display = 'none';
         if (videoPreview) videoPreview.style.display = 'none';
         
@@ -49,9 +48,9 @@ function toggleVideoPlayback(container) {
             if (videoPreview) videoPreview.style.display = 'block';
         });
     } else {
-        // Останавливаем видео и показываем превью
+        // Pause the video and show the preview
         video.pause();
-        video.currentTime = 0; // Сбрасываем на начало
+        video.currentTime = 0; // Reset to the beginning
         container.classList.remove('playing');
         
         if (playButton) playButton.style.display = 'flex';
@@ -59,11 +58,11 @@ function toggleVideoPlayback(container) {
     }
 }
 
-// Функция для создания постера из первого кадра видео
+// Function to create a poster from the first frame of a video
 function createVideoPoster(video) {
     const container = video.closest('.video-container');
     
-    // Создаем элемент для постера
+    // Creating an element for the poster
     let videoPreview = container.querySelector('.video-preview');
     if (!videoPreview) {
         videoPreview = document.createElement('img');
@@ -72,14 +71,14 @@ function createVideoPoster(video) {
         container.appendChild(videoPreview);
     }
     
-    // Пытаемся установить постер из первого кадра
+    // Trying to set a poster from the first frame
     video.addEventListener('loadeddata', function() {
         try {
-            // Создаем canvas для извлечения кадра
+            // Creating a canvas to extract a frame
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // Устанавливаем текущее время на первый кадр
+            // Set the current time to the first frame
             video.currentTime = 0.1;
             
             const onSeeked = function() {
@@ -92,7 +91,7 @@ function createVideoPoster(video) {
                     videoPreview.src = posterUrl;
                     console.log('✅ Video poster generated from first frame');
                     
-                    // Убираем обработчик после использования
+                    // Remove the handler after use
                     video.removeEventListener('seeked', onSeeked);
                 } catch (error) {
                     console.error('❌ Error generating poster from frame:', error);
@@ -107,7 +106,7 @@ function createVideoPoster(video) {
         }
     });
     
-    // Устанавливаем fallback, если основной метод не сработал
+    // We set up a fallback if the main method doesn't work
     setTimeout(() => {
         if (!videoPreview.src || videoPreview.src === '') {
             setFallbackPoster(videoPreview);
@@ -115,15 +114,15 @@ function createVideoPoster(video) {
     }, 3000);
 }
 
-// Fallback методы для постера
+// Fallback methods for the poster
 function setFallbackPoster(videoPreview) {
-    // Создаем canvas с градиентным фоном
+    // Creating a canvas with a gradient background
     const canvas = document.createElement('canvas');
     canvas.width = 400;
     canvas.height = 300;
     const ctx = canvas.getContext('2d');
     
-    // Создаем градиент
+    // Creating a gradient
     const gradient = ctx.createLinearGradient(0, 0, 400, 300);
     gradient.addColorStop(0, '#2c3e50');
     gradient.addColorStop(1, '#3498db');
@@ -131,7 +130,7 @@ function setFallbackPoster(videoPreview) {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 400, 300);
     
-    // Добавляем иконку play
+    // Adding an icon play
     ctx.fillStyle = 'white';
     ctx.font = '48px Arial';
     ctx.textAlign = 'center';
@@ -142,7 +141,7 @@ function setFallbackPoster(videoPreview) {
     console.log('🎨 Using gradient fallback poster');
 }
 
-// Обработчик окончания видео
+// Video end handler
 function handleVideoEnd(video) {
     const container = video.closest('.video-container');
     const playButton = container.querySelector('.video-play-button');
@@ -153,39 +152,39 @@ function handleVideoEnd(video) {
     if (videoPreview) videoPreview.style.display = 'block';
 }
 
-// Инициализация обработчиков
+// Initialization of handlers
 function initVideoHandlers() {
     console.log('🔄 Initializing video handlers...');
     
-    // Обработчики для кнопок воспроизведения
+    // Handlers for playback buttons
     document.querySelectorAll('.video-play-button').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
             handleVideoPlay(this);
         });
         
-        // Гарантируем, что кнопка видима
+        // We guarantee that the button is visible
         button.style.display = 'flex';
     });
     
-    // Обработчики для видео элементов
+    // Handlers for video elements
     document.querySelectorAll('.video-container').forEach(container => {
         const video = container.querySelector('video');
         
         if (video) {
-            // Гарантируем, что видео видимо
+            // We guarantee that the video is visible
             video.style.display = 'block';
             
-            // Генерируем постер
+            // Generating a poster
             createVideoPoster(video);
             
-            // ОБРАБОТЧИК КЛИКА НА КОНТЕЙНЕР - главный обработчик
+            // CLICK HANDLER ON CONTAINER - main handler
             container.addEventListener('click', function(e) {
-                // Предотвращаем всплытие, чтобы не срабатывали родительские обработчики
+                // Prevent bubbling so that parent handlers do not trigger
                 e.stopPropagation();
                 e.preventDefault();
                 
-                // Игнорируем клики непосредственно на кнопке воспроизведения
+                // Ignore clicks directly on the play button
                 if (e.target.closest('.video-play-button')) {
                     return;
                 }
@@ -193,7 +192,7 @@ function initVideoHandlers() {
                 toggleVideoPlayback(container);
             });
             
-            // События видео
+            // Video events
             video.addEventListener('play', function() {
                 this.closest('.video-container').classList.add('playing');
                 const playButton = this.closest('.video-container').querySelector('.video-play-button');
@@ -206,7 +205,7 @@ function initVideoHandlers() {
                 handleVideoEnd(this);
             });
             
-            // Обработка ошибок загрузки
+            //Load error handling
             video.addEventListener('error', function() {
                 console.error('❌ Video loading error:', this.error);
                 const playButton = this.closest('.video-container').querySelector('.video-play-button');
@@ -218,14 +217,14 @@ function initVideoHandlers() {
     });
 }
 
-// Инициализация
+// Initialization
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initVideoHandlers);
 } else {
     initVideoHandlers();
 }
 
-// Для динамического контента
+// For dynamic content
 if (typeof MutationObserver !== 'undefined') {
     const observer = new MutationObserver(function(mutations) {
         let shouldReinit = false;
@@ -250,6 +249,6 @@ if (typeof MutationObserver !== 'undefined') {
     });
 }
 
-// Глобальные функции
+// Global functions
 window.handleVideoPlay = handleVideoPlay;
 window.toggleVideoPlayback = toggleVideoPlayback;

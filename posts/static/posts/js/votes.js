@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Обработка лайков через AJAX
+    // Processing likes through AJAX
     document.querySelectorAll('.vote-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -23,18 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                // Обновляем счетчик голосов
+                // Updating the vote counter
                 const voteCount = form.closest('.card-footer').querySelector('.vote-count strong');
                 if (voteCount) {
                     voteCount.textContent = data.total_votes;
                 }
                 
-                // Обновляем стили кнопок
+                // Updating button styles
                 updateVoteButtons(form, data.user_vote);
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Fallback - отправляем форму обычным способом
+                // Fallback - We send the form in the usual way
                 form.submit();
             });
         });
@@ -45,15 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const upvoteBtn = footer.querySelector('[data-vote-type="upvote"]');
         const downvoteBtn = footer.querySelector('[data-vote-type="downvote"]');
         
-        // Сбрасываем стили
+        // Reset styles
         upvoteBtn.classList.remove('btn-success', 'btn-outline-success');
         downvoteBtn.classList.remove('btn-danger', 'btn-outline-danger');
         
-        // Устанавливаем базовые стили
+        // Setting up basic styles
         upvoteBtn.classList.add('btn-outline-success');
         downvoteBtn.classList.add('btn-outline-danger');
         
-        // Устанавливаем активные стили
+        // Setting active styles
         if (userVote === 1) {
             upvoteBtn.classList.add('btn-success');
             upvoteBtn.classList.remove('btn-outline-success');

@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Все посты</h1>
+    <h1>All posts</h1>
     
     {% for post in posts %}
     <div class="card mb-3">
@@ -21,7 +21,7 @@
                 {% if post.community %}
                     <a href="{% url 'communities:community_detail' post.community.name %}">{{ post.community.name }}</a>
                 {% else %}
-                    <span>Без сообщества</span>
+                    <span>Without a community</span>
                 {% endif %}
             </small>
             <div class="post-header mb-2 pb-3 d-flex justify-content-between align-items-center">
@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <!-- Контент поста -->
+        <!-- Post content -->
         <div class="card-body">
             <div class="post-content mb-3">
                 <div class="text-muted small mb-4">
@@ -71,7 +71,7 @@
                          class="img-fluid rounded media-image">
                     {% elif media.media_type == 'video' %}
                     <div class="video-container position-relative">
-                        <!-- Видео элемент -->
+                        <!-- Video element -->
                         <video
                             class="img-fluid rounded media-video"
                             preload="metadata"
@@ -82,10 +82,10 @@
                                 src="{{ media.media_file.url }}"
                                 type="video/mp4"
                             />
-                            Ваш браузер не поддерживает видео.
+                            Your browser does not support video.
                         </video>
 
-                        <!-- Кнопка воспроизведения -->
+                        <!-- Play button -->
                         <div
                             class="video-play-button"
                             onclick="handleVideoPlay(this)"
@@ -120,9 +120,9 @@
 {% endif %}
             </div>
 
-            <!-- Действия с постом -->
+            <!-- Post actions -->
             <div class="card-footer d-flex justify-content-start align-items-center">
-                <!-- Upvote форма - ДОБАВЛЕН КЛАСС vote-form -->
+                <!-- Upvote form - CLASS ADDED vote-form -->
                 <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline vote-form">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-success vote-btn me-1 px-3" 
@@ -131,12 +131,12 @@
                     </button>
                 </form>
 
-                <!-- Счетчик голосов -->
+                <!-- Vote counter -->
                 <span class="video-count" id="vote-count-{{ post.pk }}">
                     <strong>{{ post.total_votes }}</strong>
                 </span>
 
-                <!-- Downvote форма - ДОБАВЛЕН КЛАСС vote-form -->
+                <!-- Downvote форма - CLASS ADDED vote-form -->
                 <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline vote-form">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
@@ -145,12 +145,12 @@
                     </button>
                 </form>
                 
-                <!-- Комментарии -->
+                <!-- Comments -->
                 <a href="{% url 'post_detail' post.pk %}#write_comment" class="btn btn-outline-secondary btn-sm me-3">
                     <i class="fas fa-comment"></i> {{ post.comments.count }}
                 </a>
 
-                <!-- Кнопка Share -->
+                <!-- Button Share -->
                 <button class="btn btn-outline-secondary btn-sm share-btn" 
                         data-post-id="{{ post.id }}">
                     <i class="fas fa-share"></i> Share
@@ -160,7 +160,7 @@
     </div>
     {% empty %}
     <div class="alert alert-info">
-        Пока нет постов. <a href="{% url 'create_post' %}">Создайте первый пост!</a>
+        No posts yet. <a href="{% url 'create_post' %}">Create the first post!</a>
     </div>
     {% endfor %}
 </div>
@@ -170,9 +170,5 @@
 {% block extra_js %}
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
-    <!-- Подключаем единый обработчик видео -->
     <script src="{% static 'posts/js/video_handler.js' %}"></script>
-    <!-- ТОЛЬКО ОДИН СКРИПТ ДЛЯ ГОЛОСОВАНИЯ -->
-    <!-- <script src="{% static 'posts/js/ajax_handler.js' %}"></script> -->
-    <!-- <script src="{% static 'js/debug_votes.js' %}"></script> -->
 {% endblock %}
