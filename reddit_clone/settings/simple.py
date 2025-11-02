@@ -93,7 +93,7 @@ TEMPLATES = [
     },
 ]
 
-# Database configuration
+# Database configuration - START WITH SQLITE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -116,7 +116,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
 
 LOGGING = {
     'version': 1,
@@ -144,32 +143,36 @@ LOGGING = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Heroku production settings 
+# Heroku production settings - FIXED VERSION
 if not DEBUG:
-    try:
-        import dj_database_url
-        # Database configuration for Heroku
-        DATABASES = {
-            'default': dj_database_url.config(
-                default=os.environ.get('DATABASE_URL'),
-                conn_max_age=600,
-                ssl_require=True
-            )
-        }
-        print("✅ Production: Using PostgreSQL database")
-    except ImportError:
-        print("❌ WARNING: dj-database-url not installed. Using SQLite for production is not recommended!")
-    
     # Static files for Heroku
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     
+    # WhiteNoise for static files
     try:
-        # Adding whitenoise middleware
         MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
         print("✅ Production: WhiteNoise configured for static files")
     except ImportError:
         print("❌ WARNING: whitenoise not installed. Static files may not work properly in production!")
+    
+    # HONEST database configuration - FIXED
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        try:
+            import dj_database_url
+            # Use parse() instead of config() for explicit parsing
+            DATABASES = {
+                'default': dj_database_url.parse(database_url, conn_max_age=600)
+            }
+            print(f"✅ Production: Using PostgreSQL database from DATABASE_URL")
+        except ImportError:
+            print("❌ ERROR: dj-database-url not installed but DATABASE_URL is set!")
+        except Exception as e:
+            print(f"❌ ERROR parsing DATABASE_URL: {e}")
+            # Keep SQLite as fallback
+    else:
+        print("❌ WARNING: DATABASE_URL not found! Using SQLite in production (NOT RECOMMENDED)")
 
 # Internationalization for easy text changes
 LANGUAGES = [
