@@ -276,3 +276,38 @@
     display: none !important;
 }
 
+/* Force media visibility */
+.post-media-container {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.media-carousel {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.media-item {
+    display: block !important;
+    visibility: visible !important;
+    min-width: 100%;
+}
+
+.video-container {
+    display: block !important;
+    visibility: visible !important;
+    background: #000;
+}
+
+.media-video {
+    display: block !important;
+    visibility: visible !important;
+    background: #000;
+}
+
+.video-play-button {
+    display: flex !important;
+    visibility: visible !important;
+    align-items: center;
+    justify-content: center;
+}

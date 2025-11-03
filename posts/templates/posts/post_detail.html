@@ -1,7 +1,37 @@
-{% extends 'base.html' %} {% load static %} {% block extra_css %}
+{% extends 'base.html' %} 
+{% load static %} 
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}" />
 <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}" />
-{% endblock %} {% block content %}
+<style>
+    /* Force media visibility */
+    .post-media-container,
+    .media-carousel, 
+    .media-image,
+    .media-video,
+    .video-container,
+    .media-item {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Video container fixes */
+    .video-container video {
+        display: block !important;
+        visibility: visible !important;
+        background: #000;
+    }
+
+    .video-play-button {
+        display: flex !important;
+        visibility: visible !important;
+    }
+</style>
+{% endblock %} 
+
+{% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <!-- Main content of the post -->
@@ -37,38 +67,43 @@
           </div>
 
           {% if post.media_files.exists %}
+          <!-- DEBUG: {{ post.media_files.count }} media files for post {{ post.pk }} -->
           <div class="post-media-container mb-4 position-relative">
             <div class="media-carousel detail-view position-relative">
               <div class="media-scroll-wrapper">
                 <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
                   {% for media in post.media_files.all %}
+                  <!-- DEBUG: Media {{ forloop.counter }} - {{ media.media_type }} - {{ media.get_cloudinary_url }} -->
                   <div class="media-item">
                     {% if media.media_type == 'image' %}
                     <img
                       src="{{ media.get_cloudinary_url }}"
                       alt="Post media {{ forloop.counter }}"
                       class="img-fluid rounded media-image"
+                      style="display: block !important; visibility: visible !important;"
                     />
-<!-- In the video section of both templates -->
-{% elif media.media_type == 'video' %}
-<div class="video-container position-relative">
-    <video
-        class="img-fluid rounded media-video"
-        preload="metadata"
-        playsinline
-        webkit-playsinline
-        muted
-        style="width: 100%; height: auto; display: block; background: #000;"
-    >
-        <source src="{{ media.get_cloudinary_url }}" type="video/mp4" />
-        Your browser does not support the video tag.
-    </video>
-    
-    <div class="video-play-button" onclick="handleVideoPlay(this)">
-        <i class="fas fa-play-circle"></i>
-    </div>
-</div>
-{% endif %}
+                    {% elif media.media_type == 'video' %}
+                    <div class="video-container position-relative" style="width: 100%; height: 400px; background: #000; display: block !important;">
+                        <video
+                            class="media-video w-100 h-100"
+                            preload="metadata"
+                            playsinline
+                            webkit-playsinline
+                            muted
+                            style="object-fit: contain; display: block !important; visibility: visible !important;"
+                            poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                        >
+                            <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        
+                        <div class="video-play-button position-absolute top-50 start-50 translate-middle" 
+                             style="z-index: 10; cursor: pointer; font-size: 3rem; color: white; display: flex !important;"
+                             onclick="handleVideoPlay(this)">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
@@ -201,7 +236,7 @@
                     >{{ comment.author.username }}</strong
                   >
                   <small class="text-muted"
-                    >{{ comment.created_at|timesince }} назад</small
+                    >{{ comment.created_at|timesince }} ago</small
                   >
                 </div>
                 <div class="comment-content">
@@ -221,55 +256,107 @@
     </div>
 
     <!-- Sidebar -->
-<div class="col-lg-4">
-    <div class="sidebar-card card">
-        <div class="card-body">
-            <h6>Post information</h6>
-            <div class="sidebar-info">
-                <div class="info-item">
-                    <strong>Author:</strong> {{ post.author.username }}
+    <div class="col-lg-4">
+        <div class="sidebar-card card">
+            <div class="card-body">
+                <h6>Post information</h6>
+                <div class="sidebar-info">
+                    <div class="info-item">
+                        <strong>Author:</strong> {{ post.author.username }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Posted:</strong> {{ post.created_at|date:"d M Y H:i" }}
+                    </div>
+                    {% if post.community %}
+                    <div class="info-item">
+                        <strong>Community:</strong> {{ post.community.name }}
+                    </div>
+                    {% endif %}
+                    <div class="info-item">
+                        <strong>Comments:</strong> {{ post.comments.count }}
+                    </div>
                 </div>
-                <div class="info-item">
-                    <strong>Posted:</strong> {{ post.created_at|date:"d M Y H:i" }}
-                </div>
-                {% if post.community %}
-                <div class="info-item">
-                    <strong>Community:</strong> {{ post.community.name }}
-                </div>
+
+                {% if user.is_authenticated %}
+                    {% if user == post.author or user.is_staff or user.is_superuser %}
+                    <div class="post-actions mt-3">
+                        <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                        <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+
+                        {% if user.is_staff and user != post.author %}
+                        <span class="badge bg-warning ms-2">Moderation</span>
+                        {% endif %}
+                        {% if user.is_superuser and user != post.author %}
+                        <span class="badge bg-danger ms-2">Admin</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 {% endif %}
-                <div class="info-item">
-                    <strong>Comments:</strong> {{ post.comments.count }}
-                </div>
             </div>
-
-            {% if user.is_authenticated %}
-                {% if user == post.author or user.is_staff or user.is_superuser %}
-                <div class="post-actions mt-3">
-                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                    <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
-
-                    {% if user.is_staff and user != post.author %}
-                    <span class="badge bg-warning ms-2">Moderation</span>
-                    {% endif %}
-                    {% if user.is_superuser and user != post.author %}
-                    <span class="badge bg-danger ms-2">Admin</span>
-                    {% endif %}
-                </div>
-                {% endif %}
-            {% endif %}
         </div>
     </div>
-</div>
   </div>
 </div>
-{% include 'posts/includes/share_modal.html' %} {% endblock %} 
-{% block extra_js %}
+{% include 'posts/includes/share_modal.html' %} 
+{% endblock %} 
 
+{% block extra_js %}
 <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 <script src="{% static 'posts/js/video_handler.js' %}"></script>
-
 <script src="{% static 'js/cloudinary_media_handler.js' %}"></script> 
 <script src="{% static 'js/share.js' %}"></script>
 
+<script>
+console.log('=== POST DETAIL MEDIA DEBUG ===');
 
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        console.log('🔄 Checking media elements in post detail...');
+        
+        const mediaContainers = document.querySelectorAll('.post-media-container');
+        console.log(`📦 Found ${mediaContainers.length} media containers in detail`);
+        
+        mediaContainers.forEach((container, index) => {
+            const images = container.querySelectorAll('img');
+            const videos = container.querySelectorAll('video');
+            const videoContainers = container.querySelectorAll('.video-container');
+            
+            console.log(`📦 Detail Container ${index + 1}:`, {
+                images: images.length,
+                videos: videos.length,
+                videoContainers: videoContainers.length
+            });
+            
+            images.forEach((img, imgIndex) => {
+                console.log(`🖼️ Detail Image ${imgIndex + 1}:`, {
+                    src: img.src,
+                    visible: img.offsetParent !== null,
+                    display: window.getComputedStyle(img).display,
+                    width: img.offsetWidth,
+                    height: img.offsetHeight
+                });
+            });
+            
+            videos.forEach((video, vidIndex) => {
+                console.log(`🎬 Detail Video ${vidIndex + 1}:`, {
+                    src: video.src || video.currentSrc,
+                    visible: video.offsetParent !== null,
+                    display: window.getComputedStyle(video).display,
+                    width: video.offsetWidth,
+                    height: video.offsetHeight,
+                    readyState: video.readyState
+                });
+                
+                // Try to load video
+                video.load();
+            });
+        });
+        
+        // Force reinitialization of video handlers
+        if (typeof initVideoHandlers === 'function') {
+            setTimeout(initVideoHandlers, 500);
+        }
+    }, 1000);
+});
+</script>
 {% endblock %}

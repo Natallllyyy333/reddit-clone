@@ -3,9 +3,33 @@
 {% block title %}Posts - Reddit Clone{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'posts/css/post_list.css' %}">
- 
     <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
     <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}">
+    <style>
+        /* Force media visibility */
+        .post-media-container,
+        .media-carousel, 
+        .media-image,
+        .media-video,
+        .video-container,
+        .media-item {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Video container fixes */
+        .video-container video {
+            display: block !important;
+            visibility: visible !important;
+            background: #000;
+        }
+
+        .video-play-button {
+            display: flex !important;
+            visibility: visible !important;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -59,36 +83,41 @@
 
 <!-- Media_carousel -->
 {% if post.media_files.exists %}
+<!-- DEBUG: {{ post.media_files.count }} media files for post {{ post.pk }} -->
 <div class="post-media-container mb-3">
     <div class="media-carousel">
         <div class="media-scroll-wrapper">
             <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
                 {% for media in post.media_files.all %}
+                <!-- DEBUG: Media {{ forloop.counter }} - {{ media.media_type }} - {{ media.get_cloudinary_url }} -->
                 <div class="media-item">
                     {% if media.media_type == 'image' %}
                     <img src="{{ media.get_cloudinary_url }}" 
                          alt="Post media {{ forloop.counter }}" 
-                         class="img-fluid rounded media-image">
-<!-- In the video section of both templates -->
-{% elif media.media_type == 'video' %}
-<div class="video-container position-relative">
-    <video
-        class="img-fluid rounded media-video"
-        preload="metadata"
-        playsinline
-        webkit-playsinline
-        muted
-        style="width: 100%; height: auto; display: block; background: #000;"
-    >
-        <source src="{{ media.get_cloudinary_url }}" type="video/mp4" />
-        Your browser does not support the video tag.
-    </video>
-    
-    <div class="video-play-button" onclick="handleVideoPlay(this)">
-        <i class="fas fa-play-circle"></i>
-    </div>
-</div>
-{% endif %}
+                         class="img-fluid rounded media-image"
+                         style="display: block !important; visibility: visible !important;">
+                    {% elif media.media_type == 'video' %}
+                    <div class="video-container position-relative" style="width: 100%; height: 300px; background: #000; display: block !important;">
+                        <video
+                            class="media-video w-100 h-100"
+                            preload="metadata"
+                            playsinline
+                            webkit-playsinline
+                            muted
+                            style="object-fit: contain; display: block !important; visibility: visible !important;"
+                            poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                        >
+                            <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        
+                        <div class="video-play-button position-absolute top-50 start-50 translate-middle" 
+                             style="z-index: 10; cursor: pointer; font-size: 3rem; color: white; display: flex !important;"
+                             onclick="handleVideoPlay(this)">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -164,15 +193,59 @@
 
 {% block extra_js %}
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-<script src="{% static 'posts/js/video_handler.js' %}"></script> 
-<script src="{% static 'js/cloudinary_media_handler.js' %}"></script> 
-<script src="{% static 'js/share.js' %}"></script>
+    <script src="{% static 'posts/js/video_handler.js' %}"></script> 
+    <script src="{% static 'js/cloudinary_media_handler.js' %}"></script> 
+    <script src="{% static 'js/share.js' %}"></script>
 
-<script>
-console.log('=== MEDIA DEBUG INFO ===');
-document.querySelectorAll('img, video').forEach(media => {
-    console.log('Media:', media.tagName, 'src:', media.src || media.currentSrc);
-    console.log('Visible:', media.offsetParent !== null, 'Display:', window.getComputedStyle(media).display);
-});
-</script>
+    <script>
+    console.log('=== MEDIA DEBUG INFO ===');
+    
+    // Enhanced debug info
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            console.log('🔄 Checking media elements...');
+            
+            const mediaContainers = document.querySelectorAll('.post-media-container');
+            console.log(`📦 Found ${mediaContainers.length} media containers`);
+            
+            mediaContainers.forEach((container, index) => {
+                const images = container.querySelectorAll('img');
+                const videos = container.querySelectorAll('video');
+                const videoContainers = container.querySelectorAll('.video-container');
+                
+                console.log(`📦 Container ${index + 1}:`, {
+                    images: images.length,
+                    videos: videos.length,
+                    videoContainers: videoContainers.length
+                });
+                
+                images.forEach((img, imgIndex) => {
+                    console.log(`🖼️ Image ${imgIndex + 1}:`, {
+                        src: img.src,
+                        visible: img.offsetParent !== null,
+                        display: window.getComputedStyle(img).display,
+                        width: img.offsetWidth,
+                        height: img.offsetHeight
+                    });
+                });
+                
+                videos.forEach((video, vidIndex) => {
+                    console.log(`🎬 Video ${vidIndex + 1}:`, {
+                        src: video.src || video.currentSrc,
+                        visible: video.offsetParent !== null,
+                        display: window.getComputedStyle(video).display,
+                        width: video.offsetWidth,
+                        height: video.offsetHeight,
+                        readyState: video.readyState
+                    });
+                });
+            });
+            
+            // Force visibility one more time
+            if (window.cloudinaryHandler && typeof window.cloudinaryHandler.makeEverythingVisible === 'function') {
+                window.cloudinaryHandler.makeEverythingVisible();
+            }
+        }, 2000);
+    });
+    </script>
 {% endblock %}
