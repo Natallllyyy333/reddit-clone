@@ -49,27 +49,22 @@
                       alt="Post media {{ forloop.counter }}"
                       class="img-fluid rounded media-image"
                     />
+<!-- In the video section of both templates -->
 {% elif media.media_type == 'video' %}
 <div class="video-container position-relative">
-    <!-- Video element -->
     <video
         class="img-fluid rounded media-video"
         preload="metadata"
         playsinline
         webkit-playsinline
+        loop
+        muted
     >
-        <source
-            src="{{ media.media_file.url }}"
-            type="video/mp4"
-        />
+        <source src="{{ media.media_file.url }}" type="video/mp4" />
         Your browser does not support video.
     </video>
     
-    <!-- Play button -->
-    <div
-        class="video-play-button"
-        onclick="handleVideoPlay(this)"
-    >
+    <div class="video-play-button" onclick="handleVideoPlay(this)">
         <i class="fas fa-play-circle"></i>
     </div>
 </div>

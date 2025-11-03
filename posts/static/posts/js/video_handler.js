@@ -1,4 +1,3 @@
-// Video handler with start/stop on click anywhere
 console.log('🎬 Video handler loaded');
 
 function handleVideoPlay(button) {
@@ -17,12 +16,16 @@ function handleVideoPlay(button) {
     button.style.display = 'none';
     if (videoPreview) videoPreview.style.display = 'none';
     
-    // Playing the video
+    // Add controls for better mobile compatibility
+    video.setAttribute('controls', 'true');
+    
+    // Playing the video with better error handling
     video.play().catch(error => {
         console.error('❌ Error playing video:', error);
         // Show the back button on error
         button.style.display = 'flex';
         if (videoPreview) videoPreview.style.display = 'block';
+        video.removeAttribute('controls');
     });
 }
 
@@ -40,25 +43,30 @@ function toggleVideoPlayback(container) {
         if (playButton) playButton.style.display = 'none';
         if (videoPreview) videoPreview.style.display = 'none';
         
+        // Add controls for better compatibility
+        video.setAttribute('controls', 'true');
+        
         video.play().then(() => {
             container.classList.add('playing');
         }).catch(error => {
             console.error('Error playing video on click:', error);
             if (playButton) playButton.style.display = 'flex';
             if (videoPreview) videoPreview.style.display = 'block';
+            video.removeAttribute('controls');
         });
     } else {
         // Pause the video and show the preview
         video.pause();
         video.currentTime = 0; // Reset to the beginning
         container.classList.remove('playing');
+        video.removeAttribute('controls');
         
         if (playButton) playButton.style.display = 'flex';
         if (videoPreview) videoPreview.style.display = 'block';
     }
 }
 
-// Function to create a poster from the first frame of a video
+// SIMPLIFIED: Function to create a poster from the first frame of a video
 function createVideoPoster(video) {
     const container = video.closest('.video-container');
     
@@ -71,47 +79,15 @@ function createVideoPoster(video) {
         container.appendChild(videoPreview);
     }
     
-    // Trying to set a poster from the first frame
-    video.addEventListener('loadeddata', function() {
-        try {
-            // Creating a canvas to extract a frame
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set the current time to the first frame
-            video.currentTime = 0.1;
-            
-            const onSeeked = function() {
-                try {
-                    canvas.width = video.videoWidth || 400;
-                    canvas.height = video.videoHeight || 300;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    
-                    const posterUrl = canvas.toDataURL();
-                    videoPreview.src = posterUrl;
-                    console.log('✅ Video poster generated from first frame');
-                    
-                    // Remove the handler after use
-                    video.removeEventListener('seeked', onSeeked);
-                } catch (error) {
-                    console.error('❌ Error generating poster from frame:', error);
-                    setFallbackPoster(videoPreview);
-                }
-            };
-            
-            video.addEventListener('seeked', onSeeked);
-        } catch (error) {
-            console.error('❌ Error in poster generation:', error);
-            setFallbackPoster(videoPreview);
-        }
-    });
+    // Use a simple approach - don't try to capture first frame due to CORS/Cloudinary issues
+    setFallbackPoster(videoPreview);
     
-    // We set up a fallback if the main method doesn't work
+    // Set a timeout to ensure preview is visible even if video loads slowly
     setTimeout(() => {
         if (!videoPreview.src || videoPreview.src === '') {
             setFallbackPoster(videoPreview);
         }
-    }, 3000);
+    }, 1000);
 }
 
 // Fallback methods for the poster
@@ -148,11 +124,13 @@ function handleVideoEnd(video) {
     const videoPreview = container.querySelector('.video-preview');
     
     container.classList.remove('playing');
+    video.removeAttribute('controls');
+    
     if (playButton) playButton.style.display = 'flex';
     if (videoPreview) videoPreview.style.display = 'block';
 }
 
-// Initialization of handlers
+// IMPROVED: Initialization of handlers with better error handling
 function initVideoHandlers() {
     console.log('🔄 Initializing video handlers...');
     
@@ -175,7 +153,21 @@ function initVideoHandlers() {
             // We guarantee that the video is visible
             video.style.display = 'block';
             
-            // Generating a poster
+            // Make sure video has proper attributes for Cloudinary
+            if (!video.hasAttribute('playsinline')) {
+                video.setAttribute('playsinline', '');
+            }
+            if (!video.hasAttribute('webkit-playsinline')) {
+                video.setAttribute('webkit-playsinline', '');
+            }
+            if (!video.hasAttribute('muted')) {
+                video.setAttribute('muted', '');
+            }
+            if (!video.hasAttribute('preload')) {
+                video.setAttribute('preload', 'metadata');
+            }
+            
+            // Generating a poster - simplified for Heroku/Cloudinary
             createVideoPoster(video);
             
             // CLICK HANDLER ON CONTAINER - main handler
@@ -205,23 +197,50 @@ function initVideoHandlers() {
                 handleVideoEnd(this);
             });
             
-            //Load error handling
+            // Load error handling - less aggressive
             video.addEventListener('error', function() {
                 console.error('❌ Video loading error:', this.error);
                 const playButton = this.closest('.video-container').querySelector('.video-play-button');
                 const videoPreview = this.closest('.video-container').querySelector('.video-preview');
                 if (playButton) playButton.style.display = 'flex';
                 if (videoPreview) videoPreview.style.display = 'block';
+                
+                // Don't hide the container - let it be visible even if video fails
+                console.log('⚠️ Video error but keeping container visible');
+            });
+            
+            // Loaded event for better debugging
+            video.addEventListener('loadeddata', function() {
+                console.log('✅ Video data loaded:', this.src);
+            });
+            
+            // Can play through event
+            video.addEventListener('canplaythrough', function() {
+                console.log('✅ Video can play through:', this.src);
             });
         }
     });
 }
 
+// IMPROVED: Initialization with retry for Heroku cold starts
+function initializeWithRetry() {
+    try {
+        initVideoHandlers();
+        console.log('✅ Video handlers initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing video handlers, retrying...', error);
+        setTimeout(initVideoHandlers, 1000);
+    }
+}
+
 // Initialization
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initVideoHandlers);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delay initialization to account for Heroku latency
+        setTimeout(initializeWithRetry, 500);
+    });
 } else {
-    initVideoHandlers();
+    setTimeout(initializeWithRetry, 500);
 }
 
 // For dynamic content
@@ -239,7 +258,7 @@ if (typeof MutationObserver !== 'undefined') {
         });
         if (shouldReinit) {
             console.log('🔄 New video content detected, reinitializing...');
-            setTimeout(initVideoHandlers, 100);
+            setTimeout(initVideoHandlers, 500);
         }
     });
 
@@ -252,3 +271,12 @@ if (typeof MutationObserver !== 'undefined') {
 // Global functions
 window.handleVideoPlay = handleVideoPlay;
 window.toggleVideoPlayback = toggleVideoPlayback;
+
+// Export for module systems if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        handleVideoPlay,
+        toggleVideoPlayback,
+        initVideoHandlers
+    };
+}
