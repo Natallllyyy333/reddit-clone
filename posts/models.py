@@ -4,6 +4,15 @@ from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
 from cloudinary_storage.storage import MediaCloudinaryStorage
+import os
+
+class AutoResourceCloudinaryStorage(MediaCloudinaryStorage):
+    """Auto-detects resource type for Cloudinary uploads"""
+    def get_resource_type(self, name):
+        ext = os.path.splitext(name)[1].lower()
+        if ext in ['.mp4', '.mov', '.avi']:
+            return 'video'
+        return 'image'
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -61,8 +70,6 @@ class Post(models.Model):
         """Checks if there are multiple media files"""
         return self.media_files.count() > 1
     
-
-
     def __str__(self):
         return self.title
     
@@ -110,7 +117,7 @@ class PostMedia(models.Model):
         validators=[FileExtensionValidator(
             allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi']
         )],
-        storage=MediaCloudinaryStorage() 
+        storage=AutoResourceCloudinaryStorage()  # Use the new auto-detection storage
     )
     media_type = models.CharField(
         max_length=10,
@@ -134,14 +141,13 @@ class PostMedia(models.Model):
     
     @property
     def media_url(self):
-        """Возвращает правильный URL для медиафайла"""
+        """Returns correct URL for media file"""
         if hasattr(self.media_file, 'url'):
             return self.media_file.url
         return None
     
-    
     def get_cloudinary_url(self):
-        """Generate correct HTTPS URL for Cloudinary"""
+        """Returns correct HTTPS URL for Cloudinary"""
         try:
             if self.media_file and hasattr(self.media_file, 'url'):
                 url = self.media_file.url
@@ -150,16 +156,19 @@ class PostMedia(models.Model):
                 if 'res.cloudinary.com' in url and url.startswith('http://'):
                     url = url.replace('http://', 'https://')
                 
-                # For production with Cloudinary - FIXED VIDEO HANDLING
+                # For production with Cloudinary
                 if not settings.DEBUG or 'res.cloudinary.com' in url:
                     try:
                         import cloudinary
                         from cloudinary import CloudinaryResource
                         
-                        # If it's already a CloudinaryResource
+                        # If it's already a CloudinaryResource, use its URL
                         if isinstance(self.media_file, CloudinaryResource):
                             actual_url = self.media_file.url
                             if actual_url:
+                                # Ensure HTTPS
+                                if actual_url.startswith('http://'):
+                                    actual_url = actual_url.replace('http://', 'https://')
                                 return actual_url
                         
                         # Configure Cloudinary
@@ -169,25 +178,30 @@ class PostMedia(models.Model):
                             api_secret=settings.CLOUDINARY_STORAGE['API_SECRET']
                         )
                         
-                        # Get public_id
+                        # Get public_id - CRITICAL FIX for video files
                         if hasattr(self.media_file, 'public_id'):
                             public_id = self.media_file.public_id
                         else:
-                            # Extract public_id from filename
-                            public_id = self.media_file.name.split('.')[0]  # Remove extension
+                            # Extract public_id from filename - preserve full path for videos
+                            public_id = self.media_file.name
+                            # Remove file extension for public_id
+                            if '.' in public_id:
+                                public_id = public_id.rsplit('.', 1)[0]
                         
-                        # CRITICAL FIX: Use proper resource type for videos
+                        # Use proper resource type based on media_type
                         if self.media_type == 'video':
-                            # Use CloudinaryVideo for video files
+                            # Use CloudinaryVideo for video files with explicit resource_type
                             from cloudinary import CloudinaryVideo
                             cloudinary_url = CloudinaryVideo(public_id).build_url(
                                 resource_type='video',
-                                secure=True
+                                secure=True,
+                                type='upload'  # Explicitly set type to upload
                             )
                         else:
                             # Use CloudinaryImage for images
                             cloudinary_url = cloudinary.CloudinaryImage(public_id).build_url(
-                                secure=True
+                                secure=True,
+                                type='upload'  # Explicitly set type to upload
                             )
                         
                         print(f"🔗 Generated Cloudinary URL for {self.media_type}: {cloudinary_url}")

@@ -135,17 +135,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''), 
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
     'SECURE': True,
-    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'my-manifest-directory'),
-     'resource_type': 'auto', 
-    'type': 'upload',
-    'chunk_size': 6000000,
-    'eager': [
-        {'width': 300, 'height': 300, 'crop': 'pad', 'audio_codec': 'none'},
-        {'width': 160, 'height': 100, 'crop': 'crop', 'gravity': 'south', 'audio_codec': 'none'} ],
-    'INVALID_VIDEO_ERROR_MESSAGE': 'This file is not a valid video',
+    'RESOURCE_TYPE': 'auto',  # ADD THIS LINE
+    'TYPE': 'upload',
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # ВСЕГДА используем Cloudinary в production, даже если DEBUG=True
