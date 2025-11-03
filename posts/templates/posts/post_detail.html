@@ -66,66 +66,59 @@
             <p>{{ post.content|linebreaksbr }}</p>
           </div>
 
-          {% if post.media_files.exists %}
-          <!-- DEBUG: {{ post.media_files.count }} media files for post {{ post.pk }} -->
-          <div class="post-media-container mb-4 position-relative">
-            <div class="media-carousel detail-view position-relative">
-              <div class="media-scroll-wrapper">
-                <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
-                  {% for media in post.media_files.all %}
-                  <!-- DEBUG: Media {{ forloop.counter }} - {{ media.media_type }} - {{ media.get_cloudinary_url }} -->
-                  <div class="media-item">
-                    {% if media.media_type == 'image' %}
-                    <img
-                      src="{{ media.get_cloudinary_url }}"
-                      alt="Post media {{ forloop.counter }}"
-                      class="img-fluid rounded media-image"
-                      style="display: block !important; visibility: visible !important;"
-                    />
-                    {% elif media.media_type == 'video' %}
-                    <div class="video-container position-relative bg-dark rounded" style="min-height: 400px; display: block !important;">
-                        <video
-                            class="w-100 h-100"
-                            controls
-                            preload="metadata"
-                            style="max-height: 500px; object-fit: contain; display: block !important;"
-                        >
-                            <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+
+
+
+<!-- В секции медиа замените на: -->
+{% if post.media_files.exists %}
+<div class="post-media-container mb-3">
+    <div class="media-carousel">
+        <div class="media-scroll-wrapper">
+            <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                {% for media in post.media_files.all %}
+                {% with media_url=media.get_cloudinary_url %}
+                    {% if media_url %}
+                    <div class="media-item">
+                        {% if media.media_type == 'image' %}
+                        <img src="{{ media_url }}" 
+                             alt="Post image" 
+                             class="img-fluid rounded"
+                             onerror="this.style.display='none'">
+                        {% elif media.media_type == 'video' %}
+                        <div class="video-container bg-dark rounded" style="min-height: 300px;">
+                            <video controls class="w-100 h-100" style="max-height: 500px; object-fit: contain;"
+                                   onerror="this.style.display='none'">
+                                <source src="{{ media_url }}" type="video/mp4">
+                                Your browser doesn't support HTML5 video.
+                            </video>
+                        </div>
+                        {% endif %}
                     </div>
                     {% endif %}
-                  </div>
-                  {% endfor %}
-                </div>
-              </div>
-
-              <!-- Carousel navigation buttons -->
-              {% if post.media_files.count > 1 %}
-              <button
-                class="carousel-btn prev"
-                onclick="scrollMedia('{{ post.pk }}', -1)"
-              >
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if post.media_files.count > 1 %}
+        <div class="carousel-controls">
+            <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
                 <i class="fas fa-chevron-left"></i>
-              </button>
-              <button
-                class="carousel-btn next"
-                onclick="scrollMedia('{{ post.pk }}', 1)"
-              >
+            </button>
+            <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
                 <i class="fas fa-chevron-right"></i>
-              </button>
-              {% endif %}
-            </div>
-
-            {% if post.media_files.count > 1 %}
-            <div class="media-counter">
-              <span class="current">1</span>/<span class="total"
-                >{{ post.media_files.count }}</span
-              >
-            </div>
-            {% endif %}
-          </div>
-          {% endif %}
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if post.media_files.count > 1 %}
+    <div class="media-counter">
+        <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
 
           <!-- Post statistics -->
           <div class="card-footer d-flex justify-content-start align-items-center">
