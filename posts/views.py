@@ -120,9 +120,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
             messages.error(self.request, "Error updating post")
             return self.form_invalid(form)
 
-        def get_success_url(self):
-            """URL для перенаправления после успешного обновления"""
-            return reverse('posts:post_detail', kwargs={'pk': self.object.pk})  
+         
         
     def form_invalid(self, form):
         messages.error(self.request, 'Error creating post. Please check the form.')
