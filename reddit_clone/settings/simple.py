@@ -170,7 +170,7 @@ CLOUDINARY_STORAGE = {
 
 # FORCE CLOUDINARY IN PRODUCTION
 if not DEBUG:
-    # In production, always use Cloudinary
+    # In production, ALWAYS use Cloudinary to avoid media loss
     cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
     api_key = os.environ.get('CLOUDINARY_API_KEY')
     api_secret = os.environ.get('CLOUDINARY_API_SECRET')
@@ -178,19 +178,16 @@ if not DEBUG:
     if cloud_name and api_key and api_secret:
         DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
         print("✅ Production: Cloudinary storage configured successfully")
+        
+        # Also force Cloudinary for existing media references
+        CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
     else:
-        print("❌ WARNING: Cloudinary credentials missing in production!")
-        # Fallback to local storage (won't work on Heroku)
+        print("❌ CRITICAL: Cloudinary credentials missing in production!")
+        print("   User-uploaded media will be lost between deployments!")
+        
 else:
-    # Development: use Cloudinary if available
-    if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
-        os.environ.get('CLOUDINARY_API_KEY') and 
-        os.environ.get('CLOUDINARY_API_SECRET')):
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        print("✅ Development: Cloudinary storage configured")
-    else:
-        print("⚠️  Development: Using local media storage")
-
+    # Development: use local storage for testing
+    print("⚠️  Development: Using local media storage for testing")
 # Internationalization
 LANGUAGES = [
     ('en', 'English'),
