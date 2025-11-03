@@ -264,7 +264,7 @@ class CreatePostForm {
             // Disable submit button to prevent double submission
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Публикация...';
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Posting...';
             }
         });
     }
