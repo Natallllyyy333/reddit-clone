@@ -14,6 +14,8 @@ from comments.models import Comment
 import traceback
 from django.http import HttpResponseServerError
 from django.shortcuts import redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+
 
 
 
@@ -77,35 +79,50 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('post_list')
     
     def form_valid(self, form):
-            try:
-                print(f"🔄 Starting post update for post {self.object.id}")
-                
-                # Сохраняем пост
-                self.object = form.save(commit=False)
-                self.object.save()
-                
-                # Обработка новых медиафайлов
-                media_files = self.request.FILES.getlist('media_files')
-                print(f"🔄 Processing {len(media_files)} new media files")
-                
-                for media_file in media_files:
-                    print(f"🔄 Adding new media: {media_file.name} ({media_file.size} bytes)")
-                    try:
-                        from .models import PostMedia
-                        post_media = PostMedia(post=self.object, media_file=media_file)
-                        post_media.save()
-                        print(f"✅ Successfully added media: {post_media.media_file.url}")
-                    except Exception as e:
-                        print(f"❌ Failed to add media {media_file.name}: {str(e)}")
-                        print(f"❌ Traceback: {traceback.format_exc()}")
-                
-                return super().form_valid(form)
-                
-            except Exception as e:
-                print(f"❌ CRITICAL ERROR in PostUpdateView: {str(e)}")
-                print(f"❌ Full traceback: {traceback.format_exc()}")
-                # Возвращаем подробную ошибку для диагностики
-                return HttpResponseServerError(f"Server Error: {str(e)}\n\n{traceback.format_exc()}")   
+        try:
+            print(f"🔄 Starting post update for post {self.object.id}")
+            
+            # Сохраняем форму - это автоматически обновит self.object
+            self.object = form.save(commit=False)
+            
+            # Убедимся, что автор не меняется
+            self.object.author = self.request.user
+            
+            # Сохраняем пост
+            self.object.save()
+            
+            # Если есть поля many-to-many, сохраняем их
+            form.save_m2m()
+            
+            # Обработка новых медиафайлов
+            media_files = self.request.FILES.getlist('media_files')
+            print(f"🔄 Processing {len(media_files)} new media files")
+            
+            for media_file in media_files:
+                print(f"🔄 Adding new media: {media_file.name} ({media_file.size} bytes)")
+                try:
+                    from .models import PostMedia
+                    post_media = PostMedia(post=self.object, media_file=media_file)
+                    post_media.save()
+                    print(f"✅ Successfully added media: {post_media.media_file.url}")
+                except Exception as e:
+                    print(f"❌ Failed to add media {media_file.name}: {str(e)}")
+                    import traceback
+                    print(f"❌ Traceback: {traceback.format_exc()}")
+            
+            messages.success(self.request, "Post updated successfully!")
+            return HttpResponseRedirect(self.get_success_url())
+            
+        except Exception as e:
+            print(f"❌ CRITICAL ERROR in PostUpdateView: {str(e)}")
+            import traceback
+            print(f"❌ Traceback: {traceback.format_exc()}")
+            messages.error(self.request, "Error updating post")
+            return self.form_invalid(form)
+
+        def get_success_url(self):
+            """URL для перенаправления после успешного обновления"""
+            return reverse('posts:post_detail', kwargs={'pk': self.object.pk})  
         
     def form_invalid(self, form):
         messages.error(self.request, 'Error creating post. Please check the form.')
