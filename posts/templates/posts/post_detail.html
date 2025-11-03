@@ -45,7 +45,7 @@
                   <div class="media-item">
                     {% if media.media_type == 'image' %}
                     <img
-                      src="{{ media.media_file.url }}"
+                      src="{{ media.get_cloudinary_url }}"
                       alt="Post media {{ forloop.counter }}"
                       class="img-fluid rounded media-image"
                     />
@@ -60,7 +60,7 @@
         loop
         muted
     >
-        <source src="{{ media.media_file.url }}" type="video/mp4" />
+        <source src="{{media.get_cloudinary_url}}" type="video/mp4" />
         Your browser does not support video.
     </video>
     
@@ -264,10 +264,10 @@
 </div>
 {% include 'posts/includes/share_modal.html' %} {% endblock %} 
 {% block extra_js %}
-<!-- <script src="{% static 'posts/js/media_carousel.js' %}"></script> -->
+
 <script src="{% static 'posts/js/media_carousel.js' %}"></script>
 <script src="{% static 'posts/js/video_handler.js' %}"></script>
-<script src="{% static 'js/cloudinary_media_handler.js' %}"></script>
+
 <script src="{% static 'js/cloudinary_media_handler.js' %}"></script> 
 <script src="{% static 'js/share.js' %}"></script>
 

@@ -138,21 +138,33 @@ class PostMedia(models.Model):
         return None
     
     def get_cloudinary_url(self):
-        
+        """Generates a right URL for Cloudinary"""
         try:
-            # Если используется Cloudinary storage
-            if hasattr(self.media_file, 'url'):
+            # If a file and URL exist
+            if self.media_file and hasattr(self.media_file, 'url'):
                 url = self.media_file.url
-                # Если это Cloudinary URL, он будет содержать cloudinary.com
-                if 'cloudinary.com' in url:
+                
+                # If Cloudinary URL
+                if 'res.cloudinary.com' in url:
                     return url
-                # Иначе это локальный путь - преобразуем для production
-                elif not settings.DEBUG and url.startswith('/media/'):
-                    # В production используем Cloudinary даже для старых файлов
-                    from cloudinary import CloudinaryImage
-                    cloudinary_url = CloudinaryImage(self.media_file.name).build_url()
-                    return cloudinary_url
-            return self.media_file.url
+                
+                # If local address,  production with Cloudinary
+                if not settings.DEBUG and hasattr(settings, 'DEFAULT_FILE_STORAGE'):
+                    if 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
+                        try:
+                            from cloudinary import CloudinaryImage
+                            # Getting public_id from local file path
+                            public_id = f"media/{self.media_file.name}"
+                            cloudinary_url = CloudinaryImage(public_id).build_url()
+                            print(f"🔄 Converted {url} to {cloudinary_url}")
+                            return cloudinary_url
+                        except Exception as e:
+                            print(f"❌ Cloudinary conversion error: {e}")
+                
+                # Getting original URL
+                return url
+            
+            return ""
         except Exception as e:
-            print(f"Error generating Cloudinary URL: {e}")
-            return self.media_file.url if hasattr(self.media_file, 'url') else ''
+            print(f"❌ Error generating Cloudinary URL: {e}")
+            return ""

@@ -3,7 +3,7 @@
 {% block title %}Posts - Reddit Clone{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'posts/css/post_list.css' %}">
-    <link rel="stylesheet" href="{% static 'posts/css/style.css' %}">
+ 
     <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
     <link rel="stylesheet" href="{% static 'posts/css/media_carousel.css' %}">
 {% endblock %}
@@ -66,7 +66,7 @@
                 {% for media in post.media_files.all %}
                 <div class="media-item">
                     {% if media.media_type == 'image' %}
-                    <img src="{{ media.get_cloudinary_url|default:media.media_file.url }}" 
+                    <img src="{{ media.get_cloudinary_url }}" 
                          alt="Post media {{ forloop.counter }}" 
                          class="img-fluid rounded media-image">
 <!-- In the video section of both templates -->
@@ -80,7 +80,7 @@
         loop
         muted
     >
-        <source src="{{ media.get_cloudinary_url|default:media.media_file.url }}" type="video/mp4" />
+        <source src="{{ media.get_cloudinary_url }}" type="video/mp4" />
         Your browser does not support video.
     </video>
     
