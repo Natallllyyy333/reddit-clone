@@ -128,8 +128,34 @@ class PostMedia(models.Model):
         return None
     
     def get_cloudinary_url(self):
-        """Простой метод для получения URL"""
-        url = self.media_url
-        if url and 'res.cloudinary.com' in url and url.startswith('http://'):
-            return url.replace('http://', 'https://')
-        return url
+        """Returns correct URL for media file"""
+        try:
+            # Check if media_file exists and has url attribute
+            if not self.media_file:
+                print(f"❌ No media file for {self}")
+                return ""
+                
+            if not hasattr(self.media_file, 'url'):
+                print(f"❌ Media file has no url attribute: {self.media_file}")
+                return ""
+                
+            # Get the URL from media_file
+            url = self.media_file.url
+            
+            # If URL is None, return empty string
+            if url is None:
+                print(f"❌ Media file URL is None for {self}")
+                return ""
+                
+            print(f"🔗 Media URL for {self.media_type}: {url}")
+            
+            # Ensure HTTPS for Cloudinary URLs
+            if 'res.cloudinary.com' in url and url.startswith('http://'):
+                url = url.replace('http://', 'https://')
+                print(f"🔗 Converted to HTTPS: {url}")
+                
+            return url
+            
+        except Exception as e:
+            print(f"❌ Error in get_cloudinary_url: {e}")
+            return ""
