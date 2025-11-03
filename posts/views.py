@@ -11,9 +11,6 @@ from .models import Post, PostMedia, Share
 from .forms import PostForm, CommentForm
 from django.conf import settings
 from comments.models import Comment
-import traceback
-from django.http import HttpResponseServerError
-from django.shortcuts import redirect, get_object_or_404
 
 
 
@@ -77,36 +74,38 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('post_list')
     
     def form_valid(self, form):
-            try:
-                print(f"🔄 Starting post update for post {self.object.id}")
-                
-                # Сохраняем пост
-                self.object = form.save(commit=False)
-                self.object.save()
-                
-                # Обработка новых медиафайлов
-                media_files = self.request.FILES.getlist('media_files')
-                print(f"🔄 Processing {len(media_files)} new media files")
-                
-                for media_file in media_files:
-                    print(f"🔄 Adding new media: {media_file.name} ({media_file.size} bytes)")
-                    try:
-                        from .models import PostMedia
-                        post_media = PostMedia(post=self.object, media_file=media_file)
-                        post_media.save()
-                        print(f"✅ Successfully added media: {post_media.media_file.url}")
-                    except Exception as e:
-                        print(f"❌ Failed to add media {media_file.name}: {str(e)}")
-                        print(f"❌ Traceback: {traceback.format_exc()}")
-                
-                return super().form_valid(form)
-                
-            except Exception as e:
-                print(f"❌ CRITICAL ERROR in PostUpdateView: {str(e)}")
-                print(f"❌ Full traceback: {traceback.format_exc()}")
-                # Возвращаем подробную ошибку для диагностики
-                return HttpResponseServerError(f"Server Error: {str(e)}\n\n{traceback.format_exc()}")   
+        form.instance.author = self.request.user
+        post = form.save(commit=False)
+        post.media_file = None
+        post.media_type = 'none'
+        post.save()
         
+        media_files = self.request.FILES.getlist('media_files')
+        print(f"🔄 Processing {len(media_files)} media files")
+
+        for i, media_file in enumerate(media_files):
+            if media_file:
+                print(f"🔄 Creating PostMedia {i+1} for: {media_file.name}")
+                print(f"   File size: {media_file.size}")
+                print(f"   Content type: {media_file.content_type}")
+                
+                try:
+                    # Создаем PostMedia с обработкой исключений
+                    post_media = PostMedia.objects.create(post=post, media_file=media_file)
+                    print(f"✅ PostMedia created successfully!")
+                    print(f"   Saved as: {post_media.media_file.name}")
+                    print(f"   URL: {post_media.media_file.url}")
+                    print(f"   Cloudinary URL: {post_media.get_cloudinary_url()}")
+                except Exception as e:
+                    print(f"❌ ERROR creating PostMedia: {str(e)}")
+                    import traceback
+                    print(f"❌ TRACEBACK: {traceback.format_exc()}")
+                    # Продолжаем обработку остальных файлов
+                    continue
+        
+        messages.success(self.request, 'Post created successfully!')
+        return redirect(self.success_url)   
+     
     def form_invalid(self, form):
         messages.error(self.request, 'Error creating post. Please check the form.')
         return super().form_invalid(form)
