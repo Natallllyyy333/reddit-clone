@@ -29,7 +29,7 @@ else:
         )
 
 # ALLOWED_HOSTS - include your Heroku app domain
-DEFAULT_HOSTS = ['localhost', '127.0.0.1', 'reddit-clone-d86456f48b72.herokuapp.com']
+DEFAULT_HOSTS = ['localhost', '127.0.0.1', 'reddit-clone-d86456f48b72.herokuapp.com', '.herokuapp.com']
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ','.join(DEFAULT_HOSTS)).split(',')
 
 # Security settings
@@ -111,11 +111,13 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files configuration
+# Static files configuration - FIXED
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise configuration - SIMPLIFIED
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -134,15 +136,19 @@ LOGGING = {
             'filename': BASE_DIR / 'django_errors.log',
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
-            'level': 'ERROR',
+            'level': 'INFO',
             'propagate': True,
+        },
+        'whitenoise': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
     },
 }
@@ -159,31 +165,14 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
 }
 
-# FORCE CLOUDINARY IN PRODUCTION EVEN IF CREDENTIALS ARE MISSING (for debugging)
-if not DEBUG:
-    # In production, always use Cloudinary if credentials exist
-    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
-    api_key = os.environ.get('CLOUDINARY_API_KEY')
-    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
-    
-    if cloud_name and api_key and api_secret:
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        print("✅ Production: Cloudinary storage configured successfully")
-    else:
-        # Fallback to local storage but warn
-        print("❌ WARNING: Cloudinary credentials missing in production!")
-        print("   This will cause media files to not persist between deployments")
-        # You might want to force Cloudinary anyway for testing:
-        # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Use Cloudinary only if credentials are provided
+if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
+    os.environ.get('CLOUDINARY_API_KEY') and 
+    os.environ.get('CLOUDINARY_API_SECRET')):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    print("✅ Cloudinary storage configured successfully")
 else:
-    # Development: use Cloudinary if available, otherwise local
-    if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
-        os.environ.get('CLOUDINARY_API_KEY') and 
-        os.environ.get('CLOUDINARY_API_SECRET')):
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        print("✅ Development: Cloudinary storage configured")
-    else:
-        print("⚠️  Development: Using local media storage")
+    print("⚠️  Cloudinary credentials not found. Using local media storage.")
 
 # Heroku production settings
 if not DEBUG:
