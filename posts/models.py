@@ -6,6 +6,14 @@ from django.conf import settings
 from cloudinary_storage.storage import MediaCloudinaryStorage
 import os
 
+class SmartCloudinaryStorage(MediaCloudinaryStorage):
+    """Smart storage that auto-detects file type"""
+    def get_resource_type(self, name):
+        ext = os.path.splitext(name)[1].lower()
+        if ext in ['.mp4', '.mov', '.avi', '.webm']:
+            return 'video'
+        return 'image'
+    
 # ПРОСТОЙ storage - используем встроенный
 class VideoCloudinaryStorage(MediaCloudinaryStorage):
     """Storage specifically for videos"""
@@ -82,20 +90,15 @@ class Share(models.Model):
 class PostMedia(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='media_files')
     
-    # Separate fields for images and videos
-    image_file = models.ImageField(
-        upload_to='post_media/images/%Y/%m/%d/',
-        blank=True,
-        null=True,
-        storage=MediaCloudinaryStorage()
-    )
-    
-    video_file = models.FileField(
-        upload_to='post_media/videos/%Y/%m/%d/',
-        blank=True,
-        null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi'])],
-        storage=VideoCloudinaryStorage()
+    # ЕДИНОЕ поле для всех медиа файлов
+    media_file = models.FileField(
+        upload_to='post_media/%Y/%m/%d/',
+        validators=[FileExtensionValidator(
+            allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi']
+        )],
+        storage=SmartCloudinaryStorage(),
+        null=True,  
+        blank=True
     )
     
     media_type = models.CharField(
@@ -106,60 +109,38 @@ class PostMedia(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        # Automatically set media_type based on which field is used
-        if self.video_file:
-            self.media_type = 'video'
-        elif self.image_file:
-            self.media_type = 'image'
-        else:
-            self.media_type = 'none'
+        # Автоматически определяем тип медиа при сохранении
+        if self.media_file:
+            file_extension = self.media_file.name.lower().split('.')[-1]
+            if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+                self.media_type = 'image'
+            elif file_extension in ['mp4', 'mov', 'avi']:
+                self.media_type = 'video'
+            else:
+                self.media_type = 'none'
         
         super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Media for {self.post.title}"
     
-    @property
-    def media_url(self):
-        """Возвращает URL в зависимости от типа медиа"""
-        if self.media_type == 'video' and self.video_file:
-            return self.video_file.url
-        elif self.media_type == 'image' and self.image_file:
-            return self.image_file.url
-        return None
-    
     def get_cloudinary_url(self):
         """Returns correct URL for media file"""
         try:
-            # Determine which file field to use based on media_type
-            file_field = None
-            if self.media_type == 'image' and self.image_file:
-                file_field = self.image_file
-            elif self.media_type == 'video' and self.video_file:
-                file_field = self.video_file
-            
-            if not file_field:
-                print(f"❌ No file found for {self.media_type} media {self.id}")
+            if not self.media_file:
                 return ""
                 
-            if not hasattr(file_field, 'url'):
-                print(f"❌ File has no url attribute: {file_field}")
+            if not hasattr(self.media_file, 'url'):
                 return ""
                 
-            # Get the URL from file field
-            url = file_field.url
+            url = self.media_file.url
             
-            # If URL is None, return empty string
             if url is None:
-                print(f"❌ File URL is None for {self}")
                 return ""
-                
-            print(f"🔗 {self.media_type.capitalize()} URL: {url}")
             
             # Ensure HTTPS for Cloudinary URLs
             if 'res.cloudinary.com' in url and url.startswith('http://'):
                 url = url.replace('http://', 'https://')
-                print(f"🔗 Converted to HTTPS: {url}")
                 
             return url
             

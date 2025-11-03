@@ -82,24 +82,15 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
         for media_file in media_files:
             if media_file:
-                file_extension = media_file.name.lower().split('.')[-1]
-                print(f"🔄 Creating PostMedia for: {media_file.name} (type: {file_extension})")
+                print(f"🔄 Creating PostMedia for: {media_file.name}")
                 
                 try:
-                    if file_extension in ['mp4', 'mov', 'avi']:
-                        # Create video media
-                        post_media = PostMedia.objects.create(
-                            post=post, 
-                            video_file=media_file
-                        )
-                        print(f"✅ Video created: {post_media.get_cloudinary_url()}")
-                    else:
-                        # Create image media
-                        post_media = PostMedia.objects.create(
-                            post=post, 
-                            image_file=media_file
-                        )
-                        print(f"✅ Image created: {post_media.get_cloudinary_url()}")
+                    # Просто создаем PostMedia с media_file
+                    post_media = PostMedia.objects.create(
+                        post=post, 
+                        media_file=media_file
+                    )
+                    print(f"✅ Media created: {post_media.media_type} - {post_media.get_cloudinary_url()}")
                         
                 except Exception as e:
                     print(f"❌ ERROR creating media: {str(e)}")
