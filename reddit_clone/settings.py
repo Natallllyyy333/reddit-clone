@@ -141,6 +141,10 @@ CLOUDINARY_STORAGE = {
     'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'my-manifest-directory'),
      'resource_type': 'auto', 
     'type': 'upload',
+    'chunk_size': 6000000,
+    'eager': [
+        {'width': 300, 'height': 300, 'crop': 'pad', 'audio_codec': 'none'},
+        {'width': 160, 'height': 100, 'crop': 'crop', 'gravity': 'south', 'audio_codec': 'none'} ],
     'INVALID_VIDEO_ERROR_MESSAGE': 'This file is not a valid video',
 }
 
