@@ -154,8 +154,6 @@
         console.log(`✅ Made ${mediaElements.length} media elements visible`);
     });
     </script>
-    
-    {% block extra_js %}{% endblock %}
     <script>
 // Enhanced media handler for user-uploaded content
 function handleVideoPlay(button) {
@@ -223,5 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+    {% block extra_js %}{% endblock %}
+    
 </body>
 </html>
