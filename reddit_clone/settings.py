@@ -138,7 +138,7 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''), 
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
     'SECURE': True,
-    'SECURE_HTTP': True,
+    
 }
 
 # FORCE CLOUDINARY IN PRODUCTION
@@ -149,8 +149,9 @@ if not DEBUG:
     
     if cloud_name and api_key and api_secret:
         DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        print("✅ Production: Cloudinary storage configured successfully")
+        # Добавьте эту строку для принудительной перезаписи
         CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
+        print("✅ Production: Cloudinary storage configured successfully")
     else:
         print("❌ CRITICAL: Cloudinary credentials missing in production!")
 
