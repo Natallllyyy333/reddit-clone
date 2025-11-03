@@ -100,7 +100,7 @@
                         {% elif media.media_type == 'video' %}
                         <div class="video-container bg-dark rounded" style="min-height: 300px;">
                             <video width="100%" controls>
-    <source src="{{ media_url }}" type="video/mp4">
+    <source src="{{ post.media_file.url }}" type="video/mp4">
     Ваш браузер не поддерживает видео тег.
 </video>
                         </div>
