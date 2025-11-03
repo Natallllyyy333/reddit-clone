@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -106,18 +107,29 @@ DATABASES = {
     }
 }
 
+# Heroku database configuration
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    print("✅ Production: Using PostgreSQL database")
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files configuration - FIXED
+# Static files configuration
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise configuration - SIMPLIFIED
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+# WhiteNoise configuration
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise settings for better performance
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -130,25 +142,16 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django_errors.log',
-        },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
-        },
-        'whitenoise': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
         },
     },
 }
@@ -165,34 +168,28 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
 }
 
-# Use Cloudinary only if credentials are provided
-if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
-    os.environ.get('CLOUDINARY_API_KEY') and 
-    os.environ.get('CLOUDINARY_API_SECRET')):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    print("✅ Cloudinary storage configured successfully")
-else:
-    print("⚠️  Cloudinary credentials not found. Using local media storage.")
-
-# Heroku production settings
+# FORCE CLOUDINARY IN PRODUCTION
 if not DEBUG:
-    print("🚀 Production mode: All security settings are enabled")
+    # In production, always use Cloudinary
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+    api_key = os.environ.get('CLOUDINARY_API_KEY')
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
     
-    # Database configuration for Heroku
-    database_url = os.environ.get('DATABASE_URL')
-    if database_url:
-        try:
-            import dj_database_url
-            DATABASES = {
-                'default': dj_database_url.parse(database_url, conn_max_age=600)
-            }
-            print(f"✅ Production: Using PostgreSQL database")
-        except ImportError:
-            print("❌ ERROR: dj-database-url not installed but DATABASE_URL is set!")
-        except Exception as e:
-            print(f"❌ ERROR parsing DATABASE_URL: {e}")
+    if cloud_name and api_key and api_secret:
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        print("✅ Production: Cloudinary storage configured successfully")
     else:
-        print("❌ WARNING: DATABASE_URL not found! Using SQLite in production")
+        print("❌ WARNING: Cloudinary credentials missing in production!")
+        # Fallback to local storage (won't work on Heroku)
+else:
+    # Development: use Cloudinary if available
+    if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
+        os.environ.get('CLOUDINARY_API_KEY') and 
+        os.environ.get('CLOUDINARY_API_SECRET')):
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        print("✅ Development: Cloudinary storage configured")
+    else:
+        print("⚠️  Development: Using local media storage")
 
 # Internationalization
 LANGUAGES = [
@@ -206,3 +203,5 @@ LOCALE_PATHS = [
 
 # Adding LocaleMiddleware to support translation
 MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')
+
+print(f"✅ Settings loaded: DEBUG={DEBUG}, ALLOWED_HOSTS={ALLOWED_HOSTS}")
