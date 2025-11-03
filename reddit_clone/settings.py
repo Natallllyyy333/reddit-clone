@@ -138,21 +138,18 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''), 
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
     'SECURE': True,
-    
+    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'my-manifest-directory'),
+    'INVALID_VIDEO_ERROR_MESSAGE': 'This file is not a valid video',
 }
 
-# FORCE CLOUDINARY IN PRODUCTION
-if not DEBUG:
-    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
-    api_key = os.environ.get('CLOUDINARY_API_KEY')
-    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
-    
-    if cloud_name and api_key and api_secret:
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        # Добавьте эту строку для принудительной перезаписи
-        CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
-        print("✅ Production: Cloudinary storage configured successfully")
-    else:
-        print("❌ CRITICAL: Cloudinary credentials missing in production!")
+# ВСЕГДА используем Cloudinary в production, даже если DEBUG=True
+cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+api_key = os.environ.get('CLOUDINARY_API_KEY')
+api_secret = os.environ.get('CLOUDINARY_API_SECRET')
 
-print(f"✅ Settings loaded: DEBUG={DEBUG}, ALLOWED_HOSTS={ALLOWED_HOSTS}")
+if cloud_name and api_key and api_secret:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
+    print("✅ Cloudinary storage configured successfully")
+else:
+    print("❌ Cloudinary credentials missing")

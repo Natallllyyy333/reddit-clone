@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -108,7 +109,8 @@ class PostMedia(models.Model):
         upload_to='post_media/%Y/%m/%d/',
         validators=[FileExtensionValidator(
             allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi']
-        )]
+        )],
+        storage=MediaCloudinaryStorage() if not settings.DEBUG else None
     )
     media_type = models.CharField(
         max_length=10,
@@ -139,7 +141,7 @@ class PostMedia(models.Model):
     
     
     def get_cloudinary_url(self):
-        """Генерирует правильный HTTPS URL для Cloudinary с учетом типа медиа"""
+        """Генерирует правильный HTTPS URL для Cloudinary"""
         try:
             # Если файл существует и есть URL
             if self.media_file and hasattr(self.media_file, 'url'):
@@ -152,33 +154,49 @@ class PostMedia(models.Model):
                         url = url.replace('http://', 'https://')
                     return url
                 
-                # Если это локальный путь, но мы в production с Cloudinary
-                if not settings.DEBUG and hasattr(settings, 'DEFAULT_FILE_STORAGE'):
-                    if 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
-                        try:
-                            from cloudinary import CloudinaryImage
-                            # public_id - это путь к файлу в Cloudinary
+                # Для production с Cloudinary
+                if not settings.DEBUG:
+                    # Получаем актуальный URL из Cloudinary
+                    try:
+                        # Импортируем Cloudinary только когда нужно
+                        import cloudinary
+                        from cloudinary import CloudinaryResource
+                        
+                        # Если это CloudinaryResource, получаем актуальный URL
+                        if isinstance(self.media_file, CloudinaryResource):
+                            actual_url = self.media_file.url
+                            if actual_url:
+                                return actual_url
+                        
+                        # Альтернативный способ - получить через Cloudinary API
+                        cloudinary.config(
+                            cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME'],
+                            api_key=settings.CLOUDINARY_STORAGE['API_KEY'],
+                            api_secret=settings.CLOUDINARY_STORAGE['API_SECRET']
+                        )
+                        
+                        # Получаем public_id из файла
+                        if hasattr(self.media_file, 'public_id'):
+                            public_id = self.media_file.public_id
+                        else:
+                            # Пытаемся извлечь public_id из имени файла
                             public_id = self.media_file.name
-                            
-                            # Определяем тип ресурса: image или video
-                            resource_type = 'image'
-                            if self.media_type == 'video':
-                                resource_type = 'video'
-                            
-                            # Генерируем URL с HTTPS и правильным resource_type
-                            cloudinary_url = CloudinaryImage(public_id).build_url(
-                                secure=True, 
-                                resource_type=resource_type
-                            )
-                            print(f"🔒 Cloudinary URL ({resource_type}): {cloudinary_url}")
-                            return cloudinary_url
-                        except Exception as e:
-                            print(f"❌ Cloudinary conversion error: {e}")
+                        
+                        # Генерируем URL
+                        resource_type = 'image' if self.media_type == 'image' else 'video'
+                        cloudinary_url = cloudinary.CloudinaryImage(public_id).build_url(
+                            resource_type=resource_type,
+                            secure=True
+                        )
+                        print(f"🔗 Generated Cloudinary URL: {cloudinary_url}")
+                        return cloudinary_url
+                        
+                    except Exception as e:
+                        print(f"❌ Cloudinary URL generation error: {e}")
                 
-                # Возвращаем оригинальный URL
                 return url
             
             return ""
         except Exception as e:
-            print(f"❌ Error generating Cloudinary URL: {e}")
+            print(f"❌ Error in get_cloudinary_url: {e}")
             return ""

@@ -63,3 +63,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function reinitializeMediaCarousels() {
+    console.log('🔄 Reinitializing media carousels...');
+    
+    document.querySelectorAll('.media-carousel').forEach(carousel => {
+        const postId = carousel.closest('.post-media-container')?.querySelector('.media-scroll')?.id.replace('mediaScroll-', '');
+        if (postId) {
+            initializeMediaCarousel(postId);
+        }
+    });
+}
+
+
+if (typeof window.reinitializeMedia === 'undefined') {
+    window.reinitializeMedia = reinitializeMediaCarousels;
+}

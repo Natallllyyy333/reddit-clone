@@ -81,9 +81,13 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         post.save()
         
         media_files = self.request.FILES.getlist('media_files')
+        print(f"🔄 Processing {len(media_files)} media files")  # Логирование
+        
         for media_file in media_files:
             if media_file:
-                PostMedia.objects.create(post=post, media_file=media_file)
+                print(f"🔄 Creating PostMedia for: {media_file.name}")  # Логирование
+                post_media = PostMedia.objects.create(post=post, media_file=media_file)
+                print(f"✅ PostMedia created. URL: {post_media.media_file.url}")  # Логирование
         
         messages.success(self.request, 'Post created successfully!')
         return redirect(self.success_url)
