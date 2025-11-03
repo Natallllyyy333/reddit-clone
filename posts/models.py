@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
-from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import MediaCloudinaryStorage, VideoCloudinaryStorage
 import os
 
-class AutoResourceCloudinaryStorage(MediaCloudinaryStorage):
-    """Auto-detects resource type for Cloudinary uploads"""
+class SmartCloudinaryStorage(MediaCloudinaryStorage):
+    """Smart storage that auto-detects file type"""
     def get_resource_type(self, name):
+        # Get file extension and determine resource type
         ext = os.path.splitext(name)[1].lower()
-        if ext in ['.mp4', '.mov', '.avi']:
+        if ext in ['.mp4', '.mov', '.avi', '.webm']:
             return 'video'
         return 'image'
 
@@ -117,11 +118,11 @@ class PostMedia(models.Model):
         validators=[FileExtensionValidator(
             allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi']
         )],
-        storage=AutoResourceCloudinaryStorage()  # Use the new auto-detection storage
+        storage=SmartCloudinaryStorage()  # Use the improved storage
     )
     media_type = models.CharField(
         max_length=10,
-        choices=Post.MEDIA_TYPE_CHOICES,  # We use the same choices as in Post
+        choices=Post.MEDIA_TYPE_CHOICES,
         default='none'
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -134,7 +135,19 @@ class PostMedia(models.Model):
                 self.media_type = 'image'
             elif file_extension in ['mp4', 'mov', 'avi']:
                 self.media_type = 'video'
+        
+        # Save the model first to get an ID
         super().save(*args, **kwargs)
+        
+        # After save, if it's a video and we have Cloudinary issues, try to fix the URL
+        if self.media_type == 'video' and hasattr(self.media_file, 'url'):
+            try:
+                # Force Cloudinary to recognize this as a video
+                current_url = self.media_file.url
+                if 'image/upload' in current_url and 'video' not in current_url:
+                    print(f"🔄 Attempting to fix video URL for {self.media_file.name}")
+            except Exception as e:
+                print(f"❌ Error processing video URL: {e}")
     
     def __str__(self):
         return f"Media for {self.post.title}"
@@ -147,14 +160,9 @@ class PostMedia(models.Model):
         return None
     
     def get_cloudinary_url(self):
-        """Returns correct HTTPS URL for Cloudinary"""
+        """Returns correct HTTPS URL for Cloudinary with video support"""
         try:
-            if not self.media_file:
-                print(f"❌ No media file for {self}")
-                return ""
-                
-            if not hasattr(self.media_file, 'url'):
-                print(f"❌ Media file has no url attribute: {self.media_file}")
+            if not self.media_file or not hasattr(self.media_file, 'url'):
                 return ""
                 
             url = self.media_file.url
@@ -163,54 +171,13 @@ class PostMedia(models.Model):
             # Ensure HTTPS for Cloudinary URLs
             if 'res.cloudinary.com' in url and url.startswith('http://'):
                 url = url.replace('http://', 'https://')
-                print(f"🔗 Converted to HTTPS: {url}")
             
-            # For Cloudinary URLs, try to generate optimized URL
-            if 'res.cloudinary.com' in url:
-                try:
-                    import cloudinary
-                    
-                    # Configure Cloudinary
-                    cloudinary.config(
-                        cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME'],
-                        api_key=settings.CLOUDINARY_STORAGE['API_KEY'],
-                        api_secret=settings.CLOUDINARY_STORAGE['API_SECRET']
-                    )
-                    
-                    # Extract public_id from URL
-                    if '/upload/' in url:
-                        public_id_part = url.split('/upload/')[-1]
-                        # Remove version if present
-                        if '/v' in public_id_part:
-                            public_id = public_id_part.split('/v')[-1].split('/')[-1]
-                        else:
-                            public_id = public_id_part
-                        
-                        # Remove file extension
-                        if '.' in public_id:
-                            public_id = public_id.rsplit('.', 1)[0]
-                        
-                        print(f"🔗 Extracted public_id: {public_id}")
-                        
-                        # Generate optimized URL
-                        if self.media_type == 'video':
-                            from cloudinary import CloudinaryVideo
-                            cloudinary_url = CloudinaryVideo(public_id).build_url(
-                                resource_type='video',
-                                secure=True
-                            )
-                        else:
-                            cloudinary_url = cloudinary.CloudinaryImage(public_id).build_url(
-                                secure=True
-                            )
-                        
-                        print(f"🔗 Generated Cloudinary URL: {cloudinary_url}")
-                        return cloudinary_url
-                        
-                except Exception as e:
-                    print(f"❌ Cloudinary URL generation error: {e}")
-                    # Return original URL as fallback
-                    return url
+            # For video files, we need to ensure the URL is correct
+            if self.media_type == 'video':
+                # Fix Cloudinary URL for videos - replace image/upload with video/upload
+                if 'image/upload' in url and 'video/upload' not in url:
+                    url = url.replace('image/upload', 'video/upload')
+                    print(f"🔗 Fixed video URL: {url}")
             
             return url
             

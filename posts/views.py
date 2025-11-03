@@ -90,21 +90,30 @@ class PostCreateView(LoginRequiredMixin, CreateView):
                 print(f"   Content type: {media_file.content_type}")
                 
                 try:
-                    # Создаем PostMedia с обработкой исключений
+                    # Check if it's a video and log specifically
+                    file_extension = media_file.name.lower().split('.')[-1]
+                    if file_extension in ['mp4', 'mov', 'avi']:
+                        print(f"🎬 Detected video file: {media_file.name}")
+                    
+                    # Create PostMedia with error handling
                     post_media = PostMedia.objects.create(post=post, media_file=media_file)
                     print(f"✅ PostMedia created successfully!")
-                    print(f"   Saved as: {post_media.media_file.name}")
+                    print(f"   Media type: {post_media.media_type}")
                     print(f"   URL: {post_media.media_file.url}")
-                    print(f"   Cloudinary URL: {post_media.get_cloudinary_url()}")
+                    
                 except Exception as e:
                     print(f"❌ ERROR creating PostMedia: {str(e)}")
-                    import traceback
-                    print(f"❌ TRACEBACK: {traceback.format_exc()}")
-                    # Продолжаем обработку остальных файлов
-                    continue
+                    # If it's a video upload error, try alternative approach
+                    if 'video' in media_file.content_type or media_file.name.lower().endswith(('.mp4', '.mov', '.avi')):
+                        print(f"🎬 Video upload failed, trying to save post without media...")
+                        # Continue without this media file
+                        continue
+                    else:
+                        import traceback
+                        print(f"❌ TRACEBACK: {traceback.format_exc()}")
         
         messages.success(self.request, 'Post created successfully!')
-        return redirect(self.success_url)   
+        return redirect(self.success_url)  
      
     def form_invalid(self, form):
         messages.error(self.request, 'Error creating post. Please check the form.')
