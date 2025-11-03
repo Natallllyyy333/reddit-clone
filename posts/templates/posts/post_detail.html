@@ -264,9 +264,17 @@
 </div>
 {% include 'posts/includes/share_modal.html' %} {% endblock %} 
 {% block extra_js %}
-<script src="{% static 'posts/js/video_handler.js' %}"></script>
-<script src="{% static 'js/share.js' %}"></script>
 <script src="{% static 'posts/js/media_carousel.js' %}"></script>
-<script src="{% static 'js/comments.js' %}"></script>
+<script src="{% static 'posts/js/media_carousel.js' %}"></script>
+<script src="{% static 'posts/js/video_handler.js' %}"></script>
 <script src="{% static 'js/cloudinary_media_handler.js' %}"></script>
+<script src="{% static 'js/share.js' %}"></script>
+
+<script>
+console.log('=== MEDIA DEBUG INFO ===');
+document.querySelectorAll('img, video').forEach(media => {
+    console.log('Media:', media.tagName, 'src:', media.src || media.currentSrc);
+    console.log('Visible:', media.offsetParent !== null, 'Display:', window.getComputedStyle(media).display);
+});
+</script>
 {% endblock %}
