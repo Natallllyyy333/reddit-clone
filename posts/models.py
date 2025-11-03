@@ -129,3 +129,20 @@ class PostMedia(models.Model):
     
     def __str__(self):
         return f"Media for {self.post.title}"
+    
+    @property
+    def media_url(self):
+        """Возвращает правильный URL для медиафайла"""
+        if hasattr(self.media_file, 'url'):
+            return self.media_file.url
+        return None
+    
+    def get_cloudinary_url(self):
+        """Генерирует Cloudinary URL если используется Cloudinary"""
+        if hasattr(settings, 'DEFAULT_FILE_STORAGE') and 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
+            try:
+                from cloudinary import CloudinaryImage
+                return CloudinaryImage(self.media_file.name).build_url()
+            except:
+                pass
+        return self.media_url
