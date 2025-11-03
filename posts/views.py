@@ -179,51 +179,43 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         return Post.objects.filter(author=self.request.user)
     
     def form_valid(self, form):
+        form.instance.author = self.request.user
+        post = form.save()
         
-        post_author = self.object.author.username
-        is_moderator = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
+        media_files = self.request.FILES.getlist('media_files')
+        print(f"🔄 Processing {len(media_files)} media files")
+
+        for media_file in media_files:
+            if media_file:
+                print(f"🔄 Creating PostMedia for: {media_file.name}")
+                
+                # Определяем тип файла
+                file_extension = media_file.name.lower().split('.')[-1]
+                
+                try:
+                    if file_extension in ['mp4', 'mov', 'avi']:
+                        # Это видео
+                        post_media = PostMedia.objects.create(
+                            post=post, 
+                            video_file=media_file,
+                            media_type='video'
+                        )
+                        print(f"✅ Video created: {post_media.video_file.url}")
+                    else:
+                        # Это изображение
+                        post_media = PostMedia.objects.create(
+                            post=post, 
+                            image_file=media_file,
+                            media_type='image'
+                        )
+                        print(f"✅ Image created: {post_media.image_file.url}")
+                        
+                except Exception as e:
+                    print(f"❌ ERROR: {str(e)}")
+                    continue
         
-        try:
-            # We use a transaction for safe deletion
-            with transaction.atomic():
-                # First, manually delete all related objects
-                print(f"Deleting related objects for post {self.object.id}")
-                
-                # 1. Deleting media files
-                media_count = PostMedia.objects.filter(post=self.object).count()
-                PostMedia.objects.filter(post=self.object).delete()
-                print(f"Deleted {media_count} media files")
-                
-                # 2. Deleting comments
-                comment_count = Comment.objects.filter(post=self.object).count()
-                Comment.objects.filter(post=self.object).delete()
-                print(f"Deleted {comment_count} comments")
-                
-                # 3. Deleting shares
-                share_count = Share.objects.filter(post=self.object).count()
-                Share.objects.filter(post=self.object).delete()
-                print(f"Deleted {share_count} shares")
-                
-                # 4. Clearing ManyToMany fields (upvotes and downvotes)
-                self.object.upvotes.clear()
-                self.object.downvotes.clear()
-                print("Cleared vote relationships")
-                
-                # 5. Now we delete the post itself
-                response = super().form_valid(form)
-                print("Post deleted successfully")
-            
-            if is_moderator:
-                messages.success(self.request, f'Post by {post_author} has been deleted by moderator.')
-            else:
-                messages.success(self.request, 'Post deleted successfully!')
-            
-            return response
-            
-        except Exception as e:
-            print(f"Error during post deletion: {str(e)}")
-            messages.error(self.request, f'Error deleting post: {str(e)}')
-            return redirect('post_detail', pk=self.object.pk)
+        messages.success(self.request, 'Post created successfully!')
+        return redirect(self.success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

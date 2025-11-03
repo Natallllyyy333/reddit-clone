@@ -83,19 +83,24 @@
                       style="display: block !important; visibility: visible !important;"
                     />
                     {% elif media.media_type == 'video' %}
-<div class="video-container position-relative bg-dark rounded" style="min-height: 300px;">
-    <video
-        class="w-100 h-100"
-        controls
-        preload="metadata"
-        style="max-height: 500px; object-fit: contain;"
-    >
-        <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-</div>
+                    <div class="video-container position-relative bg-dark rounded" style="min-height: 400px; display: block !important;">
+                        <video
+                            class="w-100 h-100"
+                            controls
+                            preload="metadata"
+                            style="max-height: 500px; object-fit: contain; display: block !important;"
+                        >
+                            <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
 
-              <!-- Carousel navigation buttons - OFF video-container -->
+              <!-- Carousel navigation buttons -->
               {% if post.media_files.count > 1 %}
               <button
                 class="carousel-btn prev"
@@ -123,9 +128,7 @@
           {% endif %}
 
           <!-- Post statistics -->
-          <div
-            class="card-footer d-flex justify-content-start align-items-center"
-          >
+          <div class="card-footer d-flex justify-content-start align-items-center">
             <form
               method="post"
               action="{% url 'vote_post' post.pk 'upvote' %}"

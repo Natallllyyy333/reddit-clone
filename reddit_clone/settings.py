@@ -149,9 +149,23 @@ cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
 api_key = os.environ.get('CLOUDINARY_API_KEY')
 api_secret = os.environ.get('CLOUDINARY_API_SECRET')
 
-if cloud_name and api_key and api_secret:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
-    print("✅ Cloudinary storage configured successfully")
-else:
-    print("❌ Cloudinary credentials missing")
+# if cloud_name and api_key and api_secret:
+#     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#     CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
+#     print("✅ Cloudinary storage configured successfully")
+# else:
+#     print("❌ Cloudinary credentials missing")
+
+
+try:
+    if cloud_name and api_key and api_secret:
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
+        print("✅ Cloudinary storage configured successfully")
+    else:
+        # Fallback to local storage for development
+        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+        print("⚠️ Cloudinary credentials missing, using local storage")
+except Exception as e:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    print(f"⚠️ Cloudinary configuration error: {e}, using local storage")

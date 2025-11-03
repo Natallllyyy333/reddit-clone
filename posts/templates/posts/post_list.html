@@ -8,7 +8,7 @@
     <style>
         /* Force media visibility */
         .post-media-container,
-        .media-carousel, 
+        .media-carousel,
         .media-image,
         .media-video,
         .video-container,
@@ -55,22 +55,22 @@
                     </a>
                 </h5>
                 {% if user.is_authenticated %}
-    {% if user == post.author or user.is_staff or user.is_superuser %}
-    <div class="admin-actions mt-2">
-        <small>
-            <a href="{% url 'post_edit' post.pk %}" class="text-decoration-none">✏️</a>
-            <a href="{% url 'post_delete' post.pk %}" class="text-decoration-none text-danger ms-2">🗑️</a>
-            
-            {% if user.is_staff and user != post.author %}
-            <span class="badge bg-warning ms-2">Mod</span>
-            {% endif %}
-            {% if user.is_superuser and user != post.author %}
-            <span class="badge bg-danger ms-2">Admin</span>
-            {% endif %}
-        </small>
-    </div>
-    {% endif %}
-{% endif %}
+                    {% if user == post.author or user.is_staff or user.is_superuser %}
+                    <div class="admin-actions mt-2">
+                        <small>
+                            <a href="{% url 'post_edit' post.pk %}" class="text-decoration-none">✏️</a>
+                            <a href="{% url 'post_delete' post.pk %}" class="text-decoration-none text-danger ms-2">🗑️</a>
+                            
+                            {% if user.is_staff and user != post.author %}
+                            <span class="badge bg-warning ms-2">Mod</span>
+                            {% endif %}
+                            {% if user.is_superuser and user != post.author %}
+                            <span class="badge bg-danger ms-2">Admin</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
 
@@ -81,53 +81,58 @@
                     <p class="card-text">{{ post.content|truncatewords:50 }}</p>
                 </div>
 
-<!-- Media_carousel -->
-{% if post.media_files.exists %}
-<!-- DEBUG: {{ post.media_files.count }} media files for post {{ post.pk }} -->
-<div class="post-media-container mb-3">
-    <div class="media-carousel">
-        <div class="media-scroll-wrapper">
-            <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
-                {% for media in post.media_files.all %}
-                <!-- DEBUG: Media {{ forloop.counter }} - {{ media.media_type }} - {{ media.get_cloudinary_url }} -->
-                <div class="media-item">
-                    {% if media.media_type == 'image' %}
-                    <img src="{{ media.get_cloudinary_url }}" 
-                         alt="Post media {{ forloop.counter }}" 
-                         class="img-fluid rounded media-image"
-                         style="display: block !important; visibility: visible !important;">
-                    {% elif media.media_type == 'video' %}
-<div class="video-container position-relative bg-dark rounded" style="min-height: 300px;">
-    <video
-        class="w-100 h-100"
-        controls
-        preload="metadata"
-        style="max-height: 500px; object-fit: contain;"
-    >
-        <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-</div>
-        
-        {% if post.media_files.count > 1 %}
-        <div class="carousel-controls">
-            <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-        {% endif %}
-    </div>
-    
-    {% if post.media_files.count > 1 %}
-    <div class="media-counter">
-        <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
-    </div>
-    {% endif %}
-</div>
-{% endif %}
+                <!-- Media_carousel -->
+                {% if post.media_files.exists %}
+                <!-- DEBUG: {{ post.media_files.count }} media files for post {{ post.pk }} -->
+                <div class="post-media-container mb-3">
+                    <div class="media-carousel">
+                        <div class="media-scroll-wrapper">
+                            <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
+                                {% for media in post.media_files.all %}
+                                <!-- DEBUG: Media {{ forloop.counter }} - {{ media.media_type }} - {{ media.get_cloudinary_url }} -->
+                                <div class="media-item">
+                                    {% if media.media_type == 'image' %}
+                                    <img src="{{ media.get_cloudinary_url }}" 
+                                         alt="Post media {{ forloop.counter }}" 
+                                         class="img-fluid rounded media-image"
+                                         style="display: block !important; visibility: visible !important;">
+                                    {% elif media.media_type == 'video' %}
+                                    <div class="video-container position-relative bg-dark rounded" style="min-height: 300px; display: block !important;">
+                                        <video
+                                            class="w-100 h-100"
+                                            controls
+                                            preload="metadata"
+                                            style="max-height: 500px; object-fit: contain; display: block !important;"
+                                        >
+                                            <source src="{{ media.get_cloudinary_url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        {% if post.media_files.count > 1 %}
+                        <div class="carousel-controls">
+                            <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-btn next" onclick="scrollMedia('{{ post.pk }}', 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if post.media_files.count > 1 %}
+                    <div class="media-counter">
+                        <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <!-- Post actions -->
