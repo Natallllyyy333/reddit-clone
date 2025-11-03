@@ -139,6 +139,8 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
     'SECURE': True,
     'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'my-manifest-directory'),
+     'resource_type': 'auto', 
+    'type': 'upload',
     'INVALID_VIDEO_ERROR_MESSAGE': 'This file is not a valid video',
 }
 
