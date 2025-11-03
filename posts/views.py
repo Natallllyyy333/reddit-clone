@@ -126,55 +126,39 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         messages.error(self.request, 'Error creating post. Please check the form.')
         return super().form_invalid(form)
 
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(UpdateView):
     model = Post
-    form_class = PostForm
-    template_name = 'posts/post_edit.html'
-    
-    def get_queryset(self):
-        if self.request.user.is_staff or self.request.user.is_superuser:
-            return Post.objects.all()
-        return Post.objects.filter(author=self.request.user)
+    template_name = 'posts/edit_post.html'
+    fields = ['title', 'content', 'community']
 
-
-    def get_success_url(self):
-        return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Adding existing media files to the context
-        # context['existing_media'] = self.object.media_files.all()
-        context['is_moderator_action'] = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
-        return context
-    
     def form_valid(self, form):
-        post = form.save()
-        # Processing media file deletion
-        delete_media_ids = self.request.POST.getlist('delete_media')
-        if delete_media_ids:
-            PostMedia.objects.filter(id__in=delete_media_ids, post=post).delete()
+        print(f"🔄 form_valid called for post")
         
-        # Adding new media files
+        # Убедимся, что объект существует
+        if not hasattr(self, 'object') or self.object is None:
+            print("❌ self.object is None, getting object...")
+            self.object = self.get_object()
+        
+        print(f"🔄 Updating post {self.object.id}")
+        
+        # Сохраняем форму
+        response = super().form_valid(form)
+        
+        # Обрабатываем медиафайлы после сохранения поста
         media_files = self.request.FILES.getlist('media_files')
-        for media_file in media_files:
-            if media_file:
-                PostMedia.objects.create(post=post, media_file=media_file)
+        if media_files:
+            print(f"🔄 Processing {len(media_files)} media files after form save")
+            
+            for media_file in media_files:
+                try:
+                    from .models import PostMedia
+                    PostMedia.objects.create(post=self.object, media_file=media_file)
+                    print(f"✅ Added media: {media_file.name}")
+                except Exception as e:
+                    print(f"❌ Failed to add media: {e}")
         
-        messages.success(self.request, 'Post updated successfully!')
-        return redirect(self.get_success_url())
-    
-    def form_invalid(self, form):
-        messages.error(self.request, 'Error updating post. Please check the form.')
-        return super().form_invalid(form)
-    
-    def dispatch(self, request, *args, **kwargs):
-        # Additional verification that the user is the author of the post
-        response = super().dispatch(request, *args, **kwargs)
-        if hasattr(self, 'object') and self.object:
-            if request.user != self.object.author and (request.user.is_staff or request.user.is_superuser):
-                messages.info(request, f'You are editing the post of user {self.object.author.username} as a moderator')
+        messages.success(self.request, "Post updated successfully!")
         return response
-
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'posts/post_delete.html'
