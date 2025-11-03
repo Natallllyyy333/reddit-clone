@@ -57,59 +57,39 @@
                     <p class="card-text">{{ post.content|truncatewords:50 }}</p>
                 </div>
 
-<!-- Media_carousel  -->
-{% if post.media_file or post.media_files.exists %}
+<!-- Media_carousel -->
+{% if post.media_files.exists %}
 <div class="post-media-container mb-3">
     <div class="media-carousel">
         <div class="media-scroll-wrapper">
             <div class="media-scroll" id="mediaScroll-{{ post.pk }}">
-                {# Check old posts with media_file #}
-                {% if post.media_file %}
-                <div class="media-item">
-                    {% if post.media_type == 'image' %}
-                    <img src="{{ post.media_file.url }}" 
-                         alt="{{ post.title }}" 
-                         class="img-fluid rounded media-image"
-                         onerror="this.style.display='none'">
-                    {% elif post.media_type == 'video' %}
-                    <div class="video-container position-relative">
-                        <video
-                            class="img-fluid rounded media-video"
-                            preload="metadata"
-                            playsinline
-                            webkit-playsinline
-                        >
-                            <source src="{{ post.media_file.url }}" type="video/mp4"/>
-                            Your browser does not support video.
-                        </video>
-                        <div class="video-play-button" onclick="handleVideoPlay(this)">
-                            <i class="fas fa-play-circle"></i>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-                
-                {# Checking new posts with media_files #}
                 {% for media in post.media_files.all %}
                 <div class="media-item">
                     {% if media.media_type == 'image' %}
                     <img src="{{ media.media_file.url }}" 
                          alt="Post media {{ forloop.counter }}" 
-                         class="img-fluid rounded media-image"
-                         onerror="this.style.display='none'">
+                         class="img-fluid rounded media-image">
                     {% elif media.media_type == 'video' %}
                     <div class="video-container position-relative">
+                        <!-- Video element -->
                         <video
                             class="img-fluid rounded media-video"
                             preload="metadata"
                             playsinline
                             webkit-playsinline
                         >
-                            <source src="{{ media.media_file.url }}" type="video/mp4"/>
+                            <source
+                                src="{{ media.media_file.url }}"
+                                type="video/mp4"
+                            />
                             Your browser does not support video.
                         </video>
-                        <div class="video-play-button" onclick="handleVideoPlay(this)">
+
+                        <!-- Play button -->
+                        <div
+                            class="video-play-button"
+                            onclick="handleVideoPlay(this)"
+                        >
                             <i class="fas fa-play-circle"></i>
                         </div>
                     </div>
@@ -119,7 +99,7 @@
             </div>
         </div>
         
-        {% if post.media_files.count > 1 or post.media_file and post.media_files.count > 0 %}
+        {% if post.media_files.count > 1 %}
         <div class="carousel-controls">
             <button class="carousel-btn prev" onclick="scrollMedia('{{ post.pk }}', -1)">
                 <i class="fas fa-chevron-left"></i>
@@ -131,15 +111,9 @@
         {% endif %}
     </div>
     
-    {% if post.media_files.count > 1 or post.media_file and post.media_files.count > 0 %}
+    {% if post.media_files.count > 1 %}
     <div class="media-counter">
-        <span class="current">1</span>/<span class="total">
-            {% if post.media_file %}
-                {{ post.media_files.count|add:1 }}
-            {% else %}
-                {{ post.media_files.count }}
-            {% endif %}
-        </span>
+        <span class="current">1</span>/<span class="total">{{ post.media_files.count }}</span>
     </div>
     {% endif %}
 </div>
@@ -148,7 +122,7 @@
 
             <!-- Post actions -->
             <div class="card-footer d-flex justify-content-start align-items-center">
-                <!-- Upvote form -->
+                <!-- Upvote form - CLASS ADDED vote-form -->
                 <form method="post" action="{% url 'vote_post' post.pk 'upvote' %}" class="d-inline vote-form">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-success vote-btn me-1 px-3" 
@@ -162,7 +136,7 @@
                     <strong>{{ post.total_votes }}</strong>
                 </span>
 
-                <!-- Downvote форма -->
+                <!-- Downvote форма - CLASS ADDED vote-form -->
                 <form method="post" action="{% url 'vote_post' post.pk 'downvote' %}" class="d-inline vote-form">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger vote-btn ms-1 me-3 px-3" 
@@ -197,58 +171,5 @@
     <script src="{% static 'posts/js/media_carousel.js' %}"></script>
     <script src="{% static 'js/share.js' %}"></script>
     <script src="{% static 'posts/js/video_handler.js' %}"></script>
-    
-    {# Добавьте этот скрипт для обработки ошибок загрузки медиа #}
-    <script>
-    // Function for handling image load errors
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hide media containers if the media hasn't loaded
-        const mediaContainers = document.querySelectorAll('.post-media-container');
-        mediaContainers.forEach(container => {
-            const images = container.querySelectorAll('img');
-            const videos = container.querySelectorAll('video');
-            let hasVisibleMedia = false;
-            
-            images.forEach(img => {
-                img.onerror = function() {
-                    this.style.display = 'none';
-                };
-                if (img.complete && img.naturalHeight !== 0) {
-                    hasVisibleMedia = true;
-                }
-            });
-            
-            videos.forEach(video => {
-                video.onerror = function() {
-                    this.style.display = 'none';
-                    const playButton = this.parentElement.querySelector('.video-play-button');
-                    if (playButton) playButton.style.display = 'none';
-                };
-                // Checking video availability
-                fetch(video.querySelector('source').src)
-                    .then(response => {
-                        if (!response.ok) {
-                            video.style.display = 'none';
-                            const playButton = video.parentElement.querySelector('.video-play-button');
-                            if (playButton) playButton.style.display = 'none';
-                        } else {
-                            hasVisibleMedia = true;
-                        }
-                    })
-                    .catch(() => {
-                        video.style.display = 'none';
-                        const playButton = video.parentElement.querySelector('.video-play-button');
-                        if (playButton) playButton.style.display = 'none';
-                    });
-            });
-            
-            // If there is no visible media, hide the entire container
-            setTimeout(() => {
-                if (!hasVisibleMedia && images.length + videos.length > 0) {
-                    container.style.display = 'none';
-                }
-            }, 1000);
-        });
-    });
-    </script>
+    <script src="{% static 'js/cloudinary_media_handler.js' %}"></script>
 {% endblock %}
