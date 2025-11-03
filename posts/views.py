@@ -120,7 +120,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Adding existing media files to the context
-        # context['existing_media'] = self.object.media_files.all()
+        context['existing_media'] = self.object.media_files.all()
         context['is_moderator_action'] = self.request.user != self.object.author and (self.request.user.is_staff or self.request.user.is_superuser)
         return context
     
