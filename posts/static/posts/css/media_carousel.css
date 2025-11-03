@@ -109,7 +109,23 @@
     cursor: pointer;
     
 }
+.post-media-container,
+.media-carousel, 
+.media-image,
+.media-video,
+.video-container,
+.media-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
+/* Video container fixes */
+.video-container video {
+    display: block !important;
+    visibility: visible !important;
+    background: #000;
+}
 .video-play-button {
     position: absolute;
     top: 50%;

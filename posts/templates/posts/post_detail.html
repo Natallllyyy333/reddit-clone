@@ -57,11 +57,11 @@
         preload="metadata"
         playsinline
         webkit-playsinline
-        loop
         muted
+        style="width: 100%; height: auto; display: block;"
     >
         <source src="{{ media.get_cloudinary_url }}" type="video/mp4" />
-        Your browser does not support video.
+        Your browser does not support the video tag.
     </video>
     
     <div class="video-play-button" onclick="handleVideoPlay(this)">
