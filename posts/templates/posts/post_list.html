@@ -99,11 +99,10 @@
                              onerror="this.style.display='none'">
                         {% elif media.media_type == 'video' %}
                         <div class="video-container bg-dark rounded" style="min-height: 300px;">
-                            <video controls class="w-100 h-100" style="max-height: 500px; object-fit: contain;"
-                                   onerror="this.style.display='none'">
-                                <source src="{{ post.video.url }}" type="video/mp4">
-                                Your browser doesn't support HTML5 video.
-                            </video>
+                            <video width="100%" controls>
+    <source src="{{ media_url }}" type="video/mp4">
+    Ваш браузер не поддерживает видео тег.
+</video>
                         </div>
                         {% endif %}
                     </div>
