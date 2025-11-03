@@ -5,6 +5,9 @@ from django.core.validators import FileExtensionValidator
 from django.conf import settings
 from cloudinary_storage.storage import MediaCloudinaryStorage
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 class SmartCloudinaryStorage(MediaCloudinaryStorage):
     """Smart storage that auto-detects file type"""
