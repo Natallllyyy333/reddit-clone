@@ -28,7 +28,9 @@ else:
             "Current key is too short or uses the default insecure pattern."
         )
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# ALLOWED_HOSTS - include your Heroku app domain
+DEFAULT_HOSTS = ['localhost', '127.0.0.1', 'reddit-clone-d86456f48b72.herokuapp.com']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ','.join(DEFAULT_HOSTS)).split(',')
 
 # Security settings
 if not DEBUG:
@@ -69,7 +71,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ADDED - Must be after SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,7 +98,7 @@ TEMPLATES = [
     },
 ]
 
-# Database configuration - START WITH SQLITE
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -109,12 +111,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files configuration - FIXED FOR HEROKU
+# Static files configuration
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# WhiteNoise configuration for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -148,10 +148,10 @@ LOGGING = {
 }
 
 # Media files configuration - CLOUDINARY
-MEDIA_URL = '/media/'  # This will be overridden by Cloudinary in production
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Cloudinary configuration - MOVED OUTSIDE DEBUG CHECK
+# Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''), 
@@ -159,16 +159,33 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
 }
 
-# Use Cloudinary only if credentials are provided
-if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
-    os.environ.get('CLOUDINARY_API_KEY') and 
-    os.environ.get('CLOUDINARY_API_SECRET')):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    print("✅ Cloudinary storage configured successfully")
+# FORCE CLOUDINARY IN PRODUCTION EVEN IF CREDENTIALS ARE MISSING (for debugging)
+if not DEBUG:
+    # In production, always use Cloudinary if credentials exist
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+    api_key = os.environ.get('CLOUDINARY_API_KEY')
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+    
+    if cloud_name and api_key and api_secret:
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        print("✅ Production: Cloudinary storage configured successfully")
+    else:
+        # Fallback to local storage but warn
+        print("❌ WARNING: Cloudinary credentials missing in production!")
+        print("   This will cause media files to not persist between deployments")
+        # You might want to force Cloudinary anyway for testing:
+        # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
-    print("⚠️  Cloudinary credentials not found. Using local media storage.")
+    # Development: use Cloudinary if available, otherwise local
+    if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
+        os.environ.get('CLOUDINARY_API_KEY') and 
+        os.environ.get('CLOUDINARY_API_SECRET')):
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        print("✅ Development: Cloudinary storage configured")
+    else:
+        print("⚠️  Development: Using local media storage")
 
-# Heroku production settings - FIXED VERSION
+# Heroku production settings
 if not DEBUG:
     print("🚀 Production mode: All security settings are enabled")
     
@@ -177,24 +194,18 @@ if not DEBUG:
     if database_url:
         try:
             import dj_database_url
-            # Use parse() instead of config() for explicit parsing
             DATABASES = {
                 'default': dj_database_url.parse(database_url, conn_max_age=600)
             }
-            print(f"✅ Production: Using PostgreSQL database from DATABASE_URL")
+            print(f"✅ Production: Using PostgreSQL database")
         except ImportError:
             print("❌ ERROR: dj-database-url not installed but DATABASE_URL is set!")
         except Exception as e:
             print(f"❌ ERROR parsing DATABASE_URL: {e}")
-            # Keep SQLite as fallback
     else:
-        print("❌ WARNING: DATABASE_URL not found! Using SQLite in production (NOT RECOMMENDED)")
+        print("❌ WARNING: DATABASE_URL not found! Using SQLite in production")
 
-    # Additional production checks
-    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
-        raise ValueError("ALLOWED_HOSTS must be set in production environment!")
-
-# Internationalization for easy text changes
+# Internationalization
 LANGUAGES = [
     ('en', 'English'),
     ('ru', 'Russian'),
