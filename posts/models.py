@@ -140,35 +140,27 @@ class PostMedia(models.Model):
     def get_cloudinary_url(self):
         """Генерирует правильный HTTPS URL для Cloudinary"""
         try:
-            # Если файл существует и есть URL
             if self.media_file and hasattr(self.media_file, 'url'):
                 url = self.media_file.url
                 
-                # Если это уже Cloudinary URL
-                if 'res.cloudinary.com' in url:
-                    # Принудительно используем HTTPS
-                    if url.startswith('http://'):
-                        url = url.replace('http://', 'https://')
+                # Всегда используем HTTPS для Cloudinary
+                if 'cloudinary.com' in url:
+                    url = url.replace('http://', 'https://')
                     return url
                 
-                # Если это локальный путь, но мы в production с Cloudinary
-                if not settings.DEBUG and hasattr(settings, 'DEFAULT_FILE_STORAGE'):
-                    if 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
-                        try:
-                            from cloudinary import CloudinaryImage
-                            # Получаем public_id из пути файла
-                            public_id = f"media/{self.media_file.name}"
-                            # Генерируем URL с HTTPS
-                            cloudinary_url = CloudinaryImage(public_id).build_url(secure=True)
-                            print(f"🔒 Secure Cloudinary URL: {cloudinary_url}")
-                            return cloudinary_url
-                        except Exception as e:
-                            print(f"❌ Cloudinary conversion error: {e}")
+                # Для production с Cloudinary
+                if not settings.DEBUG:
+                    try:
+                        from cloudinary import CloudinaryImage
+                        public_id = f"media/{self.media_file.name}"
+                        # Принудительно HTTPS
+                        cloudinary_url = f"https://res.cloudinary.com/{settings.CLOUDINARY_STORAGE['CLOUD_NAME']}/image/upload/v1/{public_id}"
+                        print(f"🔒 FORCED HTTPS: {cloudinary_url}")
+                        return cloudinary_url
+                    except:
+                        pass
                 
-                # Возвращаем оригинальный URL
                 return url
-            
             return ""
         except Exception as e:
-            print(f"❌ Error generating Cloudinary URL: {e}")
-            return ""
+            return self.media_file.url if hasattr(self.media_file, 'url') else ""
