@@ -75,42 +75,35 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-        post = form.save(commit=False)
-        post.media_file = None
-        post.media_type = 'none'
-        post.save()
+        post = form.save()
         
         media_files = self.request.FILES.getlist('media_files')
         print(f"🔄 Processing {len(media_files)} media files")
 
-        for i, media_file in enumerate(media_files):
+        for media_file in media_files:
             if media_file:
-                print(f"🔄 Creating PostMedia {i+1} for: {media_file.name}")
-                print(f"   File size: {media_file.size}")
-                print(f"   Content type: {media_file.content_type}")
+                file_extension = media_file.name.lower().split('.')[-1]
+                print(f"🔄 Creating PostMedia for: {media_file.name} (type: {file_extension})")
                 
                 try:
-                    # Check if it's a video and log specifically
-                    file_extension = media_file.name.lower().split('.')[-1]
                     if file_extension in ['mp4', 'mov', 'avi']:
-                        print(f"🎬 Detected video file: {media_file.name}")
-                    
-                    # Create PostMedia with error handling
-                    post_media = PostMedia.objects.create(post=post, media_file=media_file)
-                    print(f"✅ PostMedia created successfully!")
-                    print(f"   Media type: {post_media.media_type}")
-                    print(f"   URL: {post_media.media_file.url}")
-                    
-                except Exception as e:
-                    print(f"❌ ERROR creating PostMedia: {str(e)}")
-                    # If it's a video upload error, try alternative approach
-                    if 'video' in media_file.content_type or media_file.name.lower().endswith(('.mp4', '.mov', '.avi')):
-                        print(f"🎬 Video upload failed, trying to save post without media...")
-                        # Continue without this media file
-                        continue
+                        # Create video media
+                        post_media = PostMedia.objects.create(
+                            post=post, 
+                            video_file=media_file
+                        )
+                        print(f"✅ Video created: {post_media.get_cloudinary_url()}")
                     else:
-                        import traceback
-                        print(f"❌ TRACEBACK: {traceback.format_exc()}")
+                        # Create image media
+                        post_media = PostMedia.objects.create(
+                            post=post, 
+                            image_file=media_file
+                        )
+                        print(f"✅ Image created: {post_media.get_cloudinary_url()}")
+                        
+                except Exception as e:
+                    print(f"❌ ERROR creating media: {str(e)}")
+                    continue
         
         messages.success(self.request, 'Post created successfully!')
         return redirect(self.success_url)  

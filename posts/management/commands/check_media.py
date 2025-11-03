@@ -11,17 +11,25 @@ class Command(BaseCommand):
         for media in media_files:
             self.stdout.write(f"\nMedia ID: {media.id}")
             self.stdout.write(f"Type: {media.media_type}")
-            self.stdout.write(f"File: {media.media_file}")
-            self.stdout.write(f"File exists: {bool(media.media_file)}")
             
-            if media.media_file:
-                self.stdout.write(f"File name: {media.media_file.name}")
-                self.stdout.write(f"Has URL attr: {hasattr(media.media_file, 'url')}")
-                
-                if hasattr(media.media_file, 'url'):
-                    url = media.media_file.url
-                    self.stdout.write(f"URL: {url}")
-                    self.stdout.write(f"URL is None: {url is None}")
+            if media.media_type == 'image':
+                self.stdout.write(f"Image File: {media.image_file}")
+                if media.image_file:
+                    self.stdout.write(f"Image File name: {media.image_file.name}")
+                    self.stdout.write(f"Has URL attr: {hasattr(media.image_file, 'url')}")
+                    if hasattr(media.image_file, 'url'):
+                        url = media.image_file.url
+                        self.stdout.write(f"URL: {url}")
+                        self.stdout.write(f"URL is None: {url is None}")
+            elif media.media_type == 'video':
+                self.stdout.write(f"Video File: {media.video_file}")
+                if media.video_file:
+                    self.stdout.write(f"Video File name: {media.video_file.name}")
+                    self.stdout.write(f"Has URL attr: {hasattr(media.video_file, 'url')}")
+                    if hasattr(media.video_file, 'url'):
+                        url = media.video_file.url
+                        self.stdout.write(f"URL: {url}")
+                        self.stdout.write(f"URL is None: {url is None}")
             
             cloudinary_url = media.get_cloudinary_url()
             self.stdout.write(f"Cloudinary URL: {cloudinary_url}")

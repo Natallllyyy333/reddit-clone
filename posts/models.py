@@ -78,10 +78,11 @@ class Share(models.Model):
     def __str__(self):
         return f"Share of {self.post.title} by {self.user.username}"
 
+
 class PostMedia(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='media_files')
     
-    # РАЗДЕЛИТЕЛЬНЫЕ ПОЛЯ для изображений и видео
+    # Separate fields for images and videos
     image_file = models.ImageField(
         upload_to='post_media/images/%Y/%m/%d/',
         blank=True,
@@ -94,7 +95,7 @@ class PostMedia(models.Model):
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi'])],
-        storage=VideoCloudinaryStorage()  # Специальный storage для видео
+        storage=VideoCloudinaryStorage()
     )
     
     media_type = models.CharField(
@@ -105,7 +106,7 @@ class PostMedia(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        # Определяем тип медиа
+        # Automatically set media_type based on which field is used
         if self.video_file:
             self.media_type = 'video'
         elif self.image_file:
@@ -130,24 +131,30 @@ class PostMedia(models.Model):
     def get_cloudinary_url(self):
         """Returns correct URL for media file"""
         try:
-            # Check if media_file exists and has url attribute
-            if not self.media_file:
-                print(f"❌ No media file for {self}")
+            # Determine which file field to use based on media_type
+            file_field = None
+            if self.media_type == 'image' and self.image_file:
+                file_field = self.image_file
+            elif self.media_type == 'video' and self.video_file:
+                file_field = self.video_file
+            
+            if not file_field:
+                print(f"❌ No file found for {self.media_type} media {self.id}")
                 return ""
                 
-            if not hasattr(self.media_file, 'url'):
-                print(f"❌ Media file has no url attribute: {self.media_file}")
+            if not hasattr(file_field, 'url'):
+                print(f"❌ File has no url attribute: {file_field}")
                 return ""
                 
-            # Get the URL from media_file
-            url = self.media_file.url
+            # Get the URL from file field
+            url = file_field.url
             
             # If URL is None, return empty string
             if url is None:
-                print(f"❌ Media file URL is None for {self}")
+                print(f"❌ File URL is None for {self}")
                 return ""
                 
-            print(f"🔗 Media URL for {self.media_type}: {url}")
+            print(f"🔗 {self.media_type.capitalize()} URL: {url}")
             
             # Ensure HTTPS for Cloudinary URLs
             if 'res.cloudinary.com' in url and url.startswith('http://'):
