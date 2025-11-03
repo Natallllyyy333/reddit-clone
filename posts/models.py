@@ -138,30 +138,34 @@ class PostMedia(models.Model):
         return None
     
     def get_cloudinary_url(self):
-        """Generates a right URL for Cloudinary"""
+        """Генерирует правильный HTTPS URL для Cloudinary"""
         try:
-            # If a file and URL exist
+            # Если файл существует и есть URL
             if self.media_file and hasattr(self.media_file, 'url'):
                 url = self.media_file.url
                 
-                # If Cloudinary URL
+                # Если это уже Cloudinary URL
                 if 'res.cloudinary.com' in url:
+                    # Принудительно используем HTTPS
+                    if url.startswith('http://'):
+                        url = url.replace('http://', 'https://')
                     return url
                 
-                # If local address,  production with Cloudinary
+                # Если это локальный путь, но мы в production с Cloudinary
                 if not settings.DEBUG and hasattr(settings, 'DEFAULT_FILE_STORAGE'):
                     if 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
                         try:
                             from cloudinary import CloudinaryImage
-                            # Getting public_id from local file path
+                            # Получаем public_id из пути файла
                             public_id = f"media/{self.media_file.name}"
-                            cloudinary_url = CloudinaryImage(public_id).build_url()
-                            print(f"🔄 Converted {url} to {cloudinary_url}")
+                            # Генерируем URL с HTTPS
+                            cloudinary_url = CloudinaryImage(public_id).build_url(secure=True)
+                            print(f"🔒 Secure Cloudinary URL: {cloudinary_url}")
                             return cloudinary_url
                         except Exception as e:
                             print(f"❌ Cloudinary conversion error: {e}")
                 
-                # Getting original URL
+                # Возвращаем оригинальный URL
                 return url
             
             return ""
