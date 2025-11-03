@@ -21,7 +21,9 @@ class SmartCloudinaryStorage(MediaCloudinaryStorage):
 class VideoCloudinaryStorage(MediaCloudinaryStorage):
     """Storage specifically for videos"""
     def get_resource_type(self, name):
-        return 'video'
+        ext = os.path.splitext(name)[1].lower()
+        if ext in ['.mp4', '.mov', '.avi', '.webm']:
+            return 'video'
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
