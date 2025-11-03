@@ -110,7 +110,7 @@ class PostMedia(models.Model):
         validators=[FileExtensionValidator(
             allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi']
         )],
-        storage=MediaCloudinaryStorage() if not settings.DEBUG else None
+        storage=MediaCloudinaryStorage() 
     )
     media_type = models.CharField(
         max_length=10,

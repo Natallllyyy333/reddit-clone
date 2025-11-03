@@ -81,17 +81,31 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         post.save()
         
         media_files = self.request.FILES.getlist('media_files')
-        print(f"🔄 Processing {len(media_files)} media files")  # Логирование
-        
-        for media_file in media_files:
+        print(f"🔄 Processing {len(media_files)} media files")
+
+        for i, media_file in enumerate(media_files):
             if media_file:
-                print(f"🔄 Creating PostMedia for: {media_file.name}")  # Логирование
-                post_media = PostMedia.objects.create(post=post, media_file=media_file)
-                print(f"✅ PostMedia created. URL: {post_media.media_file.url}")  # Логирование
+                print(f"🔄 Creating PostMedia {i+1} for: {media_file.name}")
+                print(f"   File size: {media_file.size}")
+                print(f"   Content type: {media_file.content_type}")
+                
+                try:
+                    # Создаем PostMedia с обработкой исключений
+                    post_media = PostMedia.objects.create(post=post, media_file=media_file)
+                    print(f"✅ PostMedia created successfully!")
+                    print(f"   Saved as: {post_media.media_file.name}")
+                    print(f"   URL: {post_media.media_file.url}")
+                    print(f"   Cloudinary URL: {post_media.get_cloudinary_url()}")
+                except Exception as e:
+                    print(f"❌ ERROR creating PostMedia: {str(e)}")
+                    import traceback
+                    print(f"❌ TRACEBACK: {traceback.format_exc()}")
+                    # Продолжаем обработку остальных файлов
+                    continue
         
         messages.success(self.request, 'Post created successfully!')
-        return redirect(self.success_url)
-    
+        return redirect(self.success_url)   
+     
     def form_invalid(self, form):
         messages.error(self.request, 'Error creating post. Please check the form.')
         return super().form_invalid(form)
