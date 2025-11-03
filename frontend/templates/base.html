@@ -154,73 +154,7 @@
         console.log(`✅ Made ${mediaElements.length} media elements visible`);
     });
     </script>
-    <script>
-// Enhanced media handler for user-uploaded content
-function handleVideoPlay(button) {
-    console.log('🎯 Play button clicked');
-    const container = button.closest('.video-container');
-    const video = container.querySelector('video');
     
-    if (!video) {
-        console.error('❌ Video element not found');
-        return;
-    }
-    
-    console.log('📹 Video URL:', video.querySelector('source').src);
-    
-    // Hide play button
-    button.style.display = 'none';
-    
-    // Add controls and try to play
-    video.setAttribute('controls', 'true');
-    
-    const playPromise = video.play();
-    
-    if (playPromise !== undefined) {
-        playPromise.then(() => {
-            console.log('✅ Video playing successfully');
-        }).catch(error => {
-            console.error('❌ Error playing video:', error);
-            button.style.display = 'flex';
-            video.removeAttribute('controls');
-        });
-    }
-}
-
-// Ensure all media is visible and handle errors gracefully
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 Initializing media visibility...');
-    
-    // Make all media containers visible
-    document.querySelectorAll('.post-media-container').forEach(container => {
-        container.style.display = 'block';
-        container.style.visibility = 'visible';
-    });
-    
-    // Handle image loading errors
-    document.querySelectorAll('.media-image').forEach(img => {
-        img.onerror = function() {
-            console.error('❌ Failed to load image:', this.src);
-            // Don't hide - show error placeholder
-            this.style.border = '2px solid red';
-            this.alt = 'Failed to load image';
-        };
-    });
-    
-    // Handle video loading errors  
-    document.querySelectorAll('.media-video').forEach(video => {
-        video.onerror = function() {
-            console.error('❌ Failed to load video:', this.src);
-            const container = this.closest('.video-container');
-            const playButton = container.querySelector('.video-play-button');
-            if (playButton) {
-                playButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                playButton.style.backgroundColor = 'red';
-            }
-        };
-    });
-});
-</script>
     {% block extra_js %}{% endblock %}
     
 </body>
