@@ -147,7 +147,7 @@ CLOUDINARY_STORAGE = {
         {'width': 160, 'height': 100, 'crop': 'crop', 'gravity': 'south', 'audio_codec': 'none'} ],
     'INVALID_VIDEO_ERROR_MESSAGE': 'This file is not a valid video',
 }
-
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # ВСЕГДА используем Cloudinary в production, даже если DEBUG=True
 cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
 api_key = os.environ.get('CLOUDINARY_API_KEY')
