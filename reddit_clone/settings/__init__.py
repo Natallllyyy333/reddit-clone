@@ -1,2 +1,2 @@
 from .base import *
-from ...simple import *
+from ...settings import *

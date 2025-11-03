@@ -3,7 +3,7 @@ from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 import dj_database_url
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Debug mode - through environment variables
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
@@ -12,31 +12,22 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 if DEBUG:
-    # In development, we use a random key if one is not set
     if not SECRET_KEY:
         SECRET_KEY = get_random_secret_key()
         print("⚠️  WARNING: Using random SECRET_KEY for development")
 else:
-    # In production, the key is REQUIRED
     if not SECRET_KEY:
-        raise ValueError(
-            "SECRET_KEY must be set in production environment! "
-            "Set SECRET_KEY environment variable."
-        )
+        raise ValueError("SECRET_KEY must be set in production environment!")
     if len(SECRET_KEY) < 50 or SECRET_KEY.startswith('django-insecure-'):
-        raise ValueError(
-            "Please set a long, random SECRET_KEY environment variable for production. "
-            "Current key is too short or uses the default insecure pattern."
-        )
+        raise ValueError("Please set a long, random SECRET_KEY for production")
 
-# ALLOWED_HOSTS - include your Heroku app domain
+# ALLOWED_HOSTS
 DEFAULT_HOSTS = ['localhost', '127.0.0.1', 'reddit-clone-d86456f48b72.herokuapp.com', '.herokuapp.com']
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ','.join(DEFAULT_HOSTS)).split(',')
 
 # Security settings
 if not DEBUG:
-    # Production security
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
@@ -45,7 +36,6 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
 else:
-    # Development security (relaxed)
     SECURE_HSTS_SECONDS = 0
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
@@ -107,7 +97,6 @@ DATABASES = {
     }
 }
 
-# Heroku database configuration
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
@@ -122,14 +111,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# WhiteNoise settings for better performance
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -137,24 +119,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
 
 # Media files configuration - CLOUDINARY
 MEDIA_URL = '/media/'
@@ -170,7 +134,6 @@ CLOUDINARY_STORAGE = {
 
 # FORCE CLOUDINARY IN PRODUCTION
 if not DEBUG:
-    # In production, ALWAYS use Cloudinary to avoid media loss
     cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
     api_key = os.environ.get('CLOUDINARY_API_KEY')
     api_secret = os.environ.get('CLOUDINARY_API_SECRET')
@@ -178,27 +141,8 @@ if not DEBUG:
     if cloud_name and api_key and api_secret:
         DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
         print("✅ Production: Cloudinary storage configured successfully")
-        
-        # Also force Cloudinary for existing media references
         CLOUDINARY_FORCE_MEDIA_OVERWRITE = True
     else:
         print("❌ CRITICAL: Cloudinary credentials missing in production!")
-        print("   User-uploaded media will be lost between deployments!")
-        
-else:
-    # Development: use local storage for testing
-    print("⚠️  Development: Using local media storage for testing")
-# Internationalization
-LANGUAGES = [
-    ('en', 'English'),
-    ('ru', 'Russian'),
-]
-
-LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
-]
-
-# Adding LocaleMiddleware to support translation
-MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')
 
 print(f"✅ Settings loaded: DEBUG={DEBUG}, ALLOWED_HOSTS={ALLOWED_HOSTS}")
