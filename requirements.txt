@@ -20,3 +20,12 @@ sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.5.0
 whitenoise==6.11.0
+
+# ADD THESE FOR BETTER HEROKU COMPATIBILITY:
+brotli==1.1.0
+brotlicffi==1.1.0.0
+cffi==1.17.1
+pycparser==2.22
+
+# OPTIONAL BUT RECOMMENDED FOR PERFORMANCE:
+defusedxml==0.7.1

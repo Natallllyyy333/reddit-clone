@@ -5,7 +5,7 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Debug mode - through environment variables
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # SECRET KEY 
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ADDED - Must be after SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,9 +109,13 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files configuration - FIXED FOR HEROKU
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise configuration for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -142,23 +147,32 @@ LOGGING = {
     },
 }
 
-MEDIA_URL = '/media/'
+# Media files configuration - CLOUDINARY
+MEDIA_URL = '/media/'  # This will be overridden by Cloudinary in production
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary configuration - MOVED OUTSIDE DEBUG CHECK
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''), 
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+    'SECURE': True,
+}
+
+# Use Cloudinary only if credentials are provided
+if (os.environ.get('CLOUDINARY_CLOUD_NAME') and 
+    os.environ.get('CLOUDINARY_API_KEY') and 
+    os.environ.get('CLOUDINARY_API_SECRET')):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    print("✅ Cloudinary storage configured successfully")
+else:
+    print("⚠️  Cloudinary credentials not found. Using local media storage.")
 
 # Heroku production settings - FIXED VERSION
 if not DEBUG:
-    # Static files for Heroku
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    print("🚀 Production mode: All security settings are enabled")
     
-    # WhiteNoise for static files
-    try:
-        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-        print("✅ Production: WhiteNoise configured for static files")
-    except ImportError:
-        print("❌ WARNING: whitenoise not installed. Static files may not work properly in production!")
-    
-    # HONEST database configuration - FIXED
+    # Database configuration for Heroku
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
         try:
@@ -176,6 +190,10 @@ if not DEBUG:
     else:
         print("❌ WARNING: DATABASE_URL not found! Using SQLite in production (NOT RECOMMENDED)")
 
+    # Additional production checks
+    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
+        raise ValueError("ALLOWED_HOSTS must be set in production environment!")
+
 # Internationalization for easy text changes
 LANGUAGES = [
     ('en', 'English'),
@@ -188,21 +206,3 @@ LOCALE_PATHS = [
 
 # Adding LocaleMiddleware to support translation
 MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')
-
-# Production checks
-if not DEBUG:
-    # Additional production checks
-    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
-        raise ValueError("ALLOWED_HOSTS must be set in production environment!")
-    
-    print("🚀 Production mode: All security settings are enabled")
-
-    # Cloudinary configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'), 
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-    'SECURE': True,
-}
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
