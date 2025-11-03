@@ -1,0 +1,2 @@
+python manage.py collectstatic --noinput
+find staticfiles -name "*.css" | head -5

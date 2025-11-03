@@ -113,6 +113,14 @@ STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_USE_FINDERS = True
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication

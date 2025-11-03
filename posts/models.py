@@ -138,11 +138,21 @@ class PostMedia(models.Model):
         return None
     
     def get_cloudinary_url(self):
-        """Генерирует Cloudinary URL если используется Cloudinary"""
-        if hasattr(settings, 'DEFAULT_FILE_STORAGE') and 'cloudinary' in settings.DEFAULT_FILE_STORAGE:
-            try:
-                from cloudinary import CloudinaryImage
-                return CloudinaryImage(self.media_file.name).build_url()
-            except:
-                pass
-        return self.media_url
+        
+        try:
+            # Если используется Cloudinary storage
+            if hasattr(self.media_file, 'url'):
+                url = self.media_file.url
+                # Если это Cloudinary URL, он будет содержать cloudinary.com
+                if 'cloudinary.com' in url:
+                    return url
+                # Иначе это локальный путь - преобразуем для production
+                elif not settings.DEBUG and url.startswith('/media/'):
+                    # В production используем Cloudinary даже для старых файлов
+                    from cloudinary import CloudinaryImage
+                    cloudinary_url = CloudinaryImage(self.media_file.name).build_url()
+                    return cloudinary_url
+            return self.media_file.url
+        except Exception as e:
+            print(f"Error generating Cloudinary URL: {e}")
+            return self.media_file.url if hasattr(self.media_file, 'url') else ''
